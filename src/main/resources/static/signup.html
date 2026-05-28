@@ -414,8 +414,8 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         }).then(r => r.json()).then(d => {
-            if (d.userId) {
-                alert('Account created! Your User ID is ' + d.userId + '. Please log in.');
+            if (d.message && !d.error) {
+                alert('Account created successfully!');
                 window.location.href = 'login.html';
             } else {
                 alert(d.error || 'Something went wrong. Please try again.');

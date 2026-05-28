@@ -81,6 +81,25 @@ public class UserDao {
         return user;
     }
 
+    public void updatePassword(Long userId, String newPasswordHash) {
+        String sql = "UPDATE users SET password_hash = ? WHERE user_id = ?";
+        jdbc.update(sql, newPasswordHash, userId);
+    }
+
+    public Optional<User> findByStudentId(String studentId) {
+        String sql = "SELECT * FROM users WHERE student_id = ?";
+        List<User> results = jdbc.query(sql, new UserRowMapper(), studentId);
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return findByStudentEmail(email);
+    }
+
+    public boolean existsByEmail(String email) {
+        return existsByStudentEmail(email);
+    }
+
     private static class UserRowMapper implements RowMapper<User> {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {

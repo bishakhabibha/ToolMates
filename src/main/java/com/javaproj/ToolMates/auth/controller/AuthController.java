@@ -1,8 +1,13 @@
 package com.javaproj.ToolMates.auth.controller;
 
+import com.javaproj.ToolMates.auth.dto.ForgotPasswordRequest;
+import com.javaproj.ToolMates.auth.dto.LoginRequest;
+import com.javaproj.ToolMates.auth.dto.ResetPasswordRequest;
 import com.javaproj.ToolMates.auth.dto.SignupRequest;
 import com.javaproj.ToolMates.auth.exception.DuplicateFieldException;
 import com.javaproj.ToolMates.auth.exception.EmailNotVerifiedException;
+import com.javaproj.ToolMates.auth.exception.InvalidCredentialsException;
+import com.javaproj.ToolMates.auth.exception.UserNotFoundException;
 import com.javaproj.ToolMates.auth.model.User;
 import com.javaproj.ToolMates.auth.service.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -22,6 +27,8 @@ public class AuthController {
     private static final String SESSION_VERIFIED_EMAIL = "verifiedEmail";
 
     @Autowired private AuthService authService;
+
+    // ── Existing: Signup ─────────────────────────────────────────────────
 
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
@@ -58,10 +65,9 @@ public class AuthController {
             User saved = authService.register(req, emailVerified);
             session.invalidate();
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-                    "userId",    saved.getUserId(),
                     "firstName", saved.getFirstName(),
                     "lastName",  saved.getLastName(),
-                    "message",   "Account created! Your User ID is " + saved.getUserId() + "."
+                    "message",   "Account created successfully!"
             ));
         } catch (EmailNotVerifiedException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -69,6 +75,74 @@ public class AuthController {
         } catch (DuplicateFieldException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("field", ex.getField(), "error", ex.getMessage()));
+        }
+    }
+
+    // ── New: Login & Logout ───────────────────────────────────────────────
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req, HttpSession session) {
+        try {
+            User user = authService.login(req, session);
+            return ResponseEntity.ok(Map.of(
+                    "firstName", user.getFirstName(),
+                    "lastName",  user.getLastName(),
+                    "message",   "Login successful."
+            ));
+        } catch (InvalidCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        authService.logout(session);
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully."));
+    }
+
+    // ── New: Forgot / Reset Password ─────────────────────────────────────
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
+        try {
+            authService.sendPasswordResetOtp(req.getEmail().trim().toLowerCase());
+        } catch (UserNotFoundException ignored) {
+            // Don't reveal whether the email exists
+        }
+        return ResponseEntity.ok(Map.of(
+                "message", "If an account with that email exists, a reset code has been sent."
+        ));
+    }
+
+    @PostMapping("/verify-reset-otp")
+    public ResponseEntity<?> verifyResetOtp(@RequestBody Map<String, String> body, HttpSession session) {
+        String email = body.get("email");
+        String otp   = body.get("otp");
+
+        if (email == null || otp == null)
+            return ResponseEntity.badRequest().body(Map.of("error", "email and otp are required."));
+
+        boolean valid = authService.verifyPasswordResetOtp(email, otp);
+        if (!valid)
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body(Map.of("error", "Invalid or expired reset code. Please try again."));
+
+        session.setAttribute(AuthService.SESSION_RESET_VERIFIED_EMAIL, email.trim().toLowerCase());
+        return ResponseEntity.ok(Map.of("message", "OTP verified. You may now set a new password."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest req, HttpSession session) {
+        try {
+            authService.resetPassword(req.getEmail(), req.getNewPassword(), session);
+            return ResponseEntity.ok(Map.of("message", "Password updated successfully. Please log in."));
+        } catch (SecurityException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", ex.getMessage()));
+        } catch (UserNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", ex.getMessage()));
         }
     }
 }

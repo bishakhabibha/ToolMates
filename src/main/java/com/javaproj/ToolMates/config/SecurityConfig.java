@@ -25,7 +25,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/send-otp",
                                 "/api/auth/verify-otp",
-                                "/api/auth/signup"
+                                "/api/auth/signup",
+                                "/api/auth/login",
+                                "/api/auth/logout",
+                                "/api/auth/forgot-password",
+                                "/api/auth/verify-reset-otp",
+                                "/api/auth/reset-password"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );
