@@ -30,7 +30,8 @@ public class SecurityConfig {
                                 "/api/auth/logout",
                                 "/api/auth/forgot-password",
                                 "/api/auth/verify-reset-otp",
-                                "/api/auth/reset-password"
+                                "/api/auth/reset-password",
+                                "/api/tools/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );
