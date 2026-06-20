@@ -1,49 +1,21 @@
-package com.javaproj.ToolMates.auth.model;
+package com.javaproj.ToolMates.auth.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 import java.util.List;
 
-@Table("tools")
-public class Tool {
-
-    @Id
-    private Long id;
-
-    @Column("owner_name")
+public class ToolCreationRequest {
     private String ownerName;
-
-    @Column("owner_id")
     private String ownerId;
-
     private String name;
     private String category;
-
-    @Column("tool_condition")
     private String condition;
-
-    @Column("price_per_hr")
-    private Double pricePerHr;
-
-    @Column("max_renting_period")
-    private Integer maxRentingPeriod;
-
-    @Column("pickup_location")
+    private double pricePerHr;
+    private int maxRentingPeriod;
     private String pickupLocation;
-
+    private List<String> imageUrls; // Array to collect up to 3 base64 strings
     private String description;
-
-    @Column("additional_info")
     private String additionalInfo;
 
-    private List<String> imageUrls;
-
-    public Tool() {}
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
+    // Getters and Setters
     public String getOwnerName() { return ownerName; }
     public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
 
@@ -59,21 +31,21 @@ public class Tool {
     public String getCondition() { return condition; }
     public void setCondition(String condition) { this.condition = condition; }
 
-    public Double getPricePerHr() { return pricePerHr; }
-    public void setPricePerHr(Double pricePerHr) { this.pricePerHr = pricePerHr; }
+    public double getPricePerHr() { return pricePerHr; }
+    public void setPricePerHr(double pricePerHr) { this.pricePerHr = pricePerHr; }
 
-    public Integer getMaxRentingPeriod() { return maxRentingPeriod; }
-    public void setMaxRentingPeriod(Integer maxRentingPeriod) { this.maxRentingPeriod = maxRentingPeriod; }
+    public int getMaxRentingPeriod() { return maxRentingPeriod; }
+    public void setMaxRentingPeriod(int maxRentingPeriod) { this.maxRentingPeriod = maxRentingPeriod; }
 
     public String getPickupLocation() { return pickupLocation; }
     public void setPickupLocation(String pickupLocation) { this.pickupLocation = pickupLocation; }
+
+    public List<String> getImageUrls() { return imageUrls; }
+    public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
     public String getAdditionalInfo() { return additionalInfo; }
     public void setAdditionalInfo(String additionalInfo) { this.additionalInfo = additionalInfo; }
-
-    public List<String> getImageUrls() { return imageUrls; }
-    public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
 }

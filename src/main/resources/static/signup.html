@@ -15,25 +15,23 @@
             align-items: center;
             justify-content: center;
             padding: 40px 16px;
-            background: linear-gradient(135deg, #4db6ac 0%, #26a69a 25%, #00838f 60%, #006064 100%);
+            background-color: #e9eeed;
         }
 
         .card {
-            background: rgba(0,60,64,0.72);
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
-            border-radius: 24px;
+            background: #ffffff;
+            border-radius: 20px;
             padding: 0;
             width: 100%;
             max-width: 620px;
-            border: 1px solid rgba(0,188,212,0.28);
-            box-shadow: 0 32px 64px rgba(0,20,20,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+            border: 1px solid #dde6e5;
+            box-shadow: 0 4px 24px rgba(0,40,36,0.10);
             overflow: hidden;
         }
 
         .accent-bar {
             height: 4px;
-            background: linear-gradient(90deg, #00e5ff, #1de9b6, #00bcd4, #00e5ff);
+            background-color: #00564b;
         }
 
         .inner { padding: 42px 46px; }
@@ -43,50 +41,49 @@
         .logo {
             width: 48px; height: 48px;
             border-radius: 13px;
-            background: linear-gradient(135deg, #1de9b6, #00bcd4);
+            background-color: #d3e6e3;
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 4px 16px rgba(29,233,182,0.35);
         }
-        .logo svg { width: 25px; height: 25px; fill: #003d33; }
+        .logo svg { width: 25px; height: 25px; fill: #00564b; }
 
-        .brand-name { font-size: 24px; font-weight: 700; color: #e0f7fa; letter-spacing: -0.3px; }
+        .brand-name { font-size: 24px; font-weight: 700; color: #00564b; letter-spacing: -0.3px; }
 
         .brand-sub {
             text-align: center;
             font-size: 11.5px;
-            color: #4db6ac;
+            color: #6b7d7b;
             margin-bottom: 28px;
             margin-top: 4px;
             letter-spacing: 2.5px;
             text-transform: uppercase;
             font-weight: 500;
         }
-        .brand-sub span { color: #00e5ff; margin: 0 6px; font-size: 10px; vertical-align: middle; }
+        .brand-sub span { color: #00564b; margin: 0 6px; font-size: 10px; vertical-align: middle; }
 
         .sec {
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1.4px; color: #80cbc4;
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.4px; color: #6b7d7b;
             margin: 20px 0 11px;
             display: flex; align-items: center; gap: 7px;
         }
-        .sec i { font-size: 13px; color: #00e5ff; }
-        .sec::after { content: ''; flex: 1; height: 1px; background: rgba(0,188,212,0.22); }
+        .sec i { font-size: 13px; color: #00564b; }
+        .sec::after { content: ''; flex: 1; height: 1px; background-color: #e2e9e8; }
         .sec:first-of-type { margin-top: 0; }
 
         .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
 
         .field { display: flex; flex-direction: column; gap: 5px; }
 
-        .lbl { font-size: 12px; font-weight: 600; color: #b2dfdb; letter-spacing: 0.2px; }
-        .req { color: #00e5ff; margin-left: 2px; }
+        .lbl { font-size: 12px; font-weight: 600; color: #3e4f4d; letter-spacing: 0.2px; }
+        .req { color: #00564b; margin-left: 2px; }
 
         input, select {
             width: 100%;
-            background: rgba(0,50,55,0.5);
-            border: 1.5px solid rgba(0,188,212,0.3);
+            background-color: #eef2f1;
+            border: 1.5px solid #d6e0de;
             border-radius: 10px;
-            color: #cfeae7;
+            color: #1e2a28;
             font-family: 'Segoe UI', sans-serif;
             font-size: 13.5px;
             padding: 10px 13px;
@@ -95,32 +92,32 @@
             -webkit-appearance: none;
         }
         input:focus, select:focus {
-            border-color: rgba(0,229,255,0.65);
-            box-shadow: 0 0 0 3px rgba(0,229,255,0.1);
-            background: rgba(0,55,60,0.7);
+            border-color: #00564b;
+            box-shadow: 0 0 0 3px rgba(0,86,75,0.12);
+            background-color: #ffffff;
         }
-        input::placeholder { color: rgba(100,190,184,0.55); }
-        select { color: #cfeae7; }
-        select option { background: #004d52; color: #cfeae7; }
+        input::placeholder { color: #94a3a1; }
+        select { color: #1e2a28; }
+        select option { background: #ffffff; color: #1e2a28; }
 
         .email-row { display: flex; gap: 8px; align-items: flex-end; }
         .email-row .field { flex: 1; margin: 0; }
 
         .btn-otp {
             height: 40px; padding: 0 16px;
-            background: rgba(0,229,255,0.12);
-            border: 1.5px solid rgba(0,229,255,0.4);
-            border-radius: 10px; color: #00e5ff;
+            background-color: #d3e6e3;
+            border: 1.5px solid #00564b;
+            border-radius: 10px; color: #00564b;
             font-family: 'Segoe UI', sans-serif;
             font-size: 12px; font-weight: 600;
             cursor: pointer; white-space: nowrap;
             transition: background .2s;
         }
-        .btn-otp:hover { background: rgba(0,229,255,0.2); }
+        .btn-otp:hover { background-color: #b9d6d1; }
         .btn-otp:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .helper { font-size: 11px; color: #4db6ac; margin-top: 3px; }
-        .err { font-size: 11px; color: #f87171; margin-top: 3px; display: none; }
+        .helper { font-size: 11px; color: #6b7d7b; margin-top: 3px; }
+        .err { font-size: 11px; color: #b3261e; margin-top: 3px; display: none; }
         .err.visible { display: block; }
 
         .otp-row { display: none; gap: 6px; align-items: center; margin-top: 10px; }
@@ -131,7 +128,7 @@
         }
 
         .verified-badge {
-            display: none; font-size: 11px; color: #1de9b6;
+            display: none; font-size: 11px; color: #00564b;
             font-weight: 600; margin-top: 4px; align-items: center; gap: 4px;
         }
         .verified-badge.visible { display: flex; }
@@ -140,28 +137,27 @@
         .phone-code { width: 85px; flex-shrink: 0; }
         .phone-code input { text-align: center; }
 
-        .strength-bar { height: 3px; border-radius: 2px; background: rgba(0,188,212,0.2); margin-top: 6px; overflow: hidden; }
+        .strength-bar { height: 3px; border-radius: 2px; background-color: #e2e9e8; margin-top: 6px; overflow: hidden; }
         .strength-fill { height: 100%; border-radius: 2px; transition: width .4s, background .4s; width: 0; }
-        .strength-text { font-size: 11px; margin-top: 3px; color: #4db6ac; }
+        .strength-text { font-size: 11px; margin-top: 3px; color: #6b7d7b; }
 
         .btn-submit {
             width: 100%; margin-top: 18px; padding: 13px;
-            background: linear-gradient(135deg, #0097a7, #00695c);
-            border: 1px solid rgba(0,229,255,0.25);
-            border-radius: 10px; color: #e0f7fa;
+            background-color: #00564b;
+            border: 1px solid transparent;
+            border-radius: 10px; color: #ffffff;
             font-family: 'Segoe UI', sans-serif;
             font-size: 14.5px; font-weight: 600; cursor: pointer;
             letter-spacing: 0.3px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 2px 8px rgba(0,229,255,0.1);
-            transition: opacity .2s, transform .15s;
+            transition: background-color .2s, transform .15s;
         }
-        .btn-submit:hover { opacity: .9; transform: translateY(-1px); }
+        .btn-submit:hover { background-color: #003c34; transform: translateY(-1px); }
 
-        .divider { border: none; border-top: 1px solid rgba(0,188,212,0.18); margin: 20px 0; }
+        .divider { border: none; border-top: 1px solid #e2e9e8; margin: 20px 0; }
 
-        .login { text-align: center; font-size: 12.5px; color: #4db6ac; margin-top: 14px; }
-        .login a { color: #80cbc4; text-decoration: none; font-weight: 600; }
-        .login a:hover { color: #b2ebf2; }
+        .login { text-align: center; font-size: 12.5px; color: #6b7d7b; margin-top: 14px; }
+        .login a { color: #00564b; text-decoration: none; font-weight: 600; }
+        .login a:hover { color: #003c34; }
 
         @media (max-width: 520px) {
             .inner { padding: 28px 20px; }
@@ -183,7 +179,7 @@
             </div>
             <span class="brand-name">ToolMates</span>
         </div>
-        <div class="brand-sub">Connect <span>◆</span> Share <span>◆</span> Create</div>
+        <div class="brand-sub">Connect <span>&#9670;</span> Share <span>&#9670;</span> Create</div>
 
         <form id="signupForm" novalidate>
 
@@ -213,8 +209,8 @@
                     <label class="lbl">Department</label>
                     <select id="department">
                         <option value="">Select department</option>
-                        <option>Computer Science & Engineering</option>
-                        <option>Electrical & Electronic Engineering</option>
+                        <option>Computer Science &amp; Engineering</option>
+                        <option>Electrical &amp; Electronic Engineering</option>
                         <option>Mechanical Engineering</option>
                         <option>Civil Engineering</option>
                         <option>Business Administration</option>
@@ -224,7 +220,7 @@
                 </div>
             </div>
 
-            <div class="sec"><i class="ti ti-mail" aria-hidden="true"></i>Contact & Verification</div>
+            <div class="sec"><i class="ti ti-mail" aria-hidden="true"></i>Contact &amp; Verification</div>
 
             <div class="field" style="margin-bottom:13px">
                 <label class="lbl">Institutional Email <span class="req">*</span></label>
@@ -243,7 +239,7 @@
                     <input class="otp-digit" maxlength="1" id="d4" oninput="dn(this,'d5')" />
                     <input class="otp-digit" maxlength="1" id="d5" oninput="dn(this,'d6')" />
                     <input class="otp-digit" maxlength="1" id="d6" oninput="checkOtp()" />
-                    <span style="font-size:11px;color:#4db6ac;margin-left:4px">Enter code</span>
+                    <span style="font-size:11px;color:#6b7d7b;margin-left:4px">Enter code</span>
                 </div>
                 <div class="verified-badge" id="verifiedBadge">
                     <i class="ti ti-circle-check"></i> Email verified
@@ -252,7 +248,7 @@
 
             <div class="field" style="margin-bottom:13px">
                 <label class="lbl">
-                    <i class="ti ti-device-mobile" style="font-size:12px;color:#00e5ff;margin-right:4px" aria-hidden="true"></i>
+                    <i class="ti ti-device-mobile" style="font-size:12px;color:#00564b;margin-right:4px" aria-hidden="true"></i>
                     Phone Number <span class="req">*</span>
                 </label>
                 <div class="phone-row">
@@ -264,7 +260,7 @@
 
             <div class="field">
                 <label class="lbl">
-                    <i class="ti ti-map-pin" style="font-size:12px;color:#00e5ff;margin-right:4px" aria-hidden="true"></i>
+                    <i class="ti ti-map-pin" style="font-size:12px;color:#00564b;margin-right:4px" aria-hidden="true"></i>
                     Campus Address
                 </label>
                 <div class="grid2" style="margin:0">
@@ -291,7 +287,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit">Create Account →</button>
+            <button type="submit" class="btn-submit">Create Account &rarr;</button>
         </form>
 
         <div class="login">Already have an account? <a href="login.html">Log in with your User ID</a></div>
@@ -352,11 +348,11 @@
         if (/[0-9]/.test(v)) s++;
         if (/[^A-Za-z0-9]/.test(v)) s++;
         const l = [
-            { w: '0%',   c: '#4db6ac', t: 'Enter a password' },
-            { w: '25%',  c: '#f87171', t: 'Too weak' },
-            { w: '50%',  c: '#fbbf24', t: 'Fair' },
-            { w: '75%',  c: '#00bcd4', t: 'Good' },
-            { w: '100%', c: '#1de9b6', t: 'Strong' }
+            { w: '0%',   c: '#94a3a1', t: 'Enter a password' },
+            { w: '25%',  c: '#b3261e', t: 'Too weak' },
+            { w: '50%',  c: '#b8860b', t: 'Fair' },
+            { w: '75%',  c: '#00838f', t: 'Good' },
+            { w: '100%', c: '#00564b', t: 'Strong' }
         ];
         const r = l[s];
         document.getElementById('sf').style.width = r.w;

@@ -78,6 +78,7 @@
             flex-direction: column;
             overflow-y: auto;
             border-right: 1px solid #eef2f5;
+            transition: transform 0.3s ease;
         }
 
         .sidebar-section-title {
@@ -103,6 +104,7 @@
             margin-bottom: 4px;
             transition: all 0.2s;
             position: relative;
+            cursor: pointer;
         }
         .menu-item:hover, .menu-item.active {
             color: #00796b;
@@ -221,12 +223,33 @@
         .dot.active { background-color: #ffffff; }
 
         /* --- Dashboard Headers --- */
+        .section-header-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
         .section-title {
             font-size: 16px;
             font-weight: 700;
             color: #2c3e50;
-            margin-bottom: 16px;
         }
+
+        .back-home-btn {
+            font-size: 13px;
+            font-weight: 600;
+            color: #00796b;
+            background: #e0f2f1;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .back-home-btn:hover { background: #b2dfdb; }
 
         /* --- Quick Actions Components --- */
         .quick-actions-grid {
@@ -257,11 +280,10 @@
             box-shadow: 0 6px 18px rgba(0, 121, 107, 0.08);
         }
         .action-card i { font-size: 26px; }
-        .action-card span { font-size: 14px; font-weight: 600; color: #34495e; }
-
         .action-card.search-tools i { color: #7b1fa2; }
         .action-card.list-tool i { color: #00796b; }
         .action-card.rent-tool i { color: #00bfa5; }
+        .action-card span { font-size: 14px; font-weight: 600; color: #34495e; }
 
         /* --- Recently Listed Grid --- */
         .items-grid {
@@ -316,9 +338,13 @@
         .search-overlay-input.visible { display: block; }
         .search-overlay-input:focus { border-color: #00796b; }
 
+        /* Hide sidebar utility class for hamburger action */
+        .sidebar.hidden { display: none; }
+
         @media (max-width: 900px) {
             .quick-actions-grid, .items-grid { grid-template-columns: 1fr; }
             .sidebar { display: none; }
+            .sidebar.mobile-show { display: flex; position: absolute; z-index: 10; height: calc(100vh - 70px); }
         }
     </style>
 </head>
@@ -326,7 +352,7 @@
 
 <header class="navbar">
     <div class="nav-left">
-        <button class="menu-btn"><i class="ti ti-menu-2"></i></button>
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
         <span class="brand-name">ToolMates</span>
     </div>
     <div class="nav-right">
@@ -337,82 +363,90 @@
 
 <div class="main-layout">
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebarPanel">
         <div class="sidebar-section-title">Navigate</div>
-        <a href="#" class="menu-item active"><i class="ti ti-home"></i> Home</a>
-        <a href="#" class="menu-item"><i class="ti ti-tool"></i> Browse Tools <span class="badge-new">New</span></a>
+        <div onclick="filterCategory('Home', this)" class="menu-item active"><i class="ti ti-home"></i> Home</div>
+        <div onclick="filterCategory('All', this)" class="menu-item"><i class="ti ti-tool"></i> Browse Tools <span class="badge-new">New</span></div>
 
         <div class="sidebar-section-title">Categories</div>
-        <a href="#" class="menu-item"><i class="ti ti-hammer"></i> Repair & Build</a>
-        <a href="#" class="menu-item"><i class="ti ti-camera"></i> Photography</a>
-        <a href="#" class="menu-item"><i class="ti ti-device-laptop"></i> Technology</a>
-        <a href="#" class="menu-item"><i class="ti ti-shovel"></i> Heavy Equipment</a>
+        <div onclick="filterCategory('Repair & Build', this)" class="menu-item"><i class="ti ti-hammer"></i> Repair & Build</div>
+        <div onclick="filterCategory('Photography', this)" class="menu-item"><i class="ti ti-camera"></i> Photography</div>
+        <div onclick="filterCategory('Technology', this)" class="menu-item"><i class="ti ti-device-laptop"></i> Technology</div>
+        <div onclick="filterCategory('Heavy Equipment', this)" class="menu-item"><i class="ti ti-shovel"></i> Heavy Equipment</div>
 
         <div class="sidebar-section-title">Other</div>
-        <a href="#" class="menu-item"><i class="ti ti-star"></i> Reviews</a>
-        <a href="#" class="menu-item"><i class="ti ti-user"></i> My Account</a>
+        <div onclick="filterCategory('Reviews', this)" class="menu-item"><i class="ti ti-star"></i> Reviews</div>
+        <div onclick="filterCategory('My Account', this)" class="menu-item"><i class="ti ti-user"></i> My Account</div>
 
         <a href="login.html" class="menu-item btn-logout"><i class="ti ti-logout"></i> Log out</a>
     </aside>
 
     <main class="content-area">
 
-        <div class="carousel-container">
-            <div class="carousel-track" id="carouselTrack">
-                <div class="slide slide-1">
-                    <div class="slide-info">
-                        <div class="slide-tag">Smart Thinking</div>
-                        <h2>Why buy when you can borrow?</h2>
-                        <p>Save money, reduce waste, and help your community.</p>
-                        <button class="slide-btn">Learn more</button>
+        <div id="promoBannerSection">
+            <div class="carousel-container">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="slide slide-1">
+                        <div class="slide-info">
+                            <div class="slide-tag">Smart Thinking</div>
+                            <h2>Why buy when you can borrow?</h2>
+                            <p>Save money, reduce waste, and help your community.</p>
+                            <button class="slide-btn">Learn more</button>
+                        </div>
+                        <div class="slide-graphic"><i class="ti ti-bulb"></i></div>
                     </div>
-                    <div class="slide-graphic"><i class="ti ti-bulb"></i></div>
+                    <div class="slide slide-2">
+                        <div class="slide-info">
+                            <div class="slide-tag">Earn Cash</div>
+                            <h2>List Your Idle Tools</h2>
+                            <p>Turn your tools into passive campus cash safely.</p>
+                            <button class="slide-btn">Get started</button>
+                        </div>
+                        <div class="slide-graphic"><i class="ti ti-coin"></i></div>
+                    </div>
+                    <div class="slide slide-3">
+                        <div class="slide-info">
+                            <div class="slide-tag">Safety First</div>
+                            <h2>Join the Community</h2>
+                            <p>Connecting students to share physical resources efficiently.</p>
+                            <button class="slide-btn">Read rules</button>
+                        </div>
+                        <div class="slide-graphic"><i class="ti ti-shield-check"></i></div>
+                    </div>
                 </div>
-                <div class="slide slide-2">
-                    <div class="slide-info">
-                        <div class="slide-tag">Earn Cash</div>
-                        <h2>List Your Idle Tools</h2>
-                        <p>Turn your tools into passive campus cash safely.</p>
-                        <button class="slide-btn">Get started</button>
-                    </div>
-                    <div class="slide-graphic"><i class="ti ti-coin"></i></div>
-                </div>
-                <div class="slide slide-3">
-                    <div class="slide-info">
-                        <div class="slide-tag">Safety First</div>
-                        <h2>Join the Community</h2>
-                        <p>Connecting students to share physical resources efficiently.</p>
-                        <button class="slide-btn">Read rules</button>
-                    </div>
-                    <div class="slide-graphic"><i class="ti ti-shield-check"></i></div>
+                <div class="carousel-dots">
+                    <div class="dot active" onclick="jumpToSlide(0)"></div>
+                    <div class="dot" onclick="jumpToSlide(1)"></div>
+                    <div class="dot" onclick="jumpToSlide(2)"></div>
                 </div>
             </div>
-            <div class="carousel-dots">
-                <div class="dot active" onclick="jumpToSlide(0)"></div>
-                <div class="dot" onclick="jumpToSlide(1)"></div>
-                <div class="dot" onclick="jumpToSlide(2)"></div>
-            </div>
+
+            <input type="text" id="inlineSearch" class="search-overlay-input" placeholder="Type the name of a tool and press Enter to search..." onkeypress="handleSearchSubmit(event)"/>
+
+            <h2 class="section-title">Quick actions</h2>
+            <section class="quick-actions-grid">
+                <div class="action-card search-tools" onclick="toggleSearchField()">
+                    <i class="ti ti-search"></i>
+                    <span>Search tools</span>
+                </div>
+                <div class="action-card list-tool" onclick="window.location.href='ListATool.html';">
+                    <i class="ti ti-plus"></i>
+                    <span>List a tool</span>
+                </div>
+                <div class="action-card rent-tool" onclick="filterCategory('All', document.querySelectorAll('.menu-item')[1])">
+                    <i class="ti ti-tool"></i>
+                    <span>Rent a tool</span>
+                </div>
+            </section>
         </div>
 
-        <input type="text" id="inlineSearch" class="search-overlay-input" placeholder="Type the name of a tool and press Enter to search..." onkeypress="handleSearchSubmit(event)"/>
+        <div class="section-header-wrapper">
+            <h2 class="section-title" id="gridDisplayTitle">Recently listed</h2>
+            <button id="backToHomeBtn" class="back-home-btn" style="display: none;" onclick="filterCategory('Home', document.querySelectorAll('.menu-item')[0])">
+                <i class="ti ti-arrow-left"></i> Home
+            </button>
+        </div>
 
-        <h2 class="section-title">Quick actions</h2>
-        <section class="quick-actions-grid">
-            <div class="action-card search-tools" onclick="toggleSearchField()">
-                <i class="ti ti-search"></i>
-                <span>Search tools</span>
-            </div>
-            <div class="action-card list-tool" onclick="alert('Redirecting to List Tool form...')">
-                <i class="ti ti-plus"></i>
-                <span>List a tool</span>
-            </div>
-            <div class="action-card rent-tool" onclick="alert('Redirecting to Rental Catalog...')">
-                <i class="ti ti-tool"></i>
-                <span>Rent a tool</span>
-            </div>
-        </section>
-
-        <h2 class="section-title">Recently listed</h2>
         <section class="items-grid" id="itemsGrid">
         </section>
 
@@ -422,11 +456,12 @@
 <script>
     let activeSlideIndex = 0;
     const slidesCount = 3;
+    let cachedToolsList = []; // Holds data globally once fetched
 
     function jumpToSlide(index) {
         activeSlideIndex = index;
         const track = document.getElementById('carouselTrack');
-        track.style.transform = `translateX(-${activeSlideIndex * 33.3333}%)`;
+        if(track) track.style.transform = `translateX(-${activeSlideIndex * 33.3333}%)`;
 
         const dots = document.querySelectorAll('.dot');
         dots.forEach((dot, idx) => {
@@ -435,9 +470,21 @@
     }
 
     setInterval(() => {
-        activeSlideIndex = (activeSlideIndex + 1) % slidesCount;
-        jumpToSlide(activeSlideIndex);
+        const track = document.getElementById('carouselTrack');
+        if (track) {
+            activeSlideIndex = (activeSlideIndex + 1) % slidesCount;
+            jumpToSlide(activeSlideIndex);
+        }
     }, 5000);
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebarPanel');
+        if (window.innerWidth <= 900) {
+            sidebar.classList.toggle('mobile-show');
+        } else {
+            sidebar.classList.toggle('hidden');
+        }
+    }
 
     function toggleSearchField() {
         const inputField = document.getElementById('inlineSearch');
@@ -447,12 +494,48 @@
         }
     }
 
+
+    function filterCategory(category, element) {// Handle Active Class state rendering inside sidebar menus
+        document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        const banner = document.getElementById('promoBannerSection');
+        const title = document.getElementById('gridDisplayTitle');
+        const backBtn = document.getElementById('backToHomeBtn');
+
+        if (category === 'Home') {
+            banner.style.display = 'block';
+            title.innerText = 'Recently listed';
+            backBtn.style.display = 'none';
+            displayTools(cachedToolsList);
+        } else {
+            banner.style.display = 'none';
+            backBtn.style.display = 'flex';
+
+            if (category === 'All') {
+                title.innerText = 'All Available Tools';
+                displayTools(cachedToolsList);
+            } else if (category === 'Reviews' || category === 'My Account') {
+                title.innerText = category;
+                document.getElementById('itemsGrid').innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d;">${category} space view is coming soon.</p>`;
+            } else {
+                title.innerText = `${category} Category`;
+                const filtered = cachedToolsList.filter(t => (t.category || 'General').toLowerCase() === category.toLowerCase());
+                displayTools(filtered);
+            }
+        }
+
+        if (window.innerWidth <= 900) {
+            document.getElementById('sidebarPanel').classList.remove('mobile-show');
+        }
+    }
+
     function displayTools(tools) {
         const grid = document.getElementById('itemsGrid');
         grid.innerHTML = '';
 
         if (!tools || tools.length === 0) {
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d;">No tools found.</p>';
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">No tools listed under this category yet.</p>';
             return;
         }
 
@@ -460,32 +543,37 @@
             const card = document.createElement('div');
             card.className = 'product-card';
 
+            // 1. Establish the clean design fallback image
             const fallbackImage = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=150&auto=format&fit=crop&q=80';
-            const imgUrl = tool.imageUrl ? tool.imageUrl : fallbackImage;
 
-            // Updated explicitly to align layout directly with backend properties
+            // 2. READ FROM THE JDBCTEMPLATE LIST APPLIED BY YOUR DAO
+            let imgUrl = fallbackImage;
+            if (tool.imageUrls && tool.imageUrls.length > 0 && tool.imageUrls[0]) {
+                imgUrl = tool.imageUrls[0];
+            }
+
             card.innerHTML = `
-                <img src="${imgUrl}" alt="${tool.name || 'Tool'}" class="item-image-thumb" />
-                <div class="item-details">
-                    <span class="item-name">${tool.name || 'Unnamed Tool'}</span>
-                    <span class="item-meta">${tool.category || 'General'} · Tk ${tool.pricePerHr || 0}/hr</span>
-                    <span class="item-meta" style="color: #e67e22; font-size: 11px;">Max Period: ${tool.maxRentingPeriod || 0} days</span>
-                </div>
-            `;
+            <img src="${imgUrl}" alt="${tool.name || 'Tool'}" class="item-image-thumb" />
+            <div class="item-details">
+                <span class="item-name">${tool.name || 'Unnamed Tool'}</span>
+                <span class="item-meta">${tool.category || 'General'} · Tk ${tool.pricePerHr || 0}/hr</span>
+                <span class="item-meta" style="color: #e67e22; font-size: 11px;">Max Period: ${tool.maxRentingPeriod || 0} days</span>
+            </div>
+        `;
             grid.appendChild(card);
         });
     }
 
+
     async function loadRecentTools() {
         try {
-            // Added cross-origin credentials check parameters to force validation execution
             const response = await fetch('http://localhost:8080/api/tools/recent', {
                 method: 'GET',
                 headers: { 'Accept': 'application/json' }
             });
             if (response.ok) {
-                const tools = await response.json();
-                displayTools(tools);
+                cachedToolsList = await response.json();
+                displayTools(cachedToolsList);
             } else {
                 console.error('Backend server responded with error:', response.status);
             }
@@ -505,6 +593,8 @@
                 if (response.ok) {
                     const tools = await response.json();
                     displayTools(tools);
+                    document.getElementById('gridDisplayTitle').innerText = `Search results for "${query}"`;
+                    document.getElementById('backToHomeBtn').style.display = 'flex';
                 }
             } catch (error) {
                 console.error('Error searching tools:', error);
