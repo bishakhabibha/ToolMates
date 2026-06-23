@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tools")
+@CrossOrigin(origins = "*")
 public class ToolController {
 
     @Autowired
@@ -31,6 +32,20 @@ public class ToolController {
         try {
             List<Tool> tools = toolService.getRecentTools();
             return new ResponseEntity<>(tools, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Tool> getToolById(@PathVariable Long id) {
+        try {
+            Tool tool = toolService.getToolById(id);
+            if (tool != null) {
+                return new ResponseEntity<>(tool, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

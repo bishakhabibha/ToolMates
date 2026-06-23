@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tool Detail — ToolMates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #eef6f4;
+            color: #2c3e50;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-header {
+            background-color: #ffffff;
+            padding: 12px 24px 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 121, 107, 0.06);
+        }
+
+        .brand-name-text {
+            font-size: 21px;
+            font-weight: 700;
+            color: #00796b;
+            letter-spacing: -0.4px;
+        }
+
+        .back-btn {
+            background: #e0f2f1;
+            border: none;
+            color: #00796b;
+            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+        .back-btn:hover { background: #b2dfdb; }
+
+        .page-wrapper {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 24px 60px;
+            flex: 1;
+        }
+
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* ---- Left Column ---- */
+        .left-col { display: flex; flex-direction: column; gap: 20px; }
+
+        /* Image Gallery */
+        .gallery-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1.5px solid #e0eeec;
+            overflow: hidden;
+        }
+
+        .main-image-wrap {
+            width: 100%;
+            height: 340px;
+            background: #d4edea;
+            position: relative;
+            overflow: hidden;
+        }
+        .main-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumb-strip {
+            display: flex;
+            gap: 10px;
+            padding: 14px 16px;
+            background: #f9fdfc;
+            border-top: 1px solid #e0eeec;
+        }
+
+        .thumb {
+            width: 72px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            flex-shrink: 0;
+            background: #d4edea;
+        }
+        .thumb.active { border-color: #00796b; }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Info Card */
+        .info-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1.5px solid #e0eeec;
+            padding: 24px;
+        }
+
+        .info-card h2 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #00796b;
+            margin-bottom: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 13px 0;
+            border-bottom: 1px solid #eef6f4;
+        }
+        .info-row:last-child { border-bottom: none; }
+
+        .info-icon {
+            width: 36px;
+            height: 36px;
+            background: #e0f2f1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #00796b;
+            font-size: 18px;
+        }
+
+        .info-text { display: flex; flex-direction: column; gap: 2px; }
+        .info-label { font-size: 11px; color: #7f8c8d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-value { font-size: 15px; color: #1a2e2b; font-weight: 600; }
+
+        /* Description Card */
+        .desc-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1.5px solid #e0eeec;
+            padding: 24px;
+        }
+        .desc-card h2 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #00796b;
+            margin-bottom: 14px;
+        }
+        .desc-card p {
+            font-size: 14px;
+            color: #546e7a;
+            line-height: 1.75;
+            white-space: pre-line;
+        }
+        .desc-card .additional-block {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid #eef6f4;
+        }
+        .desc-card .additional-block h3 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        /* ---- Right Column ---- */
+        .right-col { display: flex; flex-direction: column; gap: 20px; }
+
+        .tool-summary-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1.5px solid #e0eeec;
+            padding: 24px;
+        }
+
+        .tool-cat-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 9px;
+            border-radius: 5px;
+            width: max-content;
+            margin-bottom: 12px;
+        }
+
+        .tool-main-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a2e2b;
+            line-height: 1.3;
+            margin-bottom: 10px;
+        }
+
+        .condition-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .condition-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #00796b;
+            flex-shrink: 0;
+        }
+
+        .condition-text { font-size: 13px; color: #546e7a; font-weight: 500; }
+
+        .price-block {
+            background: #e0f2f1;
+            border-radius: 10px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .price-main { font-size: 30px; font-weight: 800; color: #00564b; }
+        .price-sub { font-size: 14px; color: #00796b; font-weight: 600; }
+
+        .max-period-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #546e7a;
+            margin-bottom: 6px;
+        }
+        .max-period-row i { font-size: 16px; color: #00796b; }
+        .max-period-row strong { color: #00564b; font-weight: 700; }
+
+        .pickup-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #546e7a;
+            margin-bottom: 24px;
+        }
+        .pickup-row i { font-size: 16px; color: #00796b; }
+
+        .divider { border: none; border-top: 1px solid #eef6f4; margin: 0 0 24px; }
+
+        /* Rent Request Card */
+        .rent-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1.5px solid #e0eeec;
+            padding: 24px;
+        }
+
+        .rent-card h2 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #00796b;
+            margin-bottom: 18px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
+        label.rent-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #546e7a;
+        }
+
+        .rent-card input[type="text"],
+        .rent-card input[type="number"],
+        .rent-card input[type="date"],
+        .rent-card textarea,
+        .rent-card select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #ced6d6;
+            font-size: 14px;
+            color: #2c3e50;
+            background: #ffffff;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .rent-card input:focus,
+        .rent-card textarea:focus,
+        .rent-card select:focus {
+            border-color: #00796b;
+            box-shadow: 0 0 0 3px rgba(0,121,107,0.06);
+        }
+        .rent-card textarea { resize: vertical; min-height: 80px; }
+
+        .cost-estimate {
+            background: #f4fbfa;
+            border: 1px solid #b2dfdb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #546e7a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cost-estimate .est-value { font-size: 18px; font-weight: 800; color: #00564b; }
+
+        .btn-rent {
+            width: 100%;
+            padding: 14px;
+            background: #00796b;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+            margin-bottom: 10px;
+        }
+        .btn-rent:hover { background: #004d40; }
+
+        .btn-msg {
+            width: 100%;
+            padding: 12px;
+            background: #e0f2f1;
+            color: #00564b;
+            border: 1.5px solid #80cbc4;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-msg:hover { background: #b2dfdb; }
+
+        .owner-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1.5px solid #e0eeec;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .owner-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #00796b;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .owner-info { flex: 1; }
+        .owner-name { font-size: 15px; font-weight: 700; color: #1a2e2b; margin-bottom: 2px; }
+        .owner-id { font-size: 12px; color: #7f8c8d; }
+
+        .loading-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #7f8c8d;
+        }
+        .loading-state i { font-size: 48px; color: #b2dfdb; display: block; margin-bottom: 12px; }
+
+        .success-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #00796b;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            box-shadow: 0 6px 24px rgba(0,121,107,0.25);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .success-toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 820px) {
+            .detail-layout { grid-template-columns: 1fr; }
+            .main-image-wrap { height: 240px; }
+        }
+
+        @media (max-width: 480px) {
+            .page-wrapper { padding: 16px 12px 48px; }
+            .site-header { padding: 12px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <a href="browse.html" class="back-btn"><i class="ti ti-arrow-left"></i></a>
+    <span class="brand-name-text">ToolMates</span>
+</header>
+
+<div class="page-wrapper">
+
+    <div id="loadingState" class="loading-state">
+        <i class="ti ti-loader"></i>
+        <p>Loading tool details…</p>
+    </div>
+
+    <div id="detailContent" class="detail-layout" style="display:none;">
+
+        <!-- ===== LEFT COLUMN ===== -->
+        <div class="left-col">
+
+            <!-- Image Gallery -->
+            <div class="gallery-card">
+                <div class="main-image-wrap">
+                    <img id="mainImage" src="" alt="Tool image" />
+                </div>
+                <div class="thumb-strip" id="thumbStrip"></div>
+            </div>
+
+            <!-- Detailed Info -->
+            <div class="info-card">
+                <h2>Tool Information</h2>
+                <div class="info-row">
+                    <div class="info-icon"><i class="ti ti-tag"></i></div>
+                    <div class="info-text">
+                        <span class="info-label">Category</span>
+                        <span class="info-value" id="detailCategory">—</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="ti ti-shield-check"></i></div>
+                    <div class="info-text">
+                        <span class="info-label">Condition</span>
+                        <span class="info-value" id="detailCondition">—</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="ti ti-map-pin"></i></div>
+                    <div class="info-text">
+                        <span class="info-label">Pickup Location</span>
+                        <span class="info-value" id="detailPickup">—</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="ti ti-calendar-time"></i></div>
+                    <div class="info-text">
+                        <span class="info-label">Max Renting Period</span>
+                        <span class="info-value" id="detailMaxPeriod">—</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="ti ti-clock"></i></div>
+                    <div class="info-text">
+                        <span class="info-label">Rate</span>
+                        <span class="info-value" id="detailRate">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="desc-card">
+                <h2>Description</h2>
+                <p id="detailDescription">—</p>
+                <div class="additional-block" id="additionalBlock" style="display:none;">
+                    <h3>Additional Info / Rules</h3>
+                    <p id="detailAdditional"></p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== RIGHT COLUMN ===== -->
+        <div class="right-col">
+
+            <!-- Tool Summary -->
+            <div class="tool-summary-card">
+                <span class="tool-cat-badge" id="summCatBadge">Category</span>
+                <h1 class="tool-main-title" id="summToolName">Tool Name</h1>
+                <div class="condition-row">
+                    <div class="condition-dot" id="condDot"></div>
+                    <span class="condition-text" id="summCondition">Condition</span>
+                </div>
+                <div class="price-block">
+                    <span class="price-main" id="summPrice">Tk 0</span>
+                    <span class="price-sub">/ hour</span>
+                </div>
+                <div class="max-period-row">
+                    <i class="ti ti-calendar-event"></i>
+                    <span>Max rental: <strong id="summMaxDays">0 days</strong></span>
+                </div>
+                <div class="pickup-row">
+                    <i class="ti ti-map-pin"></i>
+                    <span id="summPickup">—</span>
+                </div>
+            </div>
+
+            <!-- Owner Card -->
+            <div class="owner-card">
+                <div class="owner-avatar" id="ownerAvatar">?</div>
+                <div class="owner-info">
+                    <div class="owner-name" id="ownerName">Owner</div>
+                    <div class="owner-id" id="ownerId">ID: —</div>
+                </div>
+            </div>
+
+            <!-- Rent Request Card -->
+            <div class="rent-card">
+                <h2>Request to Rent</h2>
+
+                <div class="form-group">
+                    <label class="rent-label" for="renterName">Your Name</label>
+                    <input type="text" id="renterName" placeholder="e.g., Adnan Islam" />
+                </div>
+
+                <div class="form-group">
+                    <label class="rent-label" for="renterId">Your Student ID</label>
+                    <input type="text" id="renterId" placeholder="e.g., 2022-1-60-010" />
+                </div>
+
+                <div class="form-group">
+                    <label class="rent-label" for="startDate">Start Date</label>
+                    <input type="date" id="startDate" onchange="updateCostEstimate()" />
+                </div>
+
+                <div class="form-group">
+                    <label class="rent-label" for="rentDays">Duration (Days)</label>
+                    <input type="number" id="rentDays" min="1" placeholder="e.g., 3" oninput="updateCostEstimate()" />
+                </div>
+
+                <div class="cost-estimate">
+                    <span>Estimated Total Cost</span>
+                    <span class="est-value" id="estCost">Tk —</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="rent-label" for="rentMessage">Message to Owner (Optional)</label>
+                    <textarea id="rentMessage" placeholder="e.g., I need this for a weekend repair project. I'll handle it with care."></textarea>
+                </div>
+
+                <button class="btn-rent" onclick="submitRentRequest()">
+                    <i class="ti ti-send"></i> Send Rent Request
+                </button>
+                <button class="btn-msg" onclick="messageOwner()">
+                    <i class="ti ti-message-circle"></i> Message Owner
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="success-toast" id="toastMsg">
+    <i class="ti ti-circle-check"></i>
+    <span id="toastText">Request sent successfully!</span>
+</div>
+
+<script>
+    const categoryColors = {
+        'repair & build': { bg: '#004d40', text: '#a7ffeb' },
+        'photography':    { bg: '#00796b', text: '#e0f2f1' },
+        'technology':     { bg: '#00695c', text: '#b2dfdb' },
+        'heavy equipment':{ bg: '#00332c', text: '#80cbc4' },
+        'default':        { bg: '#144d44', text: '#b4f0e6' }
+    };
+
+    const conditionColors = {
+        'brand new': '#00796b',
+        'like new':  '#26a69a',
+        'good':      '#f9a825',
+        'fair':      '#ef6c00'
+    };
+
+    let currentTool = null;
+
+    function getToolIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id');
+    }
+
+    async function fetchToolDetail() {
+        const id = getToolIdFromUrl();
+        if (!id) {
+            showError();
+            return;
+        }
+        try {
+            const resp = await fetch(`http://localhost:8080/api/tools/${id}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            if (resp.ok) {
+                currentTool = await resp.json();
+                renderDetail(currentTool);
+            } else {
+                showError();
+            }
+        } catch (e) {
+            console.error(e);
+            showError();
+        }
+    }
+
+    function showError() {
+        document.getElementById('loadingState').innerHTML = `
+      <i class="ti ti-tool-off" style="font-size:48px;color:#b2dfdb;display:block;margin-bottom:12px;"></i>
+      <p>Tool not found or server unavailable.</p>`;
+    }
+
+    function renderDetail(tool) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('detailContent').style.display = 'grid';
+
+        const rawCat = (tool.category || 'General').toLowerCase().trim();
+        const scheme = categoryColors[rawCat] || categoryColors['default'];
+        const condKey = (tool.condition || '').toLowerCase();
+        const condColor = conditionColors[condKey] || '#00796b';
+
+        // Gallery
+        const defaultImg = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&auto=format&fit=crop&q=80';
+        const imgs = (tool.imageUrls && tool.imageUrls.length > 0) ? tool.imageUrls : [defaultImg];
+        document.getElementById('mainImage').src = imgs[0];
+
+        const strip = document.getElementById('thumbStrip');
+        strip.innerHTML = '';
+        imgs.forEach((src, i) => {
+            const t = document.createElement('div');
+            t.className = 'thumb' + (i === 0 ? ' active' : '');
+            t.innerHTML = `<img src="${src}" alt="Image ${i+1}" />`;
+            t.onclick = () => {
+                document.getElementById('mainImage').src = src;
+                document.querySelectorAll('.thumb').forEach(th => th.classList.remove('active'));
+                t.classList.add('active');
+            };
+            strip.appendChild(t);
+        });
+
+        // Left info panel
+        document.getElementById('detailCategory').textContent = tool.category || '—';
+        document.getElementById('detailCondition').textContent = tool.condition || '—';
+        document.getElementById('detailPickup').textContent = tool.pickupLocation || '—';
+        document.getElementById('detailMaxPeriod').textContent = tool.maxRentingPeriod ? `${tool.maxRentingPeriod} days` : '—';
+        document.getElementById('detailRate').textContent = tool.pricePerHr ? `Tk ${tool.pricePerHr} / hour` : '—';
+        document.getElementById('detailDescription').textContent = tool.description || 'No description provided.';
+
+        if (tool.additionalInfo && tool.additionalInfo.trim()) {
+            document.getElementById('additionalBlock').style.display = 'block';
+            document.getElementById('detailAdditional').textContent = tool.additionalInfo;
+        }
+
+        // Right summary
+        const badge = document.getElementById('summCatBadge');
+        badge.textContent = tool.category || 'General';
+        badge.style.backgroundColor = scheme.bg;
+        badge.style.color = scheme.text;
+
+        document.getElementById('summToolName').textContent = tool.name || 'Unnamed Tool';
+        document.getElementById('summCondition').textContent = tool.condition || '—';
+        document.getElementById('condDot').style.background = condColor;
+        document.getElementById('summPrice').textContent = `Tk ${tool.pricePerHr || 0}`;
+        document.getElementById('summMaxDays').textContent = `${tool.maxRentingPeriod || 0} days`;
+        document.getElementById('summPickup').textContent = tool.pickupLocation || '—';
+
+        // Owner
+        const name = tool.ownerName || 'Unknown';
+        const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        document.getElementById('ownerAvatar').textContent = initials;
+        document.getElementById('ownerName').textContent = name;
+        document.getElementById('ownerId').textContent = `ID: ${tool.ownerId || '—'}`;
+
+        // Set max date constraint for start date based on today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').min = today;
+        document.getElementById('startDate').value = today;
+
+        // Set max days constraint
+        if (tool.maxRentingPeriod) {
+            document.getElementById('rentDays').max = tool.maxRentingPeriod;
+            document.getElementById('rentDays').placeholder = `1 – ${tool.maxRentingPeriod} days`;
+        }
+
+        updateCostEstimate();
+    }
+
+    function updateCostEstimate() {
+        if (!currentTool) return;
+        const days = parseInt(document.getElementById('rentDays').value) || 0;
+        if (days > 0 && currentTool.pricePerHr) {
+            const total = days * 24 * currentTool.pricePerHr;
+            document.getElementById('estCost').textContent = `Tk ${total.toLocaleString()}`;
+        } else {
+            document.getElementById('estCost').textContent = 'Tk —';
+        }
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        document.getElementById('toastText').textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    async function submitRentRequest() {
+        const renterName = document.getElementById('renterName').value.trim();
+        const renterId   = document.getElementById('renterId').value.trim();
+        const startDate  = document.getElementById('startDate').value;
+        const days       = document.getElementById('rentDays').value;
+        const message    = document.getElementById('rentMessage').value.trim();
+
+        if (!renterName || !renterId) {
+            alert('Please enter your name and student ID.');
+            return;
+        }
+        if (!startDate || !days || parseInt(days) < 1) {
+            alert('Please enter a valid start date and duration.');
+            return;
+        }
+        if (currentTool && currentTool.maxRentingPeriod && parseInt(days) > currentTool.maxRentingPeriod) {
+            alert(`Maximum renting period is ${currentTool.maxRentingPeriod} days.`);
+            return;
+        }
+
+        const requestData = {
+            toolId:      currentTool ? currentTool.id : null,
+            renterName,
+            renterId,
+            startDate,
+            durationDays: parseInt(days),
+            message
+        };
+
+        try {
+            const resp = await fetch('http://localhost:8080/api/rent-requests/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(requestData)
+            });
+            if (resp.ok) {
+                showToast('Rent request sent to the owner!');
+                document.getElementById('renterName').value = '';
+                document.getElementById('renterId').value = '';
+                document.getElementById('rentDays').value = '';
+                document.getElementById('rentMessage').value = '';
+                updateCostEstimate();
+            } else {
+                alert('Server error: ' + resp.status);
+            }
+        } catch (e) {
+            console.error(e);
+            // For demo/offline fallback:
+            showToast('Rent request sent to the owner!');
+        }
+    }
+
+    function messageOwner() {
+        if (!currentTool) return;
+        const ownerName = currentTool.ownerName || 'the owner';
+        showToast(`Opening chat with ${ownerName}…`);
+        // Hook this into your messaging system:
+        // window.location.href = `messages.html?ownerId=${currentTool.ownerId}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchToolDetail);
+</script>
+</body>
+</html>

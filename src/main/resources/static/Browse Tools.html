@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse Tools — ToolMates</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #eef6f4;
+      color: #2c3e50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-header {
+      background-color: #ffffff;
+      padding: 12px 24px 14px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 121, 107, 0.06);
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-name-text {
+      font-size: 21px;
+      font-weight: 700;
+      color: #00796b;
+      letter-spacing: -0.4px;
+      line-height: 1;
+    }
+
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: #e0f2f1;
+      border: none;
+      color: #00796b;
+      font-size: 18px;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .back-btn:hover { background: #b2dfdb; }
+
+    .search-container-bar {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      background: #ffffff;
+      border: 1.5px solid #b2dfdb;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 44px;
+      transition: border-color 0.2s;
+    }
+    .search-container-bar:focus-within { border-color: #00796b; }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0 16px;
+      font-size: 15px;
+      color: #2c3e50;
+      height: 100%;
+      background: transparent;
+    }
+    .search-input::placeholder { color: #95a5a6; }
+
+    .search-teal-btn {
+      background-color: #00796b;
+      border: none;
+      width: 52px;
+      height: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      flex-shrink: 0;
+    }
+    .search-teal-btn:hover { background-color: #00564b; }
+    .search-teal-btn i { font-size: 19px; color: #ffffff; }
+
+    .browse-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px 24px;
+      flex: 1;
+    }
+
+    .meta-sort-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .meta-info-left { display: flex; flex-direction: column; gap: 3px; }
+
+    .current-query-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #00564b;
+      text-transform: capitalize;
+    }
+    .results-counter { font-size: 13px; color: #7f8c8d; }
+
+    .sort-wrapper-right { display: flex; align-items: center; gap: 8px; }
+    .sort-label { font-size: 14px; color: #2c3e50; }
+
+    .select-custom-wrapper { position: relative; }
+    .select-custom {
+      padding: 8px 36px 8px 12px;
+      border-radius: 8px;
+      border: 1.5px solid #b2dfdb;
+      background-color: #ffffff;
+      color: #2c3e50;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      min-width: 180px;
+      transition: border-color 0.2s;
+    }
+    .select-custom:focus { border-color: #00796b; }
+    .select-custom-wrapper::after {
+      content: "\ea5f";
+      font-family: 'tabler-icons';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #00796b;
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    .browse-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .tool-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1.5px solid #e0eeec;
+      overflow: hidden;
+      transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      cursor: pointer;
+    }
+    .tool-card:hover {
+      transform: translateY(-4px);
+      border-color: #00796b;
+      box-shadow: 0 10px 28px rgba(0, 121, 107, 0.09);
+    }
+
+    .image-container {
+      width: 100%;
+      height: 180px;
+      position: relative;
+      background-color: #d4edea;
+    }
+    .tool-img { width: 100%; height: 100%; object-fit: cover; }
+
+    .status-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-available {
+      background-color: rgba(255,255,255,0.88);
+      color: #00796b;
+      border: 1px solid #a7ffeb;
+    }
+
+    .card-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .tool-cat {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      width: max-content;
+      margin-bottom: 8px;
+      letter-spacing: 0.4px;
+    }
+
+    .tool-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a2e2b;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .tool-rent-details {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .price-tag { font-size: 18px; font-weight: 800; color: #00796b; }
+    .price-unit { font-size: 12px; color: #7f8c8d; font-weight: 500; }
+
+    .card-footer {
+      margin-top: auto;
+      border-top: 1px solid #eef6f4;
+      padding-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #7f8c8d;
+      font-weight: 500;
+    }
+    .max-period { color: #00796b; font-weight: 700; }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: #7f8c8d;
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e0eeec;
+    }
+    .no-results i { font-size: 48px; color: #b2dfdb; margin-bottom: 12px; display: block; }
+
+    @media (max-width: 768px) {
+      .site-header { padding: 12px 16px 14px 16px; }
+      .meta-sort-row { flex-direction: column; align-items: flex-start; }
+      .sort-wrapper-right { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand-row">
+    <span class="brand-name-text">ToolMates</span>
+  </div>
+
+  <div class="search-row">
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">
+      <i class="ti ti-arrow-left"></i>
+    </button>
+    <div class="search-container-bar">
+      <input type="text" id="toolSearch" class="search-input"
+             placeholder="Search tools, categories…"
+             onkeypress="handleSearchKeyPress(event)" />
+      <button class="search-teal-btn" onclick="executeSearchAction()">
+        <i class="ti ti-search"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="browse-container">
+
+  <section class="meta-sort-row">
+    <div class="meta-info-left">
+      <h1 class="current-query-title" id="searchTargetTitle">All Tools</h1>
+      <div class="results-counter" id="resultsCount">0 items found</div>
+    </div>
+    <div class="sort-wrapper-right">
+      <span class="sort-label">Sort by:</span>
+      <div class="select-custom-wrapper">
+        <select id="masterSortSelect" class="select-custom" onchange="processSortingAndFiltering()">
+          <option value="recent">Best Match (Newest)</option>
+          <option value="low-high">Price: Low to High</option>
+          <option value="high-low">Price: High to Low</option>
+          <option value="oldest">Oldest Items</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <main class="browse-grid" id="toolsDisplayGrid"></main>
+
+</div>
+
+<script>
+  let primaryToolsDataset = [];
+  let stateFilteredTools = [];
+
+  async function fetchAllTools() {
+    try {
+      const response = await fetch('http://localhost:8080/api/tools/recent', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        primaryToolsDataset = await response.json();
+        stateFilteredTools = [...primaryToolsDataset];
+        processSortingAndFiltering();
+      } else {
+        console.error('Failed to load catalog data.');
+      }
+    } catch (error) {
+      console.error('Backend error:', error);
+      renderToolsList([]);
+    }
+  }
+
+  function handleSearchKeyPress(event) {
+    if (event.key === 'Enter') executeSearchAction();
+  }
+
+  function executeSearchAction() {
+    const searchQuery = document.getElementById('toolSearch').value.toLowerCase().trim();
+    const titleElement = document.getElementById('searchTargetTitle');
+    if (searchQuery) {
+      titleElement.innerText = searchQuery;
+      stateFilteredTools = primaryToolsDataset.filter(tool =>
+              (tool.name && tool.name.toLowerCase().includes(searchQuery)) ||
+              (tool.category && tool.category.toLowerCase().includes(searchQuery))
+      );
+    } else {
+      titleElement.innerText = "All Tools";
+      stateFilteredTools = [...primaryToolsDataset];
+    }
+    processSortingAndFiltering();
+  }
+
+  function processSortingAndFiltering() {
+    let sortedOutput = [...stateFilteredTools];
+    const sortingMode = document.getElementById('masterSortSelect').value;
+    if (sortingMode === 'recent')        sortedOutput.sort((x, y) => (y.id || 0) - (x.id || 0));
+    else if (sortingMode === 'oldest')   sortedOutput.sort((x, y) => (x.id || 0) - (y.id || 0));
+    else if (sortingMode === 'low-high') sortedOutput.sort((x, y) => (x.pricePerHr || 0) - (y.pricePerHr || 0));
+    else if (sortingMode === 'high-low') sortedOutput.sort((x, y) => (y.pricePerHr || 0) - (x.pricePerHr || 0));
+    renderToolsList(sortedOutput);
+  }
+
+  function renderToolsList(tools) {
+    const grid = document.getElementById('toolsDisplayGrid');
+    const counter = document.getElementById('resultsCount');
+    grid.innerHTML = '';
+    counter.innerText = `${tools.length} item${tools.length === 1 ? '' : 's'} found`;
+
+    if (!tools || tools.length === 0) {
+      grid.innerHTML = `
+        <div class="no-results">
+          <i class="ti ti-tool-off"></i>
+          <h3>No items found</h3>
+          <p>Try a different search term or category.</p>
+        </div>`;
+      return;
+    }
+
+    const categoryColors = {
+      'repair & build': { bg: '#004d40', text: '#a7ffeb' },
+      'photography': { bg: '#00796b', text: '#e0f2f1' },
+      'technology': { bg: '#00695c', text: '#b2dfdb' },
+      'heavy equipment': { bg: '#00332c', text: '#80cbc4' },
+      'default': { bg: '#144d44', text: '#b4f0e6' }
+    };
+
+    tools.forEach(tool => {
+      const card = document.createElement('div');
+      card.className = 'tool-card';
+      const defaultImg = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=400&auto=format&fit=crop&q=80';
+      const activeImg = (tool.imageUrls && tool.imageUrls.length > 0 && tool.imageUrls[0])
+              ? tool.imageUrls[0] : defaultImg;
+
+      const rawCat = (tool.category || 'General').toLowerCase().trim();
+      const scheme = categoryColors[rawCat] || categoryColors['default'];
+
+      card.innerHTML = `
+        <div class="image-container">
+          <img src="${activeImg}" alt="${tool.name || 'Tool'}" class="tool-img" />
+          <span class="status-badge status-available">Available</span>
+        </div>
+        <div class="card-body">
+          <span class="tool-cat" style="background-color: ${scheme.bg}; color: ${scheme.text};">${tool.category || 'General'}</span>
+          <h3 class="tool-title">${tool.name || 'Unnamed Tool'}</h3>
+          <div class="tool-rent-details">
+            <span class="price-tag">Tk ${tool.pricePerHr || 0}</span>
+            <span class="price-unit">/ hour</span>
+          </div>
+          <div class="card-footer">
+            <span>Max Rent: <span class="max-period">${tool.maxRentingPeriod || 0} days</span></span>
+          </div>
+        </div>`;
+
+      card.onclick = () => window.location.href = `ToolInfo.html?id=${tool.id}`;
+      grid.appendChild(card);
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', fetchAllTools);
+</script>
+</body>
+</html>

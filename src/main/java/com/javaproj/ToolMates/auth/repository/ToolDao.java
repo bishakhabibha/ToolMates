@@ -79,4 +79,39 @@ public class ToolDao {
             return tool;
         });
     }
+
+    /**
+     * Finds a single tool by its unique ID, alongside all associated images.
+     */
+    public Tool findById(Long id) {
+        String selectToolSql = "SELECT * FROM tools WHERE id = ?";
+
+        try {
+            return jdbcTemplate.queryForObject(selectToolSql, (rs, rowNum) -> {
+                Tool tool = new Tool();
+                tool.setId(rs.getLong("id"));
+                tool.setOwnerName(rs.getString("owner_name"));
+                tool.setOwnerId(rs.getString("owner_id"));
+                tool.setName(rs.getString("name"));
+                tool.setCategory(rs.getString("category"));
+                tool.setCondition(rs.getString("tool_condition"));
+                tool.setPricePerHr(rs.getDouble("price_per_hr"));
+                tool.setMaxRentingPeriod(rs.getInt("max_renting_period"));
+                tool.setPickupLocation(rs.getString("pickup_location"));
+                tool.setDescription(rs.getString("description"));
+                tool.setAdditionalInfo(rs.getString("additional_info"));
+
+                String selectImagesSql = "SELECT image_url FROM tool_images WHERE tool_id = ?";
+                List<String> imageUrls = jdbcTemplate.query(selectImagesSql,
+                        (imgRs, imgRowNum) -> imgRs.getString("image_url"),
+                        tool.getId()
+                );
+                tool.setImageUrls(imageUrls);
+
+                return tool;
+            }, id);
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
 }

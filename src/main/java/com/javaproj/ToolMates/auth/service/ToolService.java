@@ -20,4 +20,8 @@ public class ToolService {
     public List<Tool> getRecentTools() {
         return toolDao.findRecent();
     }
+
+    public Tool getToolById(Long id) {
+        return toolDao.findById(id);
+    }
 }
