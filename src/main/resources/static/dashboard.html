@@ -133,6 +133,17 @@
             text-transform: uppercase;
         }
 
+        .unread-dot {
+            display: none;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #00bfa5;
+            margin-left: auto;
+            box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.12);
+        }
+        .unread-dot.visible { display: inline-block; }
+
         .btn-logout {
             margin-top: auto;
             color: #546e7a;
@@ -313,6 +324,7 @@
             border: 1px solid #eef2f5;
             box-shadow: 0 4px 12px rgba(0,0,0,0.01);
             transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            cursor: pointer;
         }
         .product-card:hover {
             transform: translateY(-2px);
@@ -332,6 +344,287 @@
         .item-details { display: flex; flex-direction: column; }
         .item-name { font-size: 14px; font-weight: 700; color: #2c3e50; margin-bottom: 2px; }
         .item-meta { font-size: 12px; color: #7f8c8d; font-weight: 500; }
+
+        .notification-item {
+            grid-column: 1 / -1;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #dfe9e7;
+            border-radius: 0;
+            padding: 18px 4px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-family: Arial, sans-serif;
+            font-weight: 400;
+        }
+
+        .notification-text {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 400;
+            color: #2c3e50;
+            line-height: 1.55;
+        }
+
+        .notification-text a {
+            color: #00796b;
+            text-decoration: underline;
+            font-weight: 400;
+        }
+
+        .notification-time {
+            align-self: flex-end;
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .notification-actions button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #00796b;
+            background: #00796b;
+            color: #ffffff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.18s, transform 0.18s, background 0.18s;
+        }
+
+        .notification-actions button:active,
+        .notification-actions button.action-done {
+            opacity: 0.58;
+            transform: scale(0.98);
+        }
+
+        .notification-actions button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .notification-actions .reject-btn {
+            background: #ffffff;
+            color: #00796b;
+        }
+
+        .report-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .report-modal-backdrop.show { display: flex; }
+
+        .report-modal {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border: 1px solid #eef2f5;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 8px 30px rgba(0, 77, 64, 0.12);
+        }
+
+        .report-modal h3 {
+            font-size: 16px;
+            color: #00564b;
+            margin-bottom: 14px;
+        }
+
+        .report-modal select,
+        .report-modal input,
+        .report-modal textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #ced6d6;
+            color: #2c3e50;
+            font-family: inherit;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        .time-row {
+            display: grid;
+            grid-template-columns: 1fr 92px;
+            gap: 10px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            width: max-content;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 9px;
+            border-radius: 6px;
+            background: #e0f2f1;
+            color: #00564b;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .report-modal textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .conversation-list {
+            grid-column: 1 / -1;
+            display: grid;
+            gap: 12px;
+        }
+
+        .messages-shell {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 560px;
+            background: #ffffff;
+            border: 1px solid #eef2f5;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .conversation-pane {
+            border-right: 1px solid #eef2f5;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .conversation-search {
+            margin: 14px;
+            padding: 11px 14px;
+            border: 1px solid #ced6d6;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .conversation-scroll {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .conversation-row {
+            background: #ffffff;
+            border: none;
+            border-bottom: 1px solid #eef2f5;
+            border-radius: 0;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .conversation-row:hover {
+            background: #f4fbfa;
+        }
+        .conversation-row.active { background: #e0f2f1; }
+
+        .conversation-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a2e2b;
+            margin-bottom: 4px;
+        }
+
+        .conversation-last {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+
+        .unread-pill {
+            float: right;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            background: #00bfa5;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+        }
+
+        .message-thread {
+            background: #ffffff;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .thread-message {
+            max-width: 70%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #2c3e50;
+            background: #ffffff;
+            border: 1px solid #eef2f5;
+            align-self: flex-start;
+        }
+        .thread-message.mine {
+            align-self: flex-end;
+            background: #dcf8c6;
+            border-color: #c5edaa;
+        }
+
+        .thread-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid #eef2f5;
+            font-weight: 700;
+            color: #00564b;
+        }
+
+        .thread-body {
+            flex: 1;
+            background: #eef6f4;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
+
+        .thread-compose {
+            border-top: 1px solid #eef2f5;
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+            background: #ffffff;
+        }
+        .thread-compose input {
+            flex: 1;
+            border: 1px solid #ced6d6;
+            border-radius: 8px;
+            padding: 11px 14px;
+            outline: none;
+        }
+        .thread-compose button {
+            border: none;
+            border-radius: 8px;
+            background: #00796b;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0 16px;
+            cursor: pointer;
+        }
 
         /* --- Search Field Overlay Mode --- */
         .search-overlay-input {
@@ -354,6 +647,8 @@
 
         @media (max-width: 900px) {
             .quick-actions-grid, .items-grid { grid-template-columns: 1fr; }
+            .messages-shell { grid-template-columns: 1fr; }
+            .conversation-pane { border-right: none; border-bottom: 1px solid #eef2f5; max-height: 260px; }
             .sidebar { display: none; }
             .sidebar.mobile-show { display: flex; position: absolute; z-index: 10; height: calc(100vh - 70px); }
         }
@@ -385,8 +680,11 @@
         <div onclick="filterCategory('Heavy Equipment', this)" class="menu-item"><i class="ti ti-shovel"></i> Heavy Equipment</div>
 
         <div class="sidebar-section-title">Other</div>
-        <div onclick="filterCategory('Reviews', this)" class="menu-item"><i class="ti ti-star"></i> Reviews</div>
-        <div onclick="filterCategory('My Account', this)" class="menu-item"><i class="ti ti-user"></i> My Account</div>
+        <div onclick="showNotificationPanel(this)" class="menu-item" id="notificationMenuItem"><i class="ti ti-bell"></i> Notifications <span class="unread-dot" id="notificationDot"></span></div>
+        <div onclick="showMessagesPanel(this)" class="menu-item"><i class="ti ti-messages"></i> My Messages</div>
+        <div onclick="window.location.href='RentalHistory.html'" class="menu-item"><i class="ti ti-history"></i> Rental History</div>
+        <div onclick="window.location.href='UserReviews.html'" class="menu-item"><i class="ti ti-star"></i> Reviews</div>
+        <div onclick="window.location.href='Profile.html'" class="menu-item"><i class="ti ti-user"></i> My Account</div>
 
         <a href="login.html" class="menu-item btn-logout"><i class="ti ti-logout"></i> Log out</a>
     </aside>
@@ -459,10 +757,60 @@
     </main>
 </div>
 
+<div class="report-modal-backdrop" id="reportModalBackdrop">
+    <div class="report-modal">
+        <h3>Report rental issue</h3>
+        <select id="reportReason">
+            <option value="Late Return">Late Return</option>
+            <option value="Tool Not Returned">Tool Not Returned</option>
+            <option value="Tool Damaged">Tool Damaged</option>
+            <option value="Missing Parts">Missing Parts</option>
+            <option value="Faulty Product Handling">Faulty Product Handling</option>
+            <option value="Remaining Payment Not Paid">Remaining Payment Not Paid</option>
+            <option value="Misuse">Misuse</option>
+            <option value="Other">Other</option>
+        </select>
+        <textarea id="reportDetails" placeholder="Add details..."></textarea>
+        <input id="reportEvidence" type="text" placeholder="Evidence photo URL (optional)" style="width:100%;padding:12px 14px;border-radius:8px;border:1px solid #ced6d6;margin-bottom:12px;" />
+        <div class="notification-actions">
+            <button onclick="submitRentalReport()">Submit Report</button>
+            <button class="reject-btn" onclick="closeReportModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="report-modal-backdrop" id="pickupModalBackdrop">
+    <div class="report-modal">
+        <h3>Pickup details</h3>
+        <input id="pickupRentalId" type="hidden" />
+        <input id="pickupDateInput" type="date" />
+        <div class="time-row">
+            <input id="pickupTimeInput" type="text" placeholder="3:30" inputmode="numeric" />
+            <select id="pickupAmPmInput">
+                <option value="PM">PM</option>
+                <option value="AM">AM</option>
+            </select>
+        </div>
+        <input id="pickupLocationInput" type="text" placeholder="Pickup location" />
+        <textarea id="pickupInstructionsInput" placeholder="Instructions (optional)"></textarea>
+        <div class="notification-actions">
+            <button id="submitPickupDetailsButton" onclick="submitPickupDetails()">Submit Pickup Details</button>
+            <button class="reject-btn" onclick="closePickupModal()">Close</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let activeSlideIndex = 0;
     const slidesCount = 3;
     let cachedToolsList = [];
+    let activeReportRentalId = null;
+    let currentUser = JSON.parse(localStorage.getItem('toolmatesUser') || 'null');
+    let latestNotifications = [];
+    let latestConversations = [];
+    let activeConversationUserId = null;
+    let activeConversationName = '';
+    let activePickupButton = null;
 
     function jumpToSlide(index) {
         activeSlideIndex = index;
@@ -558,10 +906,11 @@
                 <img src="${imgUrl}" alt="${tool.name || 'Tool'}" class="item-image-thumb" />
                 <div class="item-details">
                     <span class="item-name">${tool.name || 'Unnamed Tool'}</span>
-                    <span class="item-meta">${tool.category || 'General'} · Tk ${tool.pricePerHr || 0}/hr</span>
+                    <span class="item-meta">${tool.category || 'General'} · Tk ${tool.pricePerDay || 0}/day</span>
                     <span class="item-meta" style="color: #e67e22; font-size: 11px;">Max Period: ${tool.maxRentingPeriod || 0} days</span>
                 </div>
             `;
+            card.onclick = () => window.location.href = `ToolInfo.html?id=${tool.id}`;
             grid.appendChild(card);
         });
     }
@@ -580,6 +929,478 @@
             }
         } catch (error) {
             console.error('Connection to backend failed. Check if server is running:', error);
+        }
+    }
+
+    async function ensureCurrentUser() {
+        if (currentUser && currentUser.userId && currentUser.studentId) return currentUser;
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/me', {
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) throw new Error('Not logged in');
+            currentUser = await response.json();
+            localStorage.setItem('toolmatesUser', JSON.stringify(currentUser));
+            return currentUser;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async function refreshUnreadDot() {
+        const user = await ensureCurrentUser();
+        if (!user) return;
+        try {
+            const response = await fetch('http://localhost:8080/api/notifications/me/unread-count', {
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) return;
+            const data = await response.json();
+            document.getElementById('notificationDot').classList.toggle('visible', (data.count || 0) > 0);
+        } catch (error) {}
+    }
+
+    async function showNotificationPanel(element) {
+        document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+        if (element) element.classList.add('active');
+        document.getElementById('promoBannerSection').style.display = 'none';
+        document.getElementById('backToHomeBtn').style.display = 'flex';
+        document.getElementById('gridDisplayTitle').innerText = 'Notifications';
+
+        const grid = document.getElementById('itemsGrid');
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Loading notifications...</p>';
+
+        try {
+            const response = await fetch('http://localhost:8080/api/notifications/me', {
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) throw new Error('Notification load failed');
+            latestNotifications = await response.json();
+            renderNotifications(latestNotifications);
+            await fetch('http://localhost:8080/api/notifications/me/read', { method: 'POST', credentials: 'include' });
+            refreshUnreadDot();
+        } catch (error) {
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Please log in to view notifications.</p>';
+        }
+    }
+
+    function renderNotifications(notifications) {
+        const grid = document.getElementById('itemsGrid');
+        grid.innerHTML = '';
+
+        if (!notifications || notifications.length === 0) {
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">No notifications yet.</p>';
+            return;
+        }
+
+        notifications.forEach(notification => {
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            const type = notification.notificationType;
+            const isRentalRequest = type === 'rental_request' && notification.rentalRequestId;
+            const isPickupDetails = type === 'pickup_details_available' && notification.rentalRequestId;
+            const isPickupConfirmation = ['pickup_confirmation_owner', 'pickup_confirmation_borrower', 'pickup_confirmation_waiting'].includes(type) && notification.rentalRequestId;
+            const isPaymentConfirmation = ['payment_confirmation_owner', 'payment_confirmation_borrower', 'payment_confirmation_waiting', 'payment_confirmation_reminder'].includes(type) && notification.rentalRequestId;
+            const isReturnConfirmation = ['return_confirmation', 'return_confirmation_waiting'].includes(type) && notification.rentalRequestId;
+            const isReportRequired = type === 'report_required' && notification.rentalRequestId;
+            const isIssue = ['pickup_dispute', 'pickup_failed', 'payment_dispute', 'payment_pending'].includes(type) && notification.rentalRequestId;
+            const status = (notification.rentalStatus || '').toUpperCase();
+            const userIsOwner = currentUser && Number(currentUser.userId) === Number(notification.ownerUserId);
+            const pickupAnswered = userIsOwner ? notification.ownerPickupConfirmation : notification.borrowerPickupConfirmation;
+            const paymentAnswered = userIsOwner ? notification.ownerPaymentConfirmation : notification.borrowerPaymentConfirmation;
+            const createdAt = notification.createdAt ? new Date(notification.createdAt).toLocaleString() : '';
+            const messageHtml = isRentalRequest
+                    ? `<a href="Profile.html?studentId=${encodeURIComponent(notification.renterStudentId || '')}">${notification.renterStudentId || 'User'} (${notification.renterName || 'Unknown'})</a> wants to rent your <a href="ToolInfo.html?id=${notification.toolId || ''}">${notification.toolName || 'tool'}</a> from ${notification.pickupDate || 'the pickup date'}.`
+                    : `${notification.messageText || 'Notification'}${notification.toolName ? ` <a href="ToolInfo.html?id=${notification.toolId || ''}">${notification.toolName}</a>` : ''}`;
+            item.innerHTML = `
+                <div class="notification-text">${messageHtml}</div>
+                ${notification.rentalStatus ? `<span class="status-pill">${notification.rentalStatus.replaceAll('_', ' ')}</span>` : ''}
+                ${isRentalRequest ? `
+                    <div class="notification-actions">
+                        <button ${status !== 'PENDING' ? 'disabled' : ''} onclick="acceptRentalRequest(${notification.rentalRequestId}, this)">Accept Request</button>
+                        <button ${status === 'REJECTED' ? 'disabled' : ''} class="reject-btn" onclick="rejectRentalRequest(${notification.rentalRequestId}, this)">Reject Request</button>
+                        <button class="reject-btn" onclick="openMessageWithUser(${notification.borrowerUserId || 'null'})">Message Borrower</button>
+                    </div>` : ''}
+                ${isPickupDetails ? `
+                    <div class="notification-actions">
+                        <button onclick="window.location.href='PickupDetails.html?rentalRequestId=${notification.rentalRequestId}'">View Pickup Details</button>
+                    </div>` : ''}
+                ${isPickupConfirmation ? `
+                    <div class="notification-actions">
+                        <button ${pickupAnswered ? 'disabled' : ''} onclick="confirmPickup(${notification.rentalRequestId}, true, this)">YES</button>
+                        <button ${pickupAnswered ? 'disabled' : ''} class="reject-btn" onclick="confirmPickup(${notification.rentalRequestId}, false, this)">NO</button>
+                    </div>` : ''}
+                ${isPaymentConfirmation ? `
+                    <div class="notification-actions">
+                        <button ${paymentAnswered ? 'disabled' : ''} onclick="confirmPayment(${notification.rentalRequestId}, true, this)">YES</button>
+                        <button ${paymentAnswered ? 'disabled' : ''} class="reject-btn" onclick="confirmPayment(${notification.rentalRequestId}, false, this)">NO</button>
+                    </div>` : ''}
+                ${isReturnConfirmation ? `
+                    <div class="notification-actions">
+                        <button onclick="confirmReturn(${notification.rentalRequestId}, true, this)">Yes</button>
+                        <button class="reject-btn" onclick="confirmReturn(${notification.rentalRequestId}, false, this)">No</button>
+                    </div>` : ''}
+                ${isReportRequired ? `
+                    <div class="notification-actions">
+                        <button onclick="openReportModal(${notification.rentalRequestId})">Open Report Form</button>
+                    </div>` : ''}
+                ${isIssue ? `
+                    <div class="notification-actions">
+                        <button onclick="showMessagesPanel(document.querySelectorAll('.menu-item')[6])">Continue Chat</button>
+                        <button class="reject-btn" onclick="alert('Please contact ToolMates admin with this rental ID: ${notification.rentalRequestId}')">Contact Admin</button>
+                        ${userIsOwner && ['PICKUP_DISPUTE', 'PICKUP_FAILED'].includes(status) ? `<button onclick="openPickupModal(${notification.rentalRequestId}, this)">Reschedule Pickup</button>` : ''}
+                        <button onclick="cancelRental(${notification.rentalRequestId}, this)">Cancel Rental</button>
+                    </div>` : ''}
+                <div class="notification-time">${createdAt}</div>
+            `;
+            grid.appendChild(item);
+        });
+    }
+
+    async function acceptRentalRequest(rentalRequestId, button) {
+        if (button) {
+            button.classList.add('action-done');
+            button.disabled = true;
+        }
+        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/accept`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Accept': 'application/json' }
+        });
+        if (response.ok) {
+            openPickupModal(rentalRequestId, button);
+        } else {
+            alert(await getResponseError(response, 'Could not accept request.'));
+            if (button) button.disabled = false;
+        }
+    }
+
+    function openPickupModal(rentalRequestId, button) {
+        activePickupButton = button || null;
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('pickupRentalId').value = rentalRequestId;
+        document.getElementById('pickupDateInput').min = today;
+        document.getElementById('pickupDateInput').value = today;
+        document.getElementById('pickupTimeInput').value = '';
+        document.getElementById('pickupAmPmInput').value = 'PM';
+        document.getElementById('pickupLocationInput').value = '';
+        document.getElementById('pickupInstructionsInput').value = '';
+        document.getElementById('pickupModalBackdrop').classList.add('show');
+    }
+
+    function closePickupModal() {
+        document.getElementById('pickupModalBackdrop').classList.remove('show');
+        if (activePickupButton) activePickupButton.disabled = false;
+        activePickupButton = null;
+    }
+
+    function parseTwelveHourTime(value, ampm) {
+        const match = (value || '').trim().match(/^(\d{1,2}):(\d{2})$/);
+        if (!match) return null;
+        let hours = Number(match[1]);
+        const minutes = Number(match[2]);
+        if (hours < 1 || hours > 12 || minutes < 0 || minutes > 59) return null;
+        if (ampm === 'PM' && hours !== 12) hours += 12;
+        if (ampm === 'AM' && hours === 12) hours = 0;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+    }
+
+    async function submitPickupDetails() {
+        const rentalRequestId = document.getElementById('pickupRentalId').value;
+        const pickupDate = document.getElementById('pickupDateInput').value;
+        const pickupTime = parseTwelveHourTime(document.getElementById('pickupTimeInput').value, document.getElementById('pickupAmPmInput').value);
+        const pickupLocation = document.getElementById('pickupLocationInput').value.trim();
+        const pickupInstructions = document.getElementById('pickupInstructionsInput').value.trim();
+        if (!pickupDate) {
+            alert('Pickup date is required.');
+            return;
+        }
+        if (!pickupTime) {
+            alert('Pickup time must use 12-hour format, for example 3:30 PM.');
+            return;
+        }
+        if (!pickupLocation) {
+            alert('Pickup location is required.');
+            return;
+        }
+
+        const button = document.getElementById('submitPickupDetailsButton');
+        button.disabled = true;
+        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/pickup-details`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ pickupDate, pickupTime, pickupLocation, pickupInstructions })
+        });
+        button.disabled = false;
+        if (response.ok) {
+            document.getElementById('pickupModalBackdrop').classList.remove('show');
+            activePickupButton = null;
+            await showNotificationPanel(document.getElementById('notificationMenuItem'));
+        } else {
+            alert(await getResponseError(response, 'Could not submit pickup details.'));
+        }
+    }
+
+    async function rejectRentalRequest(rentalRequestId, button) {
+        if (button) {
+            button.classList.add('action-done');
+            button.disabled = true;
+        }
+        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/reject`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+        if (response.ok) {
+            latestNotifications = latestNotifications.map(n => n.rentalRequestId === rentalRequestId ? { ...n, rentalStatus: 'REJECTED' } : n);
+            await showNotificationPanel(document.getElementById('notificationMenuItem'));
+        } else {
+            alert(await getResponseError(response, 'Could not reject request.'));
+            if (button) button.disabled = false;
+        }
+    }
+
+    async function closeRentalRequest(rentalRequestId) {
+        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/close`, { method: 'POST', credentials: 'include' });
+        alert(response.ok ? 'Rental return confirmed.' : await getResponseError(response, 'Could not confirm return.'));
+    }
+
+    async function confirmPickup(rentalRequestId, confirmed, button) {
+        await postConfirmation(`http://localhost:8080/api/rent-requests/${rentalRequestId}/pickup-confirmation`, confirmed, button, 'Could not submit pickup confirmation.');
+    }
+
+    async function confirmPayment(rentalRequestId, confirmed, button) {
+        await postConfirmation(`http://localhost:8080/api/rent-requests/${rentalRequestId}/payment-confirmation`, confirmed, button, 'Could not submit payment confirmation.');
+    }
+
+    async function confirmReturn(rentalRequestId, confirmed, button) {
+        await postConfirmation(`http://localhost:8080/api/rent-requests/${rentalRequestId}/return-confirmation`, confirmed, button, 'Could not submit return confirmation.');
+    }
+
+    async function cancelRental(rentalRequestId, button) {
+        if (button) button.disabled = true;
+        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/cancel`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Accept': 'application/json' }
+        });
+        if (response.ok) {
+            await showNotificationPanel(document.getElementById('notificationMenuItem'));
+        } else {
+            alert(await getResponseError(response, 'Could not cancel rental.'));
+            if (button) button.disabled = false;
+        }
+    }
+
+    async function openMessageWithUser(userId) {
+        if (!userId) return;
+        await showMessagesPanel(document.querySelectorAll('.menu-item')[6]);
+        const notification = latestNotifications.find(n => Number(n.borrowerUserId) === Number(userId) || Number(n.ownerUserId) === Number(userId));
+        const name = notification && Number(notification.borrowerUserId) === Number(userId)
+                ? (notification.borrowerName || 'Borrower')
+                : (notification.ownerName || 'User');
+        await loadConversationMessages(userId, name);
+    }
+
+    async function postConfirmation(url, confirmed, button, fallbackMessage) {
+        if (button) button.disabled = true;
+        const response = await fetch(url, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ confirmed })
+        });
+        if (response.ok) {
+            await showNotificationPanel(document.getElementById('notificationMenuItem'));
+        } else {
+            alert(await getResponseError(response, fallbackMessage));
+            if (button) button.disabled = false;
+        }
+    }
+
+    async function getResponseError(response, fallbackMessage) {
+        try {
+            const body = await response.json();
+            return body.error || fallbackMessage;
+        } catch (error) {
+            return fallbackMessage;
+        }
+    }
+
+    function openReportModal(rentalRequestId) {
+        activeReportRentalId = rentalRequestId;
+        document.getElementById('reportReason').value = 'Late Return';
+        document.getElementById('reportDetails').value = '';
+        document.getElementById('reportEvidence').value = '';
+        document.getElementById('reportModalBackdrop').classList.add('show');
+    }
+
+    function closeReportModal() {
+        document.getElementById('reportModalBackdrop').classList.remove('show');
+        activeReportRentalId = null;
+    }
+
+    async function submitRentalReport() {
+        if (!activeReportRentalId) return;
+        const response = await fetch(`http://localhost:8080/api/rent-requests/${activeReportRentalId}/report`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                reasonCategory: document.getElementById('reportReason').value,
+                additionalDetails: document.getElementById('reportDetails').value.trim(),
+                evidenceUrl: document.getElementById('reportEvidence').value.trim()
+            })
+        });
+        alert(response.ok ? 'Report submitted.' : await getResponseError(response, 'Could not submit report.'));
+        if (response.ok) {
+            closeReportModal();
+            await showNotificationPanel(document.getElementById('notificationMenuItem'));
+        }
+    }
+
+    async function showMessagesPanel(element) {
+        await ensureCurrentUser();
+        document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+        if (element) element.classList.add('active');
+        document.getElementById('promoBannerSection').style.display = 'none';
+        document.getElementById('backToHomeBtn').style.display = 'flex';
+        document.getElementById('gridDisplayTitle').innerText = 'My Messages';
+
+        const grid = document.getElementById('itemsGrid');
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Loading conversations...</p>';
+        try {
+            const response = await fetch('http://localhost:8080/api/messages/me/conversations', {
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) throw new Error('Failed');
+            const conversations = await response.json();
+            renderConversations(conversations);
+        } catch (error) {
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Please log in to view messages.</p>';
+        }
+    }
+
+    function renderConversations(conversations) {
+        const grid = document.getElementById('itemsGrid');
+        latestConversations = conversations || [];
+        activeConversationUserId = null;
+        activeConversationName = '';
+        grid.innerHTML = `
+            <div class="messages-shell">
+                <aside class="conversation-pane">
+                    <input id="conversationSearch" class="conversation-search" type="text" placeholder="Search conversations" oninput="filterConversations()" />
+                    <div class="conversation-scroll" id="conversationList"></div>
+                </aside>
+                <section class="message-thread" id="messageThread">
+                    <div class="thread-header">My Messages</div>
+                    <div class="thread-body" id="threadBody">Select a conversation to view messages.</div>
+                    <div class="thread-compose">
+                        <input id="threadMessageInput" type="text" placeholder="Type a message" onkeypress="handleThreadMessageKey(event)" disabled />
+                        <button onclick="sendThreadMessage()" id="threadSendButton" disabled>Send</button>
+                    </div>
+                </section>
+            </div>`;
+        renderConversationRows(latestConversations);
+    }
+
+    function filterConversations() {
+        const query = document.getElementById('conversationSearch').value.toLowerCase().trim();
+        const filtered = latestConversations.filter(conversation => {
+            const fullName = `${conversation.otherFirstName || ''} ${conversation.otherLastName || ''}`.toLowerCase();
+            const studentId = `${conversation.otherStudentId || ''}`.toLowerCase();
+            return fullName.includes(query) || studentId.includes(query);
+        });
+        renderConversationRows(filtered);
+    }
+
+    function renderConversationRows(conversations) {
+        const list = document.getElementById('conversationList');
+        if (!conversations || conversations.length === 0) {
+            list.innerHTML = '<p style="color:#7f8c8d;">No conversations yet.</p>';
+            return;
+        }
+        list.innerHTML = '';
+        conversations.forEach(conversation => {
+            const row = document.createElement('div');
+            row.className = 'conversation-row' + (conversation.otherUserId === activeConversationUserId ? ' active' : '');
+            const name = `${conversation.otherFirstName || ''} ${conversation.otherLastName || ''}`.trim() || 'User';
+            row.onclick = () => loadConversationMessages(conversation.otherUserId, name);
+            const unreadCount = Number(conversation.unreadCount || 0);
+            row.innerHTML = `
+                <div class="conversation-title">${name}${unreadCount > 0 ? `<span class="unread-pill">${unreadCount}</span>` : ''}</div>
+                <div class="conversation-last">${conversation.lastMessage || ''}</div>
+            `;
+            list.appendChild(row);
+        });
+    }
+
+    async function loadConversationMessages(otherUserId, displayName) {
+        activeConversationUserId = otherUserId;
+        activeConversationName = displayName;
+        renderConversationRows(latestConversations);
+        const thread = document.getElementById('messageThread');
+        thread.innerHTML = `
+            <div class="thread-header">${displayName}</div>
+            <div class="thread-body" id="threadBody">Loading messages...</div>
+            <div class="thread-compose">
+                <input id="threadMessageInput" type="text" placeholder="Type a message" onkeypress="handleThreadMessageKey(event)" />
+                <button onclick="sendThreadMessage()" id="threadSendButton">Send</button>
+            </div>`;
+        const body = document.getElementById('threadBody');
+        try {
+            const response = await fetch(`http://localhost:8080/api/messages/me/conversations/${otherUserId}`, {
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) throw new Error('Failed');
+            const messages = await response.json();
+            body.innerHTML = messages.length ? '' : 'No messages in this conversation yet.';
+            messages.forEach(message => {
+                const div = document.createElement('div');
+                div.className = 'thread-message' + (currentUser && message.senderId === currentUser.userId ? ' mine' : '');
+                div.textContent = message.messageText;
+                body.appendChild(div);
+            });
+            body.scrollTop = body.scrollHeight;
+        } catch (error) {
+            body.innerHTML = 'Could not load messages.';
+        }
+    }
+
+    function handleThreadMessageKey(event) {
+        if (event.key === 'Enter') sendThreadMessage();
+    }
+
+    async function sendThreadMessage() {
+        const input = document.getElementById('threadMessageInput');
+        const messageText = input.value.trim();
+        if (!messageText || !activeConversationUserId) return;
+        const response = await fetch('http://localhost:8080/api/messages', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                otherUserId: activeConversationUserId,
+                messageText
+            })
+        });
+        if (!response.ok) {
+            alert('Could not send message.');
+            return;
+        }
+        input.value = '';
+        await loadConversationMessages(activeConversationUserId, activeConversationName);
+        const conversationsResponse = await fetch('http://localhost:8080/api/messages/me/conversations', {
+            credentials: 'include',
+            headers: { 'Accept': 'application/json' }
+        });
+        if (conversationsResponse.ok) {
+            latestConversations = await conversationsResponse.json();
+            renderConversationRows(latestConversations);
         }
     }
 
@@ -603,7 +1424,20 @@
         }
     }
 
-    window.addEventListener('DOMContentLoaded', loadRecentTools);
+    window.addEventListener('DOMContentLoaded', () => {
+        loadRecentTools();
+        refreshUnreadDot();
+        const conversationUserId = sessionStorage.getItem('toolmatesOpenConversationUserId');
+        const conversationName = sessionStorage.getItem('toolmatesOpenConversationName') || 'User';
+        if (conversationUserId) {
+            sessionStorage.removeItem('toolmatesOpenConversationUserId');
+            sessionStorage.removeItem('toolmatesOpenConversationName');
+            setTimeout(async () => {
+                await showMessagesPanel(document.querySelectorAll('.menu-item')[6]);
+                await loadConversationMessages(Number(conversationUserId), conversationName);
+            }, 250);
+        }
+    });
 </script>
 </body>
 </html>

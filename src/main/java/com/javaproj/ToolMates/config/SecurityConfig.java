@@ -42,10 +42,17 @@ public class SecurityConfig {
                                 "/api/auth/signup",
                                 "/api/auth/login",
                                 "/api/auth/logout",
+                                "/api/auth/me",
                                 "/api/auth/forgot-password",
                                 "/api/auth/verify-reset-otp",
                                 "/api/auth/reset-password",
-                                "/api/tools/**"
+                                "/api/tools/**",
+                                "/api/rent-requests/**",
+                                "/api/rental-history/**",
+                                "/api/messages/**",
+                                "/api/notifications/**",
+                                "/api/reviews/**",
+                                "/api/profile/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );

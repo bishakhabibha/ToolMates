@@ -17,6 +17,9 @@ public class User {
     private LocalDateTime createdAt;
     private int totalToolsRented = 0;
     private int totalToolsReceived = 0;
+    private int suspendedTimes = 0;
+    private String avatarUrl;
+    private String bio;
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
@@ -56,4 +59,13 @@ public class User {
 
     public int getTotalToolsReceived() { return totalToolsReceived; }
     public void setTotalToolsReceived(int totalToolsReceived) { this.totalToolsReceived = totalToolsReceived; }
+
+    public int getSuspendedTimes() { return suspendedTimes; }
+    public void setSuspendedTimes(int suspendedTimes) { this.suspendedTimes = suspendedTimes; }
+
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
 }

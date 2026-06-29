@@ -283,7 +283,7 @@
         <span class="brand-name">ToolMates</span>
     </div>
     <div class="nav-right">
-        <a href="#" class="btn-nav btn-login">My Account</a>
+        <a href="Profile.html" class="btn-nav btn-login">My Account</a>
     </div>
 </header>
 
@@ -292,7 +292,7 @@
     <aside class="sidebar">
         <div class="sidebar-section-title">Navigate</div>
         <a href="dashboard.html" class="menu-item"><i class="ti ti-home"></i> Home</a>
-        <a href="#" class="menu-item"><i class="ti ti-tool"></i> Browse Tools</a>
+        <a href="Browse Tools.html" class="menu-item"><i class="ti ti-tool"></i> Browse Tools</a>
 
         <div class="sidebar-section-title">Categories</div>
         <a href="#" class="menu-item"><i class="ti ti-hammer"></i> Repair & Build</a>
@@ -349,8 +349,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="pricePerHr">Rent Rate (Tk / Hour)</label>
-                        <input type="number" id="pricePerHr" min="0" required placeholder="e.g., 50" />
+                        <label for="pricePerDay">Rent Rate (Tk / Day)</label>
+                        <input type="number" id="pricePerDay" min="0" required placeholder="e.g., 500" />
                     </div>
 
                     <div class="form-group">
@@ -392,7 +392,7 @@
 
                     <div class="form-group full-width">
                         <label for="additionalInfo">Additional Info / Rules (Optional)</label>
-                        <textarea id="additionalInfo" placeholder="e.g., Please return clean. Must show campus matching student identification details at swap point."></textarea>
+                        <textarea id="additionalInfo" placeholder="Return rules, pickup notes, or care instructions."></textarea>
                     </div>
 
                 </div>
@@ -497,7 +497,7 @@
             name: document.getElementById('toolName').value,
             category: document.getElementById('toolCategory').value,
             condition: document.getElementById('toolCondition').value,
-            pricePerHr: parseFloat(document.getElementById('pricePerHr').value),
+            pricePerDay: parseFloat(document.getElementById('pricePerDay').value),
             maxRentingPeriod: parseInt(document.getElementById('maxRentingPeriod').value),
             pickupLocation: document.getElementById('pickupLocation').value,
             imageUrls: uploadedImages, // Sends base64 array payload direct to controller maps

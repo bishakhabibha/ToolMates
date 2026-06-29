@@ -9,6 +9,7 @@ import com.javaproj.ToolMates.auth.exception.EmailNotVerifiedException;
 import com.javaproj.ToolMates.auth.exception.InvalidCredentialsException;
 import com.javaproj.ToolMates.auth.exception.UserNotFoundException;
 import com.javaproj.ToolMates.auth.model.User;
+import com.javaproj.ToolMates.auth.repository.UserDao;
 import com.javaproj.ToolMates.auth.service.AuthService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class AuthController {
     private static final String SESSION_VERIFIED_EMAIL = "verifiedEmail";
 
     @Autowired private AuthService authService;
+    @Autowired private UserDao userDao;
 
     // ── Existing: Signup ─────────────────────────────────────────────────
 
@@ -85,6 +87,8 @@ public class AuthController {
         try {
             User user = authService.login(req, session);
             return ResponseEntity.ok(Map.of(
+                    "userId",    user.getUserId(),
+                    "studentId", user.getStudentId(),
                     "firstName", user.getFirstName(),
                     "lastName",  user.getLastName(),
                     "message",   "Login successful."
@@ -93,6 +97,25 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", ex.getMessage()));
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        String studentId = (String) session.getAttribute("studentId");
+        String email = (String) session.getAttribute("email");
+        if (userId == null || studentId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Not logged in."));
+        }
+        User user = userDao.findByUserId(userId).orElse(null);
+        return ResponseEntity.ok(Map.of(
+                "userId", userId,
+                "studentId", studentId,
+                "email", email == null ? "" : email,
+                "firstName", user == null ? "" : user.getFirstName(),
+                "lastName", user == null ? "" : user.getLastName()
+        ));
     }
 
     @PostMapping("/logout")

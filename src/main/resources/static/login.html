@@ -204,7 +204,7 @@
 
             <div class="field">
                 <label class="lbl"><i class="ti ti-id-badge"></i>Student ID <span class="req">*</span></label>
-                <input type="text" id="username" placeholder="e.g., 2003001" />
+                <input type="text" id="username" />
                 <span class="err" id="err-username">Please enter your Student ID.</span>
             </div>
 
@@ -496,6 +496,12 @@
             });
             const data = await r.json();
             if (r.ok) {
+                localStorage.setItem('toolmatesUser', JSON.stringify({
+                    userId: data.userId,
+                    studentId: data.studentId,
+                    firstName: data.firstName,
+                    lastName: data.lastName
+                }));
                 window.location.href = 'dashboard.html';
             } else {
                 alert(data.error || 'Invalid credentials. Please try again.');

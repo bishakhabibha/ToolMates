@@ -118,6 +118,18 @@ public class UserDao {
             if (ts != null) u.setCreatedAt(ts.toLocalDateTime());
             u.setTotalToolsRented(rs.getInt("total_tools_rented"));
             u.setTotalToolsReceived(rs.getInt("total_tools_received"));
+            try {
+                u.setSuspendedTimes(rs.getInt("suspended_times"));
+            } catch (SQLException ignored) {
+                u.setSuspendedTimes(0);
+            }
+            try {
+                u.setAvatarUrl(rs.getString("avatar_url"));
+                u.setBio(rs.getString("bio"));
+            } catch (SQLException ignored) {
+                u.setAvatarUrl(null);
+                u.setBio(null);
+            }
             return u;
         }
     }

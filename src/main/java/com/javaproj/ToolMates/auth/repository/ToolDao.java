@@ -18,7 +18,7 @@ public class ToolDao {
     private JdbcTemplate jdbcTemplate;
 
     public Tool save(Tool tool) {
-        String insertToolSql = "INSERT INTO tools (owner_name, owner_id, name, category, tool_condition, price_per_hr, max_renting_period, pickup_location, description, additional_info) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertToolSql = "INSERT INTO tools (owner_name, owner_id, name, category, tool_condition, price_per_day, max_renting_period, pickup_location, description, additional_info) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -29,7 +29,7 @@ public class ToolDao {
             ps.setString(3, tool.getName());
             ps.setString(4, tool.getCategory());
             ps.setString(5, tool.getCondition());
-            ps.setDouble(6, tool.getPricePerHr());
+            ps.setDouble(6, tool.getPricePerDay());
             ps.setInt(7, tool.getMaxRentingPeriod());
             ps.setString(8, tool.getPickupLocation());
             ps.setString(9, tool.getDescription());
@@ -61,7 +61,7 @@ public class ToolDao {
             tool.setName(rs.getString("name"));
             tool.setCategory(rs.getString("category"));
             tool.setCondition(rs.getString("tool_condition"));
-            tool.setPricePerHr(rs.getDouble("price_per_hr"));
+            tool.setPricePerDay(rs.getDouble("price_per_day"));
             tool.setMaxRentingPeriod(rs.getInt("max_renting_period"));
             tool.setPickupLocation(rs.getString("pickup_location"));
             tool.setDescription(rs.getString("description"));
@@ -95,7 +95,7 @@ public class ToolDao {
                 tool.setName(rs.getString("name"));
                 tool.setCategory(rs.getString("category"));
                 tool.setCondition(rs.getString("tool_condition"));
-                tool.setPricePerHr(rs.getDouble("price_per_hr"));
+                tool.setPricePerDay(rs.getDouble("price_per_day"));
                 tool.setMaxRentingPeriod(rs.getInt("max_renting_period"));
                 tool.setPickupLocation(rs.getString("pickup_location"));
                 tool.setDescription(rs.getString("description"));
@@ -113,5 +113,31 @@ public class ToolDao {
         } catch (org.springframework.dao.EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    public List<Tool> findByOwnerId(String ownerId) {
+        String selectToolsSql = "SELECT * FROM tools WHERE owner_id = ? ORDER BY id DESC";
+        return jdbcTemplate.query(selectToolsSql, (rs, rowNum) -> {
+            Tool tool = new Tool();
+            tool.setId(rs.getLong("id"));
+            tool.setOwnerName(rs.getString("owner_name"));
+            tool.setOwnerId(rs.getString("owner_id"));
+            tool.setName(rs.getString("name"));
+            tool.setCategory(rs.getString("category"));
+            tool.setCondition(rs.getString("tool_condition"));
+            tool.setPricePerDay(rs.getDouble("price_per_day"));
+            tool.setMaxRentingPeriod(rs.getInt("max_renting_period"));
+            tool.setPickupLocation(rs.getString("pickup_location"));
+            tool.setDescription(rs.getString("description"));
+            tool.setAdditionalInfo(rs.getString("additional_info"));
+
+            String selectImagesSql = "SELECT image_url FROM tool_images WHERE tool_id = ?";
+            List<String> imageUrls = jdbcTemplate.query(selectImagesSql,
+                    (imgRs, imgRowNum) -> imgRs.getString("image_url"),
+                    tool.getId()
+            );
+            tool.setImageUrls(imageUrls);
+            return tool;
+        }, ownerId);
     }
 }

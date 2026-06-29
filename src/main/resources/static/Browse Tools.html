@@ -370,8 +370,8 @@
     const sortingMode = document.getElementById('masterSortSelect').value;
     if (sortingMode === 'recent')        sortedOutput.sort((x, y) => (y.id || 0) - (x.id || 0));
     else if (sortingMode === 'oldest')   sortedOutput.sort((x, y) => (x.id || 0) - (y.id || 0));
-    else if (sortingMode === 'low-high') sortedOutput.sort((x, y) => (x.pricePerHr || 0) - (y.pricePerHr || 0));
-    else if (sortingMode === 'high-low') sortedOutput.sort((x, y) => (y.pricePerHr || 0) - (x.pricePerHr || 0));
+    else if (sortingMode === 'low-high') sortedOutput.sort((x, y) => (x.pricePerDay || 0) - (y.pricePerDay || 0));
+    else if (sortingMode === 'high-low') sortedOutput.sort((x, y) => (y.pricePerDay || 0) - (x.pricePerDay || 0));
     renderToolsList(sortedOutput);
   }
 
@@ -418,8 +418,8 @@
           <span class="tool-cat" style="background-color: ${scheme.bg}; color: ${scheme.text};">${tool.category || 'General'}</span>
           <h3 class="tool-title">${tool.name || 'Unnamed Tool'}</h3>
           <div class="tool-rent-details">
-            <span class="price-tag">Tk ${tool.pricePerHr || 0}</span>
-            <span class="price-unit">/ hour</span>
+            <span class="price-tag">Tk ${tool.pricePerDay || 0}</span>
+            <span class="price-unit">/ day</span>
           </div>
           <div class="card-footer">
             <span>Max Rent: <span class="max-period">${tool.maxRentingPeriod || 0} days</span></span>

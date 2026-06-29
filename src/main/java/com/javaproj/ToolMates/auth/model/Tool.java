@@ -23,8 +23,8 @@ public class Tool {
     @Column("tool_condition")
     private String condition;
 
-    @Column("price_per_hr")
-    private Double pricePerHr;
+    @Column("price_per_day")
+    private Double pricePerDay;
 
     @Column("max_renting_period")
     private Integer maxRentingPeriod;
@@ -59,8 +59,8 @@ public class Tool {
     public String getCondition() { return condition; }
     public void setCondition(String condition) { this.condition = condition; }
 
-    public Double getPricePerHr() { return pricePerHr; }
-    public void setPricePerHr(Double pricePerHr) { this.pricePerHr = pricePerHr; }
+    public Double getPricePerDay() { return pricePerDay; }
+    public void setPricePerDay(Double pricePerDay) { this.pricePerDay = pricePerDay; }
 
     public Integer getMaxRentingPeriod() { return maxRentingPeriod; }
     public void setMaxRentingPeriod(Integer maxRentingPeriod) { this.maxRentingPeriod = maxRentingPeriod; }

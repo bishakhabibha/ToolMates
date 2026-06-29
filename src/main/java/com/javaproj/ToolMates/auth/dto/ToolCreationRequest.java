@@ -8,7 +8,7 @@ public class ToolCreationRequest {
     private String name;
     private String category;
     private String condition;
-    private double pricePerHr;
+    private double pricePerDay;
     private int maxRentingPeriod;
     private String pickupLocation;
     private List<String> imageUrls; // Array to collect up to 3 base64 strings
@@ -31,8 +31,8 @@ public class ToolCreationRequest {
     public String getCondition() { return condition; }
     public void setCondition(String condition) { this.condition = condition; }
 
-    public double getPricePerHr() { return pricePerHr; }
-    public void setPricePerHr(double pricePerHr) { this.pricePerHr = pricePerHr; }
+    public double getPricePerDay() { return pricePerDay; }
+    public void setPricePerDay(double pricePerDay) { this.pricePerDay = pricePerDay; }
 
     public int getMaxRentingPeriod() { return maxRentingPeriod; }
     public void setMaxRentingPeriod(int maxRentingPeriod) { this.maxRentingPeriod = maxRentingPeriod; }

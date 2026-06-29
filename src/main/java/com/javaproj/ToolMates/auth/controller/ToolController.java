@@ -23,6 +23,7 @@ public class ToolController {
             Tool savedTool = toolService.saveToolListing(tool);
             return new ResponseEntity<>(savedTool, HttpStatus.CREATED);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -33,6 +34,7 @@ public class ToolController {
             List<Tool> tools = toolService.getRecentTools();
             return new ResponseEntity<>(tools, HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -47,6 +49,7 @@ public class ToolController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
