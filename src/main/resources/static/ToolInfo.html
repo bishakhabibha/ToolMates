@@ -129,8 +129,28 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #00796b;
+        }
+        .info-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
             margin-bottom: 18px;
         }
+        .edit-icon-btn {
+            display: none;
+            border: none;
+            background: #e0f2f1;
+            color: #00796b;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .edit-icon-btn:hover { background: #b2dfdb; }
 
         .info-row {
             display: flex;
@@ -157,6 +177,51 @@
         .info-text { display: flex; flex-direction: column; gap: 2px; }
         .info-label { font-size: 11px; color: #7f8c8d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .info-value { font-size: 15px; color: #1a2e2b; font-weight: 600; }
+        .edit-field { display: none; }
+        body.edit-mode .read-field { display: none; }
+        body.edit-mode .edit-field { display: block; }
+        body.edit-mode #editToolButton { display: none !important; }
+        .info-text input,
+        .info-text select,
+        .desc-card textarea,
+        .tool-summary-card input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ced6d6;
+            font-size: 14px;
+            color: #2c3e50;
+            font-family: inherit;
+            outline: none;
+        }
+        .desc-card textarea { min-height: 110px; resize: vertical; }
+        .edit-actions {
+            display: none;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+        body.edit-mode .edit-actions { display: flex; }
+        .edit-actions button {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #00796b;
+            background: #00796b;
+            color: #ffffff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .edit-actions .secondary { background: #ffffff; color: #00796b; }
+        .edit-actions .danger { border-color: #b3261e; color: #b3261e; background: #ffffff; }
+        .image-edit-panel {
+            display: none;
+            padding: 14px 16px;
+            border-top: 1px solid #e0eeec;
+            background: #f9fdfc;
+        }
+        body.edit-mode .image-edit-panel { display: block; }
+        .image-edit-panel input { width: 100%; margin-bottom: 8px; }
+        .image-edit-panel .hint { font-size: 12px; color: #7f8c8d; }
 
         /* Description Card */
         .desc-card {
@@ -324,6 +389,17 @@
             box-shadow: 0 0 0 3px rgba(0,121,107,0.06);
         }
         .rent-card textarea { resize: vertical; min-height: 80px; }
+        .rent-card input[readonly] {
+            background: #f4fbfa;
+            color: #546e7a;
+        }
+        .own-tool-note {
+            display: none;
+            color: #b3261e;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
 
         .cost-estimate {
             background: #f4fbfa;
@@ -565,55 +641,86 @@
                     <img id="mainImage" src="" alt="Tool image" />
                 </div>
                 <div class="thumb-strip" id="thumbStrip"></div>
+                <div class="image-edit-panel">
+                    <input type="file" id="editImagesInput" accept="image/*" multiple onchange="handleEditImages(this)" />
+                    <div class="hint">Upload up to 3 replacement images.</div>
+                </div>
             </div>
 
             <!-- Detailed Info -->
             <div class="info-card">
-                <h2>Tool Information</h2>
+                <div class="info-heading">
+                    <h2>Tool Information</h2>
+                    <button id="editToolButton" class="edit-icon-btn" onclick="enterEditMode()" title="Edit tool">
+                        <i class="ti ti-pencil"></i>
+                    </button>
+                </div>
                 <div class="info-row">
                     <div class="info-icon"><i class="ti ti-tag"></i></div>
                     <div class="info-text">
                         <span class="info-label">Category</span>
-                        <span class="info-value" id="detailCategory">—</span>
+                        <span class="info-value read-field" id="detailCategory">—</span>
+                        <select class="edit-field" id="editCategory">
+                            <option>Repair & Build</option>
+                            <option>Photography</option>
+                            <option>Technology</option>
+                            <option>Heavy Equipment</option>
+                        </select>
                     </div>
                 </div>
                 <div class="info-row">
                     <div class="info-icon"><i class="ti ti-shield-check"></i></div>
                     <div class="info-text">
                         <span class="info-label">Condition</span>
-                        <span class="info-value" id="detailCondition">—</span>
+                        <span class="info-value read-field" id="detailCondition">—</span>
+                        <select class="edit-field" id="editCondition">
+                            <option>Brand New</option>
+                            <option>Like New</option>
+                            <option>Good</option>
+                            <option>Fair</option>
+                        </select>
                     </div>
                 </div>
                 <div class="info-row">
                     <div class="info-icon"><i class="ti ti-map-pin"></i></div>
                     <div class="info-text">
                         <span class="info-label">Pickup Location</span>
-                        <span class="info-value" id="detailPickup">—</span>
+                        <span class="info-value read-field" id="detailPickup">—</span>
+                        <input class="edit-field" type="text" id="editPickup" />
                     </div>
                 </div>
                 <div class="info-row">
                     <div class="info-icon"><i class="ti ti-calendar-time"></i></div>
                     <div class="info-text">
                         <span class="info-label">Max Renting Period</span>
-                        <span class="info-value" id="detailMaxPeriod">—</span>
+                        <span class="info-value read-field" id="detailMaxPeriod">—</span>
+                        <input class="edit-field" type="number" id="editMaxPeriod" min="1" />
                     </div>
                 </div>
                 <div class="info-row">
                     <div class="info-icon"><i class="ti ti-clock"></i></div>
                     <div class="info-text">
                         <span class="info-label">Rate</span>
-                        <span class="info-value" id="detailRate">—</span>
+                        <span class="info-value read-field" id="detailRate">—</span>
+                        <input class="edit-field" type="number" id="editPrice" min="0" step="0.01" />
                     </div>
+                </div>
+                <div class="edit-actions">
+                    <button onclick="saveToolEdits()">Save</button>
+                    <button class="secondary" onclick="cancelToolEdits()">Cancel</button>
+                    <button class="danger" id="unlistToolButton" onclick="unlistTool()">Unlist Tool</button>
                 </div>
             </div>
 
             <!-- Description -->
             <div class="desc-card">
                 <h2>Description</h2>
-                <p id="detailDescription">—</p>
+                <p class="read-field" id="detailDescription">—</p>
+                <textarea class="edit-field" id="editDescription"></textarea>
                 <div class="additional-block" id="additionalBlock" style="display:none;">
                     <h3>Additional Info / Rules</h3>
-                    <p id="detailAdditional"></p>
+                    <p class="read-field" id="detailAdditional"></p>
+                    <textarea class="edit-field" id="editAdditional"></textarea>
                 </div>
             </div>
 
@@ -625,7 +732,8 @@
             <!-- Tool Summary -->
             <div class="tool-summary-card">
                 <span class="tool-cat-badge" id="summCatBadge">Category</span>
-                <h1 class="tool-main-title" id="summToolName">Tool Name</h1>
+                <h1 class="tool-main-title read-field" id="summToolName">Tool Name</h1>
+                <input class="edit-field" type="text" id="editToolName" />
                 <div class="condition-row">
                     <div class="condition-dot" id="condDot"></div>
                     <span class="condition-text" id="summCondition">Condition</span>
@@ -656,15 +764,17 @@
             <!-- Rent Request Card -->
             <div class="rent-card">
                 <h2>Request to Rent</h2>
+                <div class="own-tool-note" id="ownToolNote">You cannot rent your own tool.</div>
+                <div class="own-tool-note" id="unavailableToolNote">This tool is no longer available for rent.</div>
 
                 <div class="form-group">
                     <label class="rent-label" for="renterName">Your Name</label>
-                    <input type="text" id="renterName" autocomplete="name" />
+                    <input type="text" id="renterName" autocomplete="name" readonly />
                 </div>
 
                 <div class="form-group">
                     <label class="rent-label" for="renterId">Your Student ID</label>
-                    <input type="text" id="renterId" autocomplete="off" />
+                    <input type="text" id="renterId" autocomplete="off" readonly />
                 </div>
 
                 <div class="form-group">
@@ -692,7 +802,7 @@
                     <textarea id="rentMessage" placeholder="e.g., I need this for a weekend repair project. I'll handle it with care."></textarea>
                 </div>
 
-                <button class="btn-rent" onclick="submitRentRequest()">
+                <button class="btn-rent" id="rentRequestButton" onclick="submitRentRequest()">
                     <i class="ti ti-send"></i> Send Rent Request
                 </button>
                 <button class="btn-rent" onclick="messageOwner()">
@@ -743,6 +853,8 @@
     let currentUser = JSON.parse(localStorage.getItem('toolmatesUser') || 'null');
     let activeRentalRequestId = null;
     let activeChatSenderStudentId = null;
+    let editSnapshot = null;
+    let editedImages = [];
 
     function getToolIdFromUrl() {
         const params = new URLSearchParams(window.location.search);
@@ -787,24 +899,7 @@
         const condKey = (tool.condition || '').toLowerCase();
         const condColor = conditionColors[condKey] || '#00796b';
 
-        // Gallery
-        const defaultImg = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&auto=format&fit=crop&q=80';
-        const imgs = (tool.imageUrls && tool.imageUrls.length > 0) ? tool.imageUrls : [defaultImg];
-        document.getElementById('mainImage').src = imgs[0];
-
-        const strip = document.getElementById('thumbStrip');
-        strip.innerHTML = '';
-        imgs.forEach((src, i) => {
-            const t = document.createElement('div');
-            t.className = 'thumb' + (i === 0 ? ' active' : '');
-            t.innerHTML = `<img src="${src}" alt="Image ${i+1}" />`;
-            t.onclick = () => {
-                document.getElementById('mainImage').src = src;
-                document.querySelectorAll('.thumb').forEach(th => th.classList.remove('active'));
-                t.classList.add('active');
-            };
-            strip.appendChild(t);
-        });
+        renderGallery(tool.imageUrls || []);
 
         // Left info panel
         document.getElementById('detailCategory').textContent = tool.category || '—';
@@ -817,6 +912,9 @@
         if (tool.additionalInfo && tool.additionalInfo.trim()) {
             document.getElementById('additionalBlock').style.display = 'block';
             document.getElementById('detailAdditional').textContent = tool.additionalInfo;
+        } else {
+            document.getElementById('additionalBlock').style.display = 'none';
+            document.getElementById('detailAdditional').textContent = '';
         }
 
         // Right summary
@@ -855,6 +953,28 @@
         }
 
         updateCostEstimate();
+        fillEditFields(tool);
+        updateEditVisibility();
+        updateRentAvailability();
+    }
+
+    function renderGallery(imageUrls) {
+        const defaultImg = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&auto=format&fit=crop&q=80';
+        const imgs = (imageUrls && imageUrls.length > 0) ? imageUrls : [defaultImg];
+        document.getElementById('mainImage').src = imgs[0];
+        const strip = document.getElementById('thumbStrip');
+        strip.innerHTML = '';
+        imgs.forEach((src, i) => {
+            const t = document.createElement('div');
+            t.className = 'thumb' + (i === 0 ? ' active' : '');
+            t.innerHTML = `<img src="${src}" alt="Image ${i+1}" />`;
+            t.onclick = () => {
+                document.getElementById('mainImage').src = src;
+                document.querySelectorAll('.thumb').forEach(th => th.classList.remove('active'));
+                t.classList.add('active');
+            };
+            strip.appendChild(t);
+        });
     }
 
     function updateCostEstimate() {
@@ -885,8 +1005,17 @@
         const days       = document.getElementById('rentDays').value;
         const message    = document.getElementById('rentMessage').value.trim();
 
-        if (!renterName || !renterId) {
-            alert('Please enter your name and student ID.');
+        const user = await ensureCurrentUser();
+        if (!user || !user.studentId) {
+            alert('Please log in to request rent.');
+            return;
+        }
+        if (currentTool && currentTool.ownerId === user.studentId) {
+            alert('You cannot rent your own tool.');
+            return;
+        }
+        if (currentTool && currentTool.active === false) {
+            alert('This tool is no longer available for rent.');
             return;
         }
         if (!startDate || !days || parseInt(days) < 1) {
@@ -900,8 +1029,8 @@
 
         const requestData = {
             toolId:      currentTool ? currentTool.id : null,
-            renterName,
-            renterId,
+            renterName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+            renterId: user.studentId,
             startDate,
             durationDays: parseInt(days),
             message
@@ -910,6 +1039,7 @@
         try {
             const resp = await fetch('http://localhost:8080/api/rent-requests/add', {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify(requestData)
             });
@@ -935,21 +1065,21 @@
     }
 
     async function ensureCurrentUser() {
-        if (currentUser && currentUser.userId && currentUser.studentId) {
-            fillCurrentUserFields();
-            return currentUser;
-        }
         try {
             const response = await fetch('http://localhost:8080/api/auth/me', {
                 credentials: 'include',
                 headers: { 'Accept': 'application/json' }
             });
-            if (!response.ok) return null;
+            if (!response.ok) throw new Error('Not logged in');
             currentUser = await response.json();
             localStorage.setItem('toolmatesUser', JSON.stringify(currentUser));
             fillCurrentUserFields();
+            updateEditVisibility();
             return currentUser;
         } catch (error) {
+            currentUser = null;
+            localStorage.removeItem('toolmatesUser');
+            updateEditVisibility();
             return null;
         }
     }
@@ -961,6 +1091,137 @@
         const fullName = `${firstName} ${lastName}`.trim();
         if (fullName) document.getElementById('renterName').value = fullName;
         if (currentUser.studentId) document.getElementById('renterId').value = currentUser.studentId;
+        updateRentAvailability();
+    }
+
+    function updateRentAvailability() {
+        if (!currentTool) return;
+        const isOwnTool = currentUser && currentTool.ownerId === currentUser.studentId;
+        const isInactive = currentTool.active === false;
+        const button = document.getElementById('rentRequestButton');
+        document.getElementById('ownToolNote').style.display = isOwnTool ? 'block' : 'none';
+        document.getElementById('unavailableToolNote').style.display = isInactive ? 'block' : 'none';
+        if (button) button.disabled = isOwnTool || isInactive;
+    }
+
+    function updateEditVisibility() {
+        const canEdit = currentTool && currentUser && currentTool.ownerId === currentUser.studentId;
+        document.getElementById('editToolButton').style.display = canEdit ? 'flex' : 'none';
+    }
+
+    function fillEditFields(tool) {
+        document.getElementById('editToolName').value = tool.name || '';
+        document.getElementById('editCategory').value = tool.category || 'Repair & Build';
+        document.getElementById('editCondition').value = tool.condition || 'Good';
+        document.getElementById('editPickup').value = tool.pickupLocation || '';
+        document.getElementById('editMaxPeriod').value = tool.maxRentingPeriod || '';
+        document.getElementById('editPrice').value = tool.pricePerDay || '';
+        document.getElementById('editDescription').value = tool.description || '';
+        document.getElementById('editAdditional').value = tool.additionalInfo || '';
+        editedImages = [...(tool.imageUrls || [])];
+        document.getElementById('unlistToolButton').disabled = tool.active === false;
+    }
+
+    function enterEditMode() {
+        if (!currentTool || !currentUser || currentTool.ownerId !== currentUser.studentId) return;
+        editSnapshot = JSON.parse(JSON.stringify(currentTool));
+        fillEditFields(currentTool);
+        document.getElementById('additionalBlock').style.display = 'block';
+        document.body.classList.add('edit-mode');
+    }
+
+    function cancelToolEdits() {
+        if (editSnapshot) {
+            currentTool = JSON.parse(JSON.stringify(editSnapshot));
+            renderDetail(currentTool);
+        }
+        document.body.classList.remove('edit-mode');
+        editSnapshot = null;
+    }
+
+    function handleEditImages(input) {
+        const files = Array.from(input.files || []);
+        editedImages = [];
+        if (files.length === 0) {
+            editedImages = [...(currentTool.imageUrls || [])];
+            return;
+        }
+        files.slice(0, 3).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = event => {
+                editedImages.push(event.target.result);
+                renderGallery(editedImages);
+            };
+            reader.readAsDataURL(file);
+        });
+        input.value = '';
+    }
+
+    async function saveToolEdits() {
+        const payload = {
+            name: document.getElementById('editToolName').value.trim(),
+            category: document.getElementById('editCategory').value,
+            condition: document.getElementById('editCondition').value,
+            pricePerDay: parseFloat(document.getElementById('editPrice').value),
+            maxRentingPeriod: parseInt(document.getElementById('editMaxPeriod').value),
+            pickupLocation: document.getElementById('editPickup').value.trim(),
+            description: document.getElementById('editDescription').value.trim(),
+            additionalInfo: document.getElementById('editAdditional').value.trim(),
+            imageUrls: editedImages
+        };
+        if (!payload.name || !payload.category || !payload.condition || !payload.pickupLocation || !payload.description) {
+            alert('Please complete the required tool details.');
+            return;
+        }
+        if (Number.isNaN(payload.pricePerDay) || payload.pricePerDay < 0) {
+            alert('Price must be valid.');
+            return;
+        }
+        if (Number.isNaN(payload.maxRentingPeriod) || payload.maxRentingPeriod < 1) {
+            alert('Maximum renting period must be valid.');
+            return;
+        }
+        const response = await fetch(`http://localhost:8080/api/tools/${currentTool.id}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            alert(await responseError(response, 'Could not update tool.'));
+            return;
+        }
+        currentTool = await response.json();
+        document.body.classList.remove('edit-mode');
+        editSnapshot = null;
+        renderDetail(currentTool);
+        showToast('Tool updated successfully.');
+    }
+
+    async function unlistTool() {
+        if (!confirm('This tool will no longer appear for future rentals.\n\nPast and ongoing rental records will remain unchanged.\n\nDo you want to continue?')) return;
+        const response = await fetch(`http://localhost:8080/api/tools/${currentTool.id}/unlist`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Accept': 'application/json' }
+        });
+        if (!response.ok) {
+            alert(await responseError(response, 'Could not unlist tool.'));
+            return;
+        }
+        currentTool.active = false;
+        document.body.classList.remove('edit-mode');
+        renderDetail(currentTool);
+        showToast('Tool unlisted.');
+    }
+
+    async function responseError(response, fallbackMessage) {
+        try {
+            const body = await response.json();
+            return body.error || fallbackMessage;
+        } catch (error) {
+            return fallbackMessage;
+        }
     }
 
     async function messageOwner() {

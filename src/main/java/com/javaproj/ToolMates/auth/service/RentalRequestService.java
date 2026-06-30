@@ -12,6 +12,7 @@ import com.javaproj.ToolMates.auth.repository.ReportDao;
 import com.javaproj.ToolMates.auth.repository.ToolDao;
 import com.javaproj.ToolMates.auth.repository.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,13 +64,26 @@ public class RentalRequestService {
     @Autowired
     private ReportDao reportDao;
 
+    @Value("${app.demo-mode:false}")
+    private boolean demoMode;
+
+    @Value("${app.demo-minutes-per-day:1}")
+    private long demoMinutesPerDay;
+
     @Transactional
-    public RentalRequest createRentalRequest(RentalRequestCreateRequest request) {
+    public RentalRequest createRentalRequest(RentalRequestCreateRequest request, Long actorUserId) {
+        if (actorUserId == null) throw new IllegalArgumentException("You must be logged in.");
         Tool tool = toolDao.findById(request.getToolId());
         if (tool == null) throw new IllegalArgumentException("Tool not found.");
+        if (!Boolean.TRUE.equals(tool.getActive())) {
+            throw new IllegalArgumentException("This tool is no longer available for rent.");
+        }
 
-        User borrower = userDao.findByStudentId(request.getRenterId())
+        User borrower = userDao.findByUserId(actorUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Borrower not found."));
+        if (tool.getOwnerId() != null && tool.getOwnerId().equalsIgnoreCase(borrower.getStudentId())) {
+            throw new IllegalArgumentException("You cannot rent your own tool.");
+        }
         User owner = userDao.findByStudentId(tool.getOwnerId())
                 .orElseThrow(() -> new IllegalArgumentException("Owner not found."));
 
@@ -84,8 +98,8 @@ public class RentalRequestService {
         rentalRequest.setToolId(tool.getId());
         rentalRequest.setOwnerId(owner.getUserId());
         rentalRequest.setBorrowerId(borrower.getUserId());
-        rentalRequest.setBorrowerName(request.getRenterName());
-        rentalRequest.setRenterId(request.getRenterId());
+        rentalRequest.setBorrowerName((borrower.getFirstName() + " " + borrower.getLastName()).trim());
+        rentalRequest.setRenterId(borrower.getStudentId());
         rentalRequest.setStartDate(request.getStartDate());
         rentalRequest.setDurationDays(durationDays);
         rentalRequest.setMessage(request.getMessage());
@@ -94,7 +108,7 @@ public class RentalRequestService {
         RentalRequest saved = rentalRequestDao.save(rentalRequest);
         rentalRequestDao.logStatusTransition(saved.getRentalRequestId(), null, PENDING, borrower.getUserId(), "Rental request created.");
         rentalRequestDao.logAction(saved.getRentalRequestId(), borrower.getUserId(), "CREATE_RENTAL_REQUEST", request.getMessage());
-        notificationDao.create(
+        notificationDao.createOnce(
                 owner.getUserId(),
                 saved.getRentalRequestId(),
                 "User " + borrower.getFirstName() + " " + borrower.getLastName() + " requested to rent your tool.",
@@ -151,7 +165,7 @@ public class RentalRequestService {
         rentalRequestDao.logAction(rentalRequestId, actorUserId, "SUBMIT_PICKUP_DETAILS",
                 scheduleRequest.getPickupDate() + " " + scheduleRequest.getPickupTime().format(PICKUP_TIME_FORMAT) + " at " + pickupLocation);
         rentalRequestDao.logStatusTransition(rentalRequestId, fromStatus, PICKUP_DETAILS_SUBMITTED, actorUserId, "Owner submitted pickup details.");
-        notificationDao.create(
+        notificationDao.createOnce(
                 rentalRequest.getBorrowerId(),
                 rentalRequestId,
                 "User " + owner.getFirstName() + " " + owner.getLastName() + " accepted your rental request.",
@@ -226,22 +240,24 @@ public class RentalRequestService {
         RentalRequest updated = rentalRequestDao.findByIdForUpdate(rentalRequestId);
         if (updated.getOwnerPickupConfirmation() == null || updated.getBorrowerPickupConfirmation() == null) {
             Long otherUserId = owner ? updated.getBorrowerId() : updated.getOwnerId();
-            notificationDao.create(otherUserId, rentalRequestId, "The other user answered the pickup confirmation. Please answer YES or NO.", "pickup_confirmation_waiting");
+            notificationDao.createOnce(otherUserId, rentalRequestId, "The other user answered the pickup confirmation. Please answer YES or NO.", "pickup_confirmation_waiting");
+            notificationDao.markReadByRentalRequestUserAndTypes(rentalRequestId, actorUserId, "pickup_confirmation_owner", "pickup_confirmation_borrower", "pickup_confirmation_waiting");
             return updated;
         }
+        notificationDao.markReadByRentalRequestAndTypes(rentalRequestId, "pickup_confirmation_owner", "pickup_confirmation_borrower", "pickup_confirmation_waiting");
 
         boolean ownerYes = "YES".equals(updated.getOwnerPickupConfirmation());
         boolean borrowerYes = "YES".equals(updated.getBorrowerPickupConfirmation());
         if (ownerYes && borrowerYes) {
             transition(updated, ADVANCE_PAYMENT_CONFIRMATION, actorUserId, "Both users confirmed successful pickup.");
-            notificationDao.create(updated.getBorrowerId(), rentalRequestId, "Did you pay the required 40% advance payment?", "payment_confirmation_borrower");
-            notificationDao.create(updated.getOwnerId(), rentalRequestId, "Did you receive the required 40% advance payment?", "payment_confirmation_owner");
+            notificationDao.createOnce(updated.getBorrowerId(), rentalRequestId, "Did you pay the required 40% advance payment?", "payment_confirmation_borrower");
+            notificationDao.createOnce(updated.getOwnerId(), rentalRequestId, "Did you receive the required 40% advance payment?", "payment_confirmation_owner");
         } else if (!ownerYes && !borrowerYes) {
             transition(updated, PICKUP_FAILED, actorUserId, "Both users said pickup failed.");
             notifyBoth(updated, "Pickup failed. You may reschedule pickup, cancel rental, or message the other user.", "pickup_failed");
         } else {
             transition(updated, PICKUP_DISPUTE, actorUserId, "Pickup confirmations did not match.");
-            notifyBoth(updated, "Pickup dispute opened. You may continue chat, contact admin, reschedule pickup, or cancel rental.", "pickup_dispute");
+            notifyBoth(updated, "Pickup confirmations do not match. Please continue chat, report the user, reschedule pickup, or cancel rental.", "pickup_dispute");
         }
         return rentalRequestDao.findById(rentalRequestId);
     }
@@ -275,15 +291,17 @@ public class RentalRequestService {
         RentalRequest updated = rentalRequestDao.findByIdForUpdate(rentalRequestId);
         if (updated.getOwnerPaymentConfirmation() == null || updated.getBorrowerPaymentConfirmation() == null) {
             Long otherUserId = owner ? updated.getBorrowerId() : updated.getOwnerId();
-            notificationDao.create(otherUserId, rentalRequestId, "The other user answered the advance payment confirmation. Please answer YES or NO.", "payment_confirmation_waiting");
+            notificationDao.createOnce(otherUserId, rentalRequestId, "The other user answered the advance payment confirmation. Please answer YES or NO.", "payment_confirmation_waiting");
+            notificationDao.markReadByRentalRequestUserAndTypes(rentalRequestId, actorUserId, "payment_confirmation_owner", "payment_confirmation_borrower", "payment_confirmation_waiting", "payment_confirmation_reminder");
             return updated;
         }
+        notificationDao.markReadByRentalRequestAndTypes(rentalRequestId, "payment_confirmation_owner", "payment_confirmation_borrower", "payment_confirmation_waiting", "payment_confirmation_reminder");
 
         boolean ownerYes = "YES".equals(updated.getOwnerPaymentConfirmation());
         boolean borrowerYes = "YES".equals(updated.getBorrowerPaymentConfirmation());
         if (ownerYes && borrowerYes) {
             LocalDateTime startAt = LocalDateTime.now();
-            LocalDateTime endAt = startAt.plusDays(updated.getDurationDays());
+            LocalDateTime endAt = calculateRentalEnd(startAt, updated.getDurationDays());
             rentalRequestDao.startRental(rentalRequestId, safeMoney(updated.getTotalRent()), safeMoney(updated.getAdvancePaid()), safeMoney(updated.getRemainingBalance()), startAt, endAt);
             rentalRequestDao.logStatusTransition(rentalRequestId, ADVANCE_PAYMENT_CONFIRMATION, ACTIVE, actorUserId, "Both users confirmed advance payment.");
             notifyBoth(updated, "Pickup and payment have been successfully confirmed. Your rental period has officially started.", "rental_started");
@@ -291,8 +309,9 @@ public class RentalRequestService {
             transition(updated, PAYMENT_PENDING, actorUserId, "Both users said advance payment is not complete.");
             notifyBoth(updated, "Advance payment is still pending. The rental has not started.", "payment_pending");
         } else {
-            transition(updated, PAYMENT_DISPUTE, actorUserId, "Advance payment confirmations did not match.");
-            notifyBoth(updated, "Payment dispute opened. Continue chat, contact admin, or cancel rental.", "payment_dispute");
+            rentalRequestDao.resetPaymentConfirmations(rentalRequestId);
+            rentalRequestDao.logStatusTransition(rentalRequestId, updated.getStatus(), updated.getStatus(), actorUserId, "Advance payment confirmations did not match. Confirmation reset for retry.");
+            notifyBoth(updated, "Payment confirmation does not match. Please resolve the issue and confirm payment again.", "payment_confirmation_waiting");
         }
         return rentalRequestDao.findById(rentalRequestId);
     }
@@ -304,29 +323,28 @@ public class RentalRequestService {
         if (!AWAITING_RETURN.equals(rentalRequest.getStatus()) && !RETURN_CONFIRMATION.equals(rentalRequest.getStatus())) {
             throw new IllegalArgumentException("Return can only be confirmed after the rental is awaiting return.");
         }
-        if (!confirmed) {
-            if (owner) {
-                transition(rentalRequest, REPORTED, actorUserId, "Owner said tool was not returned.");
-                notificationDao.create(rentalRequest.getOwnerId(), rentalRequestId, "Please submit the report form for this return issue.", "report_required");
-            } else {
-                transition(rentalRequest, RETURN_DISPUTE, actorUserId, "Borrower disputed owner return confirmation.");
-                notifyBoth(rentalRequest, "Return dispute opened. Admin review is required.", "return_dispute");
-            }
-            return rentalRequestDao.findById(rentalRequestId);
-        }
         if ((owner && rentalRequest.getOwnerReturnConfirmedAt() != null) || (!owner && rentalRequest.getBorrowerReturnConfirmedAt() != null)) {
-            throw new IllegalArgumentException("Return already confirmed by this user.");
+            throw new IllegalArgumentException("Return already confirmed.");
+        }
+        if (!confirmed) {
+            transition(rentalRequest, RETURN_DISPUTE, actorUserId, "Return disputed by participant.");
+            notificationDao.markReadByRentalRequestUserAndTypes(rentalRequestId, actorUserId, "return_confirmation", "return_confirmation_waiting");
+            notificationDao.createOnce(actorUserId, rentalRequestId, "Please submit the report form for this return issue.", "report_required");
+            notifyBoth(rentalRequest, "Return confirmation does not match. Please resolve the issue or report the user.", "return_dispute");
+            return rentalRequestDao.findById(rentalRequestId);
         }
         rentalRequestDao.confirmReturn(rentalRequestId, owner);
         rentalRequestDao.logAction(rentalRequestId, actorUserId, owner ? "OWNER_CONFIRMED_RETURN" : "BORROWER_CONFIRMED_RETURN", null);
         RentalRequest updated = rentalRequestDao.findByIdForUpdate(rentalRequestId);
+        notificationDao.markReadByRentalRequestUserAndTypes(rentalRequestId, actorUserId, "return_confirmation", "return_confirmation_waiting");
         if (updated.getOwnerReturnConfirmedAt() != null && updated.getBorrowerReturnConfirmedAt() != null) {
             transition(updated, COMPLETED, actorUserId, "Both parties confirmed return.");
+            notificationDao.markReadByRentalRequestAndTypes(rentalRequestId, "return_confirmation", "return_confirmation_waiting");
             notifyBoth(updated, "Rental completed. Please review each other.", "rental_completed");
         } else {
             transition(updated, RETURN_CONFIRMATION, actorUserId, "Waiting for the other party to confirm return.");
             Long otherUserId = owner ? updated.getBorrowerId() : updated.getOwnerId();
-            notificationDao.create(otherUserId, rentalRequestId, owner ? "The owner confirmed return. Did you return the tool?" : "The borrower confirmed return. Please confirm receipt.", "return_confirmation_waiting");
+            notificationDao.createOnce(otherUserId, rentalRequestId, owner ? "The owner confirmed return. Did you return the tool?" : "The borrower confirmed return. Please confirm receipt.", "return_confirmation_waiting");
         }
         return rentalRequestDao.findById(rentalRequestId);
     }
@@ -349,27 +367,71 @@ public class RentalRequestService {
     }
 
     @Transactional
-    public void reportRentalIssue(ReportRequest reportRequest) {
+    public Map<String, Object> getReportStatus(Long rentalRequestId, Long actorUserId) {
+        RentalRequest rentalRequest = rentalRequestDao.findById(rentalRequestId);
+        boolean owner = assertParticipant(rentalRequest, actorUserId);
+        Long reportedId = owner ? rentalRequest.getBorrowerId() : rentalRequest.getOwnerId();
+        return Map.of(
+                "alreadyReported", reportDao.existsByRentalAndReporter(rentalRequestId, actorUserId),
+                "reportedUserId", reportedId,
+                "rentalId", rentalRequestId,
+                "toolId", rentalRequest.getToolId()
+        );
+    }
+
+    @Transactional
+    public void reportRentalIssue(ReportRequest reportRequest, Long actorUserId) {
         RentalRequest rentalRequest = rentalRequestDao.findByIdForUpdate(reportRequest.getRentalId());
-        if (reportDao.existsByRentalAndReporter(rentalRequest.getRentalRequestId(), rentalRequest.getOwnerId())) {
-            throw new IllegalArgumentException("A report has already been submitted for this rental.");
+        boolean owner = assertParticipant(rentalRequest, actorUserId);
+        if (reportDao.existsByRentalAndReporter(rentalRequest.getRentalRequestId(), actorUserId)) {
+            throw new IllegalArgumentException("You have already submitted a report for this rental.");
         }
-        reportRequest.setReporterId(rentalRequest.getOwnerId());
-        reportRequest.setReportedId(rentalRequest.getBorrowerId());
+        if (reportRequest.getReasonCategory() == null || reportRequest.getReasonCategory().isBlank()) {
+            throw new IllegalArgumentException("Report reason is required.");
+        }
+        if (reportRequest.getReasonCategory().contains("Other")
+                && (reportRequest.getAdditionalDetails() == null || reportRequest.getAdditionalDetails().isBlank())) {
+            throw new IllegalArgumentException("Additional details are required when Other is selected.");
+        }
+        reportRequest.setReporterId(actorUserId);
+        reportRequest.setReportedId(owner ? rentalRequest.getBorrowerId() : rentalRequest.getOwnerId());
         reportRequest.setToolId(rentalRequest.getToolId());
         reportDao.save(reportRequest);
-        transition(rentalRequest, REPORTED, rentalRequest.getOwnerId(), "Owner submitted report: " + reportRequest.getReasonCategory());
-        notifyBoth(rentalRequest, "A report has been submitted for this rental. Admin review is required.", "rental_reported");
+        rentalRequestDao.logAction(rentalRequest.getRentalRequestId(), actorUserId, "SUBMIT_USER_REPORT", reportRequest.getReasonCategory());
     }
 
     @Transactional
     public void beginPickupConfirmation(RentalRequest rentalRequest) {
         RentalRequest locked = rentalRequestDao.findByIdForUpdate(rentalRequest.getRentalRequestId());
         if (!PICKUP_SCHEDULED.equals(locked.getStatus()) || Boolean.TRUE.equals(locked.getPickupNotificationSent())) return;
+        Tool tool = toolDao.findById(locked.getToolId());
+        User owner = userDao.findByUserId(locked.getOwnerId()).orElse(null);
+        User borrower = userDao.findByUserId(locked.getBorrowerId()).orElse(null);
+        String toolName = tool == null ? "the tool" : tool.getName();
+        String ownerName = owner == null ? "the owner" : (owner.getFirstName() + " " + owner.getLastName()).trim();
+        String borrowerName = borrower == null ? "the borrower" : (borrower.getFirstName() + " " + borrower.getLastName()).trim();
+        String ownerStudentId = owner == null ? "" : owner.getStudentId();
+        String borrowerStudentId = borrower == null ? "" : borrower.getStudentId();
         transition(locked, WAITING_FOR_PICKUP_TIME, null, "Scheduled pickup time passed.");
         transition(locked, PICKUP_CONFIRMATION, null, "Pickup confirmation workflow started one minute after pickup time.");
-        notificationDao.create(locked.getOwnerId(), locked.getRentalRequestId(), "Did you successfully hand over the tool?", "pickup_confirmation_owner");
-        notificationDao.create(locked.getBorrowerId(), locked.getRentalRequestId(), "Did you successfully receive the tool?", "pickup_confirmation_borrower");
+        notificationDao.replaceUserRentalNotifications(
+                locked.getOwnerId(),
+                locked.getRentalRequestId(),
+                "Did you hand over " + toolName + " to " + borrowerName + " (" + borrowerStudentId + ")?",
+                "pickup_confirmation_owner",
+                "pickup_reminder_24h",
+                "pickup_reminder_2h",
+                "pickup_confirmation_owner"
+        );
+        notificationDao.replaceUserRentalNotifications(
+                locked.getBorrowerId(),
+                locked.getRentalRequestId(),
+                "Did you receive " + toolName + " from " + ownerName + " (" + ownerStudentId + ")?",
+                "pickup_confirmation_borrower",
+                "pickup_reminder_24h",
+                "pickup_reminder_2h",
+                "pickup_confirmation_borrower"
+        );
         rentalRequestDao.markPickupNotificationSent(locked.getRentalRequestId());
     }
 
@@ -437,5 +499,11 @@ public class RentalRequestService {
 
     private double safeMoney(Double value) {
         return value == null ? 0 : value;
+    }
+
+    private LocalDateTime calculateRentalEnd(LocalDateTime startAt, Integer durationDays) {
+        int days = durationDays == null ? 0 : durationDays;
+        if (!demoMode) return startAt.plusDays(days);
+        return startAt.plusMinutes(Math.max(1, days) * Math.max(1, demoMinutesPerDay));
     }
 }

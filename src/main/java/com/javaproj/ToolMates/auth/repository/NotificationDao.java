@@ -26,6 +26,23 @@ public class NotificationDao {
         jdbc.update(sql, userId, rentalRequestId, messageText, notificationType);
     }
 
+    public void createOnce(Long userId, Long rentalRequestId, String messageText, String notificationType) {
+        if (existsByRentalRequestUserAndType(rentalRequestId, userId, notificationType)) return;
+        create(userId, rentalRequestId, messageText, notificationType);
+    }
+
+    public void replaceUserRentalNotifications(Long userId, Long rentalRequestId, String messageText, String notificationType, String... typesToReplace) {
+        if (typesToReplace != null && typesToReplace.length > 0) {
+            String placeholders = String.join(",", java.util.Collections.nCopies(typesToReplace.length, "?"));
+            Object[] params = new Object[typesToReplace.length + 2];
+            params[0] = rentalRequestId;
+            params[1] = userId;
+            System.arraycopy(typesToReplace, 0, params, 2, typesToReplace.length);
+            jdbc.update("DELETE FROM notifications WHERE rental_request_id = ? AND user_id = ? AND notification_type IN (" + placeholders + ")", params);
+        }
+        create(userId, rentalRequestId, messageText, notificationType);
+    }
+
     public boolean existsByRentalRequestAndType(Long rentalRequestId, String notificationType) {
         String sql = "SELECT COUNT(*) FROM notifications WHERE rental_request_id = ? AND notification_type = ?";
         Integer count = jdbc.queryForObject(sql, Integer.class, rentalRequestId, notificationType);
@@ -76,6 +93,8 @@ public class NotificationDao {
                     r.borrower_pickup_confirmation AS borrowerPickupConfirmation,
                     r.owner_payment_confirmation AS ownerPaymentConfirmation,
                     r.borrower_payment_confirmation AS borrowerPaymentConfirmation,
+                    r.owner_return_confirmed_at AS ownerReturnConfirmedAt,
+                    r.borrower_return_confirmed_at AS borrowerReturnConfirmedAt,
                     r.total_rent AS totalRent,
                     r.advance_paid AS advancePaid,
                     r.remaining_balance AS remainingBalance,
@@ -110,6 +129,25 @@ public class NotificationDao {
     public void markReadForUser(Long userId) {
         String sql = "UPDATE notifications SET is_read = TRUE WHERE user_id = ?";
         jdbc.update(sql, userId);
+    }
+
+    public void markReadByRentalRequestAndTypes(Long rentalRequestId, String... notificationTypes) {
+        if (notificationTypes == null || notificationTypes.length == 0) return;
+        String placeholders = String.join(",", java.util.Collections.nCopies(notificationTypes.length, "?"));
+        Object[] params = new Object[notificationTypes.length + 1];
+        params[0] = rentalRequestId;
+        System.arraycopy(notificationTypes, 0, params, 1, notificationTypes.length);
+        jdbc.update("UPDATE notifications SET is_read = TRUE WHERE rental_request_id = ? AND notification_type IN (" + placeholders + ")", params);
+    }
+
+    public void markReadByRentalRequestUserAndTypes(Long rentalRequestId, Long userId, String... notificationTypes) {
+        if (notificationTypes == null || notificationTypes.length == 0) return;
+        String placeholders = String.join(",", java.util.Collections.nCopies(notificationTypes.length, "?"));
+        Object[] params = new Object[notificationTypes.length + 2];
+        params[0] = rentalRequestId;
+        params[1] = userId;
+        System.arraycopy(notificationTypes, 0, params, 2, notificationTypes.length);
+        jdbc.update("UPDATE notifications SET is_read = TRUE WHERE rental_request_id = ? AND user_id = ? AND notification_type IN (" + placeholders + ")", params);
     }
 
     private static class NotificationRowMapper implements RowMapper<Notification> {

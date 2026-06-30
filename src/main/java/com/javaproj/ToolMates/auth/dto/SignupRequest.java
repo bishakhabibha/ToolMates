@@ -20,6 +20,7 @@ public class SignupRequest {
 
     @NotBlank(message = "Institutional email is required")
     @Email(message = "Must be a valid email address")
+    @Pattern(regexp = "^[A-Za-z0-9._%+-]+@student\\.cuet\\.ac\\.bd$", message = "Please enter a valid CUET student email address.")
     private String studentEmail;
 
     @NotBlank(message = "Phone number is required")

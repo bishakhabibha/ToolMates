@@ -13,6 +13,9 @@ public class RentalSchemaInitializer {
 
     @PostConstruct
     public void ensureRentalWorkflowColumns() {
+        addColumnIfMissing("tools", "is_active", "BOOLEAN NOT NULL DEFAULT TRUE");
+        addColumnIfMissing("users", "bio", "TEXT NULL");
+
         addColumnIfMissing("pickup_instructions", "TEXT NULL");
         addColumnIfMissing("owner_pickup_confirmation", "VARCHAR(3) NULL");
         addColumnIfMissing("borrower_pickup_confirmation", "VARCHAR(3) NULL");
@@ -33,19 +36,24 @@ public class RentalSchemaInitializer {
     }
 
     private void addColumnIfMissing(String columnName, String columnDefinition) {
+        addColumnIfMissing("rental_requests", columnName, columnDefinition);
+    }
+
+    private void addColumnIfMissing(String tableName, String columnName, String columnDefinition) {
         Integer count = jdbc.queryForObject(
                 """
                 SELECT COUNT(*)
                 FROM information_schema.columns
                 WHERE table_schema = DATABASE()
-                  AND table_name = 'rental_requests'
+                  AND table_name = ?
                   AND column_name = ?
                 """,
                 Integer.class,
+                tableName,
                 columnName
         );
         if (count != null && count > 0) return;
-        jdbc.execute("ALTER TABLE rental_requests ADD COLUMN " + columnName + " " + columnDefinition);
+        jdbc.execute("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + columnDefinition);
     }
 
     private void addIndexIfMissing(String indexName, String indexDefinition) {

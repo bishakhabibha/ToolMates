@@ -45,9 +45,13 @@
                 <label for="reviewedStudentId">Reviewed Student ID</label>
                 <input id="reviewedStudentId" type="text" />
             </div>
+            <div class="form-group">
+                <label for="toolName">Exact Tool Name</label>
+                <input id="toolName" type="text" />
+            </div>
             <label>Rating</label>
             <div class="stars" id="starPicker">
-                <span data-value="1">★</span><span data-value="2">★</span><span data-value="3">★</span><span data-value="4">★</span><span data-value="5">★</span>
+                <span data-value="1">&#9733;</span><span data-value="2">&#9733;</span><span data-value="3">&#9733;</span><span data-value="4">&#9733;</span><span data-value="5">&#9733;</span>
             </div>
             <div class="form-group">
                 <label for="reviewText">Comment</label>
@@ -56,7 +60,7 @@
             <button class="btn-submit" onclick="submitReview()">Submit Review</button>
         </section>
         <section class="panel">
-            <h2>Global Leaderboard</h2>
+            <h2>Top Reviewed Users</h2>
             <table>
                 <thead>
                 <tr><th>Rank</th><th>User</th><th>Average</th><th>Reviews</th></tr>
@@ -66,24 +70,42 @@
                 </tbody>
             </table>
         </section>
+        <section class="panel" style="grid-column:1/-1;">
+            <h2>All Reviews</h2>
+            <table>
+                <thead>
+                <tr><th>Reviewed User</th><th>Reviewer</th><th>Rating</th><th>Review</th><th>Date</th></tr>
+                </thead>
+                <tbody id="allReviewsBody">
+                <tr><td colspan="5">Loading...</td></tr>
+                </tbody>
+            </table>
+        </section>
     </div>
 </main>
 <script>
     let selectedRating = 0;
     let currentUser = JSON.parse(localStorage.getItem('toolmatesUser') || 'null');
+
     document.querySelectorAll('#starPicker span').forEach(star => {
         star.onclick = () => {
-            selectedRating = parseInt(star.dataset.value);
-            document.querySelectorAll('#starPicker span').forEach(s => {
-                s.classList.toggle('active', parseInt(s.dataset.value) <= selectedRating);
-            });
+            const rating = parseInt(star.dataset.value);
+            selectedRating = selectedRating === rating ? 0 : rating;
+            renderStars();
         };
     });
 
+    function renderStars() {
+        document.querySelectorAll('#starPicker span').forEach(star => {
+            star.classList.toggle('active', parseInt(star.dataset.value) <= selectedRating);
+        });
+    }
+
     async function submitReview() {
         const reviewedStudentId = document.getElementById('reviewedStudentId').value.trim();
-        if (!reviewedStudentId || !selectedRating) {
-            alert('Reviewed user and rating are required.');
+        const toolName = document.getElementById('toolName').value.trim();
+        if (!reviewedStudentId || !toolName || !selectedRating) {
+            alert('Reviewed user, exact tool name, and rating are required.');
             return;
         }
         const response = await fetch('http://localhost:8080/api/reviews', {
@@ -92,6 +114,7 @@
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify({
                 reviewedStudentId,
+                toolName,
                 ratingStars: selectedRating,
                 reviewText: document.getElementById('reviewText').value.trim()
             })
@@ -99,10 +122,12 @@
         if (response.ok) {
             alert('Review submitted.');
             document.getElementById('reviewedStudentId').value = '';
+            document.getElementById('toolName').value = '';
             document.getElementById('reviewText').value = '';
             selectedRating = 0;
-            document.querySelectorAll('#starPicker span').forEach(s => s.classList.remove('active'));
+            renderStars();
             loadLeaderboard();
+            loadAllReviews();
         } else {
             let message = 'Could not submit review.';
             try {
@@ -128,6 +153,28 @@
         }
     }
 
+    async function loadAllReviews() {
+        const body = document.getElementById('allReviewsBody');
+        try {
+            const response = await fetch('http://localhost:8080/api/reviews');
+            if (!response.ok) throw new Error('Failed');
+            const rows = await response.json();
+            body.innerHTML = rows.length ? '' : '<tr><td colspan="5">No reviews yet.</td></tr>';
+            rows.forEach(row => {
+                body.innerHTML += `
+                    <tr>
+                        <td>${escapeHtml(row.reviewedName || 'User')}<br><span style="color:#7f8c8d;font-size:12px;">${escapeHtml(row.reviewedStudentId || '')}</span></td>
+                        <td>${escapeHtml(row.reviewerName || 'User')}<br><span style="color:#7f8c8d;font-size:12px;">${escapeHtml(row.reviewerStudentId || '')}</span></td>
+                        <td>${escapeHtml(row.ratingStars || 0)}</td>
+                        <td>${escapeHtml(row.reviewText || '')}</td>
+                        <td>${formatDate(row.createdAt)}</td>
+                    </tr>`;
+            });
+        } catch (error) {
+            body.innerHTML = '<tr><td colspan="5">Reviews unavailable.</td></tr>';
+        }
+    }
+
     async function loadLoggedInReviewer() {
         try {
             const response = await fetch('http://localhost:8080/api/auth/me', {
@@ -142,9 +189,20 @@
         } catch (error) {}
     }
 
+    function formatDate(value) {
+        if (!value) return '-';
+        const date = new Date(String(value).replace(' ', 'T'));
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
         loadLoggedInReviewer();
         loadLeaderboard();
+        loadAllReviews();
     });
 </script>
 </body>

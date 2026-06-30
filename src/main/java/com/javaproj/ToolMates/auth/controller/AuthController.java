@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -38,8 +39,12 @@ public class AuthController {
         if (email == null || email.isBlank())
             return ResponseEntity.badRequest().body(Map.of("error", "Email is required."));
 
-        authService.sendVerificationOtp(email.trim().toLowerCase());
-        return ResponseEntity.ok(Map.of("message", "OTP sent. Please check your inbox."));
+        try {
+            authService.sendVerificationOtp(email.trim().toLowerCase());
+            return ResponseEntity.ok(Map.of("message", "OTP sent. Please check your inbox."));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
     }
 
     @PostMapping("/verify-otp")
@@ -50,7 +55,12 @@ public class AuthController {
         if (email == null || otp == null)
             return ResponseEntity.badRequest().body(Map.of("error", "email and otp are required."));
 
-        boolean valid = authService.verifyOtp(email.trim().toLowerCase(), otp.trim());
+        boolean valid;
+        try {
+            valid = authService.verifyOtp(email.trim().toLowerCase(), otp.trim());
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
         if (!valid)
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                     .body(Map.of("error", "Invalid or expired code. Please try again."));
@@ -77,6 +87,8 @@ public class AuthController {
         } catch (DuplicateFieldException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("field", ex.getField(), "error", ex.getMessage()));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
     }
 
@@ -167,5 +179,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", ex.getMessage()));
         }
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("Invalid request.");
+        return ResponseEntity.badRequest().body(Map.of("error", message));
     }
 }

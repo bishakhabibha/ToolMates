@@ -5,6 +5,7 @@ public class ReviewRequest {
     private Long reviewerId;
     private Long reviewedUserId;
     private String reviewedStudentId;
+    private String toolName;
     private Integer ratingStars;
     private String reviewText;
 
@@ -16,6 +17,9 @@ public class ReviewRequest {
 
     public String getReviewedStudentId() { return reviewedStudentId; }
     public void setReviewedStudentId(String reviewedStudentId) { this.reviewedStudentId = reviewedStudentId; }
+
+    public String getToolName() { return toolName; }
+    public void setToolName(String toolName) { this.toolName = toolName; }
 
     public Integer getRatingStars() { return ratingStars; }
     public void setRatingStars(Integer ratingStars) { this.ratingStars = ratingStars; }

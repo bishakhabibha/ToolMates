@@ -132,6 +132,7 @@
         renderFields(data);
         renderProgress(data.progress || {});
         renderActions(data);
+        loadActionAvailability(data);
         renderPastRentals(data.pastRentals || []);
         renderTimeline(timeline);
     }
@@ -181,17 +182,34 @@
         if (['ADVANCE_PAYMENT_CONFIRMATION', 'PAYMENT_PENDING'].includes(status)) {
             actions.push(`<button class="action-btn" onclick="postConfirm('payment-confirmation', true)">Confirm Advance Payment</button>`);
         }
-        if (['AWAITING_RETURN', 'RETURN_CONFIRMATION'].includes(status)) {
+        const returnAnswered = (isOwner && data.ownerReturnConfirmedAt) || (isBorrower && data.borrowerReturnConfirmedAt);
+        if (['AWAITING_RETURN', 'RETURN_CONFIRMATION'].includes(status) && !returnAnswered) {
             actions.push(`<button class="action-btn" onclick="postConfirm('return-confirmation', true)">Confirm Return</button>`);
         }
-        if (isOwner && ['AWAITING_RETURN', 'RETURN_CONFIRMATION', 'RETURN_DISPUTE'].includes(status)) {
-            actions.push(`<button class="action-btn secondary" onclick="reportUser()">Report User</button>`);
+        if (isOwner || isBorrower) {
+            actions.push(`<button id="reportActionButton" class="action-btn secondary" onclick="reportUser()">Report User</button><div id="reportActionMessage" class="meta" style="display:none;"></div>`);
         }
         if (['COMPLETED', 'CLOSED'].includes(status)) {
             actions.push(`<button class="action-btn secondary" onclick="window.location.href='UserReviews.html'">Leave Review</button>`);
         }
         if (!actions.length) actions.push('<div class="meta">No actions available.</div>');
         document.getElementById('actionsBox').innerHTML = actions.join('');
+    }
+
+    async function loadActionAvailability(data) {
+        const reportButton = document.getElementById('reportActionButton');
+        if (reportButton) {
+            const response = await fetch(`${RENT_API}/${data.rentalRequestId}/report-status`, { credentials: 'include', headers: { 'Accept': 'application/json' } });
+            if (response.ok) {
+                const status = await response.json();
+                if (status.alreadyReported) {
+                    reportButton.disabled = true;
+                    const message = document.getElementById('reportActionMessage');
+                    message.style.display = 'block';
+                    message.textContent = 'You have already reported this user.';
+                }
+            }
+        }
     }
 
     function renderTimeline(timeline) {
@@ -238,6 +256,7 @@
             alert(await responseError(response));
             return;
         }
+        if (action === 'return-confirmation' && confirmed) alert('Return confirmed successfully.');
         await loadDetails();
     }
 
@@ -248,7 +267,7 @@
     }
 
     function reportUser() {
-        window.location.href = `dashboard.html`;
+        window.location.href = `ReportUser.html?rentalId=${rental.rentalRequestId}`;
     }
 
     async function responseError(response) {

@@ -231,7 +231,7 @@
                     <button type="button" class="btn-otp" id="otpBtn" onclick="sendOTP()">Send Code</button>
                 </div>
                 <span class="helper">A 6-digit code will be sent to verify your address</span>
-                <span class="err" id="err-email">Please enter a valid institutional email.</span>
+                <span class="err" id="err-email">Please enter a valid CUET student email address.</span>
                 <div class="otp-row" id="otpRow">
                     <input class="otp-digit" maxlength="1" id="d1" oninput="dn(this,'d2')" />
                     <input class="otp-digit" maxlength="1" id="d2" oninput="dn(this,'d3')" />
@@ -263,10 +263,7 @@
                     <i class="ti ti-map-pin" style="font-size:12px;color:#00564b;margin-right:4px" aria-hidden="true"></i>
                     Campus Address
                 </label>
-                <div class="grid2" style="margin:0">
-                    <input type="text" id="hallName" placeholder="Hall name" />
-                    <input type="text" id="roomNumber" placeholder="Room number" />
-                </div>
+                <input type="text" id="campusAddress" placeholder="Campus Address" />
             </div>
 
             <hr class="divider" />
@@ -297,10 +294,11 @@
 
 <script>
     let emailVerified = false;
+    const cuetStudentEmailPattern = /^[A-Za-z0-9._%+-]+@student\.cuet\.ac\.bd$/;
 
     function sendOTP() {
         const email = document.getElementById('studentEmail').value.trim();
-        if (!email || !email.includes('@')) {
+        if (!cuetStudentEmailPattern.test(email)) {
             document.getElementById('err-email').classList.add('visible');
             return;
         }
@@ -377,7 +375,7 @@
         req('firstName',    'err-fn');
         req('lastName',     'err-ln');
         req('studentId',    'err-sid');
-        req('studentEmail', 'err-email', v => v.includes('@'));
+        req('studentEmail', 'err-email', v => cuetStudentEmailPattern.test(v.trim()));
         req('phone',        'err-phone', v => v.trim().length >= 8);
         req('password',     'err-pw',    v => v.length >= 8);
 
@@ -389,9 +387,7 @@
         if (!valid) return;
         if (!emailVerified) { alert('Please verify your email first.'); return; }
 
-        const hall = document.getElementById('hallName').value.trim();
-        const room = document.getElementById('roomNumber').value.trim();
-        const address = [hall, room].filter(Boolean).join(', ');
+        const address = document.getElementById('campusAddress').value.trim();
 
         const payload = {
             firstName:    document.getElementById('firstName').value.trim(),

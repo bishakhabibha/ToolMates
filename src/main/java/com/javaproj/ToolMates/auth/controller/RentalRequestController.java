@@ -23,9 +23,10 @@ public class RentalRequestController {
     private RentalRequestService rentalRequestService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addRentalRequest(@RequestBody RentalRequestCreateRequest request) {
+    public ResponseEntity<?> addRentalRequest(@RequestBody RentalRequestCreateRequest request, HttpSession session) {
         try {
-            RentalRequest saved = rentalRequestService.createRentalRequest(request);
+            Long actorUserId = (Long) session.getAttribute("userId");
+            RentalRequest saved = rentalRequestService.createRentalRequest(request, actorUserId);
             return new ResponseEntity<>(saved, HttpStatus.CREATED);
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
@@ -166,11 +167,26 @@ public class RentalRequestController {
     }
 
     @PostMapping("/{rentalRequestId}/report")
-    public ResponseEntity<?> reportRentalIssue(@PathVariable Long rentalRequestId, @RequestBody ReportRequest request) {
+    public ResponseEntity<?> reportRentalIssue(@PathVariable Long rentalRequestId, @RequestBody ReportRequest request, HttpSession session) {
         try {
+            Long actorUserId = (Long) session.getAttribute("userId");
             request.setRentalId(rentalRequestId);
-            rentalRequestService.reportRentalIssue(request);
+            rentalRequestService.reportRentalIssue(request, actorUserId);
             return new ResponseEntity<>(Map.of("message", "Report submitted."), HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{rentalRequestId}/report-status")
+    public ResponseEntity<?> getReportStatus(@PathVariable Long rentalRequestId, HttpSession session) {
+        try {
+            Long actorUserId = (Long) session.getAttribute("userId");
+            return ResponseEntity.ok(rentalRequestService.getReportStatus(rentalRequestId, actorUserId));
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));

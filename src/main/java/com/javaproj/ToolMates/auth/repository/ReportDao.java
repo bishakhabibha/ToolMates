@@ -17,6 +17,12 @@ public class ReportDao {
         return count != null && count > 0;
     }
 
+    public int countReceivedByUser(Long userId) {
+        String sql = "SELECT COUNT(*) FROM user_reports WHERE reported_id = ?";
+        Integer count = jdbc.queryForObject(sql, Integer.class, userId);
+        return count == null ? 0 : count;
+    }
+
     public void save(ReportRequest request) {
         String sql = """
                 INSERT INTO user_reports

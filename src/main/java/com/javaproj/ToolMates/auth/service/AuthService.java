@@ -27,10 +27,12 @@ public class AuthService {
     // ── Existing: Signup ─────────────────────────────────────────────────
 
     public void sendVerificationOtp(String email) {
+        validateCuetStudentEmail(email);
         otpService.generateAndSend(email, OtpService.Purpose.SIGNUP);
     }
 
     public boolean verifyOtp(String email, String otp) {
+        validateCuetStudentEmail(email);
         return otpService.verify(email, otp, OtpService.Purpose.SIGNUP);
     }
 
@@ -38,6 +40,8 @@ public class AuthService {
 
         if (!emailVerified)
             throw new EmailNotVerifiedException("Please verify your email before signing up.");
+
+        validateCuetStudentEmail(req.getStudentEmail());
 
         if (userDao.existsByStudentId(req.getStudentId()))
             throw new DuplicateFieldException("studentId", "This Student ID is already registered.");
@@ -87,6 +91,12 @@ public class AuthService {
 
     public void logout(HttpSession session) {
         session.invalidate();
+    }
+
+    private void validateCuetStudentEmail(String email) {
+        if (email == null || !email.trim().toLowerCase().matches("^[a-z0-9._%+-]+@student\\.cuet\\.ac\\.bd$")) {
+            throw new IllegalArgumentException("Please enter a valid CUET student email address.");
+        }
     }
 
     // ── New: Forgot / Reset Password ─────────────────────────────────────

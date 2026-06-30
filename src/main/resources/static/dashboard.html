@@ -46,7 +46,7 @@
 
         .brand-name { font-size: 22px; font-weight: 700; color: #00796b; letter-spacing: -0.5px; }
 
-        .nav-right { display: flex; gap: 12px; }
+        .nav-right { display: flex; gap: 12px; align-items: center; }
 
         .btn-nav {
             padding: 10px 20px;
@@ -60,6 +60,33 @@
         .btn-login:hover { background: rgba(0, 121, 107, 0.05); }
         .btn-signup { background-color: #00796b; color: #ffffff; border: 1px solid transparent; }
         .btn-signup:hover { background-color: #004d40; }
+        .top-welcome {
+            display: none;
+            color: #546e7a;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.25;
+            text-align: right;
+        }
+        .top-welcome span {
+            color: #00796b;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .top-notification-btn {
+            display: none;
+            position: relative;
+            background: #f4f7f6;
+            border: 1px solid #e0eae9;
+            color: #00796b;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
 
         /* --- Main Layout Wrapper --- */
         .main-layout {
@@ -121,6 +148,7 @@
             border-radius: 0 4px 4px 0;
         }
         .menu-item i { font-size: 18px; }
+        .auth-only { display: none; }
 
         .badge-new {
             background-color: #00bfa5;
@@ -143,6 +171,12 @@
             box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.12);
         }
         .unread-dot.visible { display: inline-block; }
+        .top-notification-btn .unread-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            margin-left: 0;
+        }
 
         .btn-logout {
             margin-top: auto;
@@ -245,6 +279,12 @@
             font-size: 16px;
             font-weight: 700;
             color: #2c3e50;
+        }
+
+        .welcome-text {
+            font-size: 13px;
+            color: #546e7a;
+            margin-top: 4px;
         }
 
         .back-home-btn {
@@ -662,8 +702,13 @@
         <span class="brand-name">ToolMates</span>
     </div>
     <div class="nav-right">
-        <a href="login.html" class="btn-nav btn-login">Log in</a>
-        <a href="signup.html" class="btn-nav btn-signup">Sign up</a>
+        <a href="login.html" class="btn-nav btn-login" id="loginNavButton">Log in</a>
+        <a href="signup.html" class="btn-nav btn-signup" id="signupNavButton">Sign up</a>
+        <div class="top-welcome" id="topWelcomePanel">Welcome Back,<br><span id="topWelcomeName"></span></div>
+        <button class="top-notification-btn" id="topNotificationButton" onclick="showNotificationPanel(document.getElementById('notificationMenuItem'))" aria-label="Notifications">
+            <i class="ti ti-bell"></i>
+            <span class="unread-dot" id="topNotificationDot"></span>
+        </button>
     </div>
 </header>
 
@@ -680,13 +725,13 @@
         <div onclick="filterCategory('Heavy Equipment', this)" class="menu-item"><i class="ti ti-shovel"></i> Heavy Equipment</div>
 
         <div class="sidebar-section-title">Other</div>
-        <div onclick="showNotificationPanel(this)" class="menu-item" id="notificationMenuItem"><i class="ti ti-bell"></i> Notifications <span class="unread-dot" id="notificationDot"></span></div>
-        <div onclick="showMessagesPanel(this)" class="menu-item"><i class="ti ti-messages"></i> My Messages</div>
-        <div onclick="window.location.href='RentalHistory.html'" class="menu-item"><i class="ti ti-history"></i> Rental History</div>
+        <div onclick="showNotificationPanel(this)" class="menu-item auth-only" id="notificationMenuItem"><i class="ti ti-bell"></i> Notifications <span class="unread-dot" id="notificationDot"></span></div>
+        <div onclick="showMessagesPanel(this)" class="menu-item auth-only"><i class="ti ti-messages"></i> My Messages</div>
+        <div onclick="window.location.href='RentalHistory.html'" class="menu-item auth-only"><i class="ti ti-history"></i> Rental History</div>
         <div onclick="window.location.href='UserReviews.html'" class="menu-item"><i class="ti ti-star"></i> Reviews</div>
-        <div onclick="window.location.href='Profile.html'" class="menu-item"><i class="ti ti-user"></i> My Account</div>
+        <div onclick="window.location.href='Profile.html'" class="menu-item auth-only"><i class="ti ti-user"></i> My Account</div>
 
-        <a href="login.html" class="menu-item btn-logout"><i class="ti ti-logout"></i> Log out</a>
+        <button type="button" class="menu-item btn-logout auth-only" onclick="logoutUser()"><i class="ti ti-logout"></i> Log out</button>
     </aside>
 
     <main class="content-area">
@@ -699,7 +744,7 @@
                             <div class="slide-tag">Smart Thinking</div>
                             <h2>Why buy when you can borrow?</h2>
                             <p>Save money, reduce waste, and help your community.</p>
-                            <button class="slide-btn">Learn more</button>
+                            <button class="slide-btn" onclick="window.location.href='WhyToolMates.html'">Learn more</button>
                         </div>
                         <div class="slide-graphic"><i class="ti ti-bulb"></i></div>
                     </div>
@@ -708,7 +753,7 @@
                             <div class="slide-tag">Earn Cash</div>
                             <h2>List Your Idle Tools</h2>
                             <p>Turn your tools into passive campus cash safely.</p>
-                            <button class="slide-btn">Get started</button>
+                            <button class="slide-btn" onclick="window.location.href='ListATool.html'">Get started</button>
                         </div>
                         <div class="slide-graphic"><i class="ti ti-coin"></i></div>
                     </div>
@@ -717,7 +762,7 @@
                             <div class="slide-tag">Safety First</div>
                             <h2>Join the Community</h2>
                             <p>Connecting students to share physical resources efficiently.</p>
-                            <button class="slide-btn">Read rules</button>
+                            <button class="slide-btn" onclick="window.location.href='CommunityGuide.html'">Read rules</button>
                         </div>
                         <div class="slide-graphic"><i class="ti ti-shield-check"></i></div>
                     </div>
@@ -745,7 +790,9 @@
         </div>
 
         <div class="section-header-wrapper">
-            <h2 class="section-title" id="gridDisplayTitle">Recently listed</h2>
+            <div>
+                <h2 class="section-title" id="gridDisplayTitle">Recently listed</h2>
+            </div>
             <button id="backToHomeBtn" class="back-home-btn" style="display: none;" onclick="filterCategory('Home', document.querySelectorAll('.menu-item')[0])">
                 <i class="ti ti-arrow-left"></i> Home
             </button>
@@ -755,28 +802,6 @@
         </section>
 
     </main>
-</div>
-
-<div class="report-modal-backdrop" id="reportModalBackdrop">
-    <div class="report-modal">
-        <h3>Report rental issue</h3>
-        <select id="reportReason">
-            <option value="Late Return">Late Return</option>
-            <option value="Tool Not Returned">Tool Not Returned</option>
-            <option value="Tool Damaged">Tool Damaged</option>
-            <option value="Missing Parts">Missing Parts</option>
-            <option value="Faulty Product Handling">Faulty Product Handling</option>
-            <option value="Remaining Payment Not Paid">Remaining Payment Not Paid</option>
-            <option value="Misuse">Misuse</option>
-            <option value="Other">Other</option>
-        </select>
-        <textarea id="reportDetails" placeholder="Add details..."></textarea>
-        <input id="reportEvidence" type="text" placeholder="Evidence photo URL (optional)" style="width:100%;padding:12px 14px;border-radius:8px;border:1px solid #ced6d6;margin-bottom:12px;" />
-        <div class="notification-actions">
-            <button onclick="submitRentalReport()">Submit Report</button>
-            <button class="reject-btn" onclick="closeReportModal()">Cancel</button>
-        </div>
-    </div>
 </div>
 
 <div class="report-modal-backdrop" id="pickupModalBackdrop">
@@ -804,7 +829,6 @@
     let activeSlideIndex = 0;
     const slidesCount = 3;
     let cachedToolsList = [];
-    let activeReportRentalId = null;
     let currentUser = JSON.parse(localStorage.getItem('toolmatesUser') || 'null');
     let latestNotifications = [];
     let latestConversations = [];
@@ -933,7 +957,6 @@
     }
 
     async function ensureCurrentUser() {
-        if (currentUser && currentUser.userId && currentUser.studentId) return currentUser;
         try {
             const response = await fetch('http://localhost:8080/api/auth/me', {
                 credentials: 'include',
@@ -944,6 +967,8 @@
             localStorage.setItem('toolmatesUser', JSON.stringify(currentUser));
             return currentUser;
         } catch (error) {
+            currentUser = null;
+            localStorage.removeItem('toolmatesUser');
             return null;
         }
     }
@@ -958,7 +983,9 @@
             });
             if (!response.ok) return;
             const data = await response.json();
-            document.getElementById('notificationDot').classList.toggle('visible', (data.count || 0) > 0);
+            const hasUnread = (data.count || 0) > 0;
+            document.getElementById('notificationDot').classList.toggle('visible', hasUnread);
+            document.getElementById('topNotificationDot').classList.toggle('visible', hasUnread);
         } catch (error) {}
     }
 
@@ -1011,9 +1038,12 @@
             const userIsOwner = currentUser && Number(currentUser.userId) === Number(notification.ownerUserId);
             const pickupAnswered = userIsOwner ? notification.ownerPickupConfirmation : notification.borrowerPickupConfirmation;
             const paymentAnswered = userIsOwner ? notification.ownerPaymentConfirmation : notification.borrowerPaymentConfirmation;
+            const returnAnswered = status !== 'AWAITING_RETURN' && status !== 'RETURN_CONFIRMATION'
+                    || (userIsOwner ? notification.ownerReturnConfirmedAt : notification.borrowerReturnConfirmedAt);
             const createdAt = notification.createdAt ? new Date(notification.createdAt).toLocaleString() : '';
+            const requestedDate = formatNotificationDate(notification.pickupDate);
             const messageHtml = isRentalRequest
-                    ? `<a href="Profile.html?studentId=${encodeURIComponent(notification.renterStudentId || '')}">${notification.renterStudentId || 'User'} (${notification.renterName || 'Unknown'})</a> wants to rent your <a href="ToolInfo.html?id=${notification.toolId || ''}">${notification.toolName || 'tool'}</a> from ${notification.pickupDate || 'the pickup date'}.`
+                    ? `<a href="Profile.html?studentId=${encodeURIComponent(notification.renterStudentId || '')}">${notification.renterStudentId || 'User'} (${notification.renterName || 'Unknown'})</a> wants to rent your <a href="ToolInfo.html?id=${notification.toolId || ''}">${notification.toolName || 'tool'}</a> from ${requestedDate || 'the pickup date'}.`
                     : `${notification.messageText || 'Notification'}${notification.toolName ? ` <a href="ToolInfo.html?id=${notification.toolId || ''}">${notification.toolName}</a>` : ''}`;
             item.innerHTML = `
                 <div class="notification-text">${messageHtml}</div>
@@ -1040,17 +1070,17 @@
                     </div>` : ''}
                 ${isReturnConfirmation ? `
                     <div class="notification-actions">
-                        <button onclick="confirmReturn(${notification.rentalRequestId}, true, this)">Yes</button>
-                        <button class="reject-btn" onclick="confirmReturn(${notification.rentalRequestId}, false, this)">No</button>
+                        <button ${returnAnswered ? 'disabled' : ''} onclick="confirmReturn(${notification.rentalRequestId}, true, this)">Yes</button>
+                        <button ${returnAnswered ? 'disabled' : ''} class="reject-btn" onclick="confirmReturn(${notification.rentalRequestId}, false, this)">No</button>
                     </div>` : ''}
                 ${isReportRequired ? `
                     <div class="notification-actions">
-                        <button onclick="openReportModal(${notification.rentalRequestId})">Open Report Form</button>
+                        <button onclick="openReportPage(${notification.rentalRequestId})">Report User</button>
                     </div>` : ''}
                 ${isIssue ? `
                     <div class="notification-actions">
                         <button onclick="showMessagesPanel(document.querySelectorAll('.menu-item')[6])">Continue Chat</button>
-                        <button class="reject-btn" onclick="alert('Please contact ToolMates admin with this rental ID: ${notification.rentalRequestId}')">Contact Admin</button>
+                        <button class="reject-btn" onclick="openReportPage(${notification.rentalRequestId})">Report User</button>
                         ${userIsOwner && ['PICKUP_DISPUTE', 'PICKUP_FAILED'].includes(status) ? `<button onclick="openPickupModal(${notification.rentalRequestId}, this)">Reschedule Pickup</button>` : ''}
                         <button onclick="cancelRental(${notification.rentalRequestId}, this)">Cancel Rental</button>
                     </div>` : ''}
@@ -1076,6 +1106,19 @@
             alert(await getResponseError(response, 'Could not accept request.'));
             if (button) button.disabled = false;
         }
+    }
+
+    function formatNotificationDate(value) {
+        if (!value) return '';
+        const date = new Date(String(value).replace(' ', 'T'));
+        if (Number.isNaN(date.getTime())) return String(value);
+        const day = date.getDate();
+        const suffix = (day % 10 === 1 && day % 100 !== 11) ? 'st'
+                : (day % 10 === 2 && day % 100 !== 12) ? 'nd'
+                : (day % 10 === 3 && day % 100 !== 13) ? 'rd'
+                : 'th';
+        const month = date.toLocaleString('en-US', { month: 'long' });
+        return `${day}${suffix} ${month}, ${date.getFullYear()}`;
     }
 
     function openPickupModal(rentalRequestId, button) {
@@ -1177,7 +1220,10 @@
     }
 
     async function confirmReturn(rentalRequestId, confirmed, button) {
-        await postConfirmation(`http://localhost:8080/api/rent-requests/${rentalRequestId}/return-confirmation`, confirmed, button, 'Could not submit return confirmation.');
+        const ok = await postConfirmation(`http://localhost:8080/api/rent-requests/${rentalRequestId}/return-confirmation`, confirmed, button, 'Could not submit return confirmation.', confirmed ? 'Return confirmed successfully.' : null);
+        if (ok && !confirmed) {
+            window.location.href = `ReportUser.html?rentalId=${rentalRequestId}`;
+        }
     }
 
     async function cancelRental(rentalRequestId, button) {
@@ -1205,8 +1251,9 @@
         await loadConversationMessages(userId, name);
     }
 
-    async function postConfirmation(url, confirmed, button, fallbackMessage) {
-        if (button) button.disabled = true;
+    async function postConfirmation(url, confirmed, button, fallbackMessage, successMessage) {
+        const actionButtons = button ? button.closest('.notification-actions').querySelectorAll('button') : [];
+        actionButtons.forEach(btn => btn.disabled = true);
         const response = await fetch(url, {
             method: 'POST',
             credentials: 'include',
@@ -1214,11 +1261,44 @@
             body: JSON.stringify({ confirmed })
         });
         if (response.ok) {
+            if (successMessage) alert(successMessage);
             await showNotificationPanel(document.getElementById('notificationMenuItem'));
+            return true;
         } else {
             alert(await getResponseError(response, fallbackMessage));
-            if (button) button.disabled = false;
+            actionButtons.forEach(btn => btn.disabled = false);
+            return false;
         }
+    }
+
+    function applyAuthState(user) {
+        const authenticated = Boolean(user && user.userId);
+        document.getElementById('loginNavButton').style.display = authenticated ? 'none' : '';
+        document.getElementById('signupNavButton').style.display = authenticated ? 'none' : '';
+        document.getElementById('topWelcomePanel').style.display = authenticated ? 'block' : 'none';
+        document.getElementById('topWelcomeName').textContent = authenticated ? (user.firstName || '') : '';
+        document.getElementById('topNotificationButton').style.display = authenticated ? 'flex' : 'none';
+        document.querySelectorAll('.auth-only').forEach(item => item.style.display = authenticated ? 'flex' : 'none');
+        if (!authenticated) {
+            document.getElementById('notificationDot').classList.remove('visible');
+            document.getElementById('topNotificationDot').classList.remove('visible');
+        }
+    }
+
+    async function initializeAuthUi() {
+        const user = await ensureCurrentUser();
+        applyAuthState(user);
+        if (user) refreshUnreadDot();
+    }
+
+    async function logoutUser() {
+        try {
+            await fetch('http://localhost:8080/api/auth/logout', { method: 'POST', credentials: 'include' });
+        } catch (error) {}
+        currentUser = null;
+        localStorage.removeItem('toolmatesUser');
+        applyAuthState(null);
+        filterCategory('Home', document.querySelectorAll('.menu-item')[0]);
     }
 
     async function getResponseError(response, fallbackMessage) {
@@ -1230,35 +1310,8 @@
         }
     }
 
-    function openReportModal(rentalRequestId) {
-        activeReportRentalId = rentalRequestId;
-        document.getElementById('reportReason').value = 'Late Return';
-        document.getElementById('reportDetails').value = '';
-        document.getElementById('reportEvidence').value = '';
-        document.getElementById('reportModalBackdrop').classList.add('show');
-    }
-
-    function closeReportModal() {
-        document.getElementById('reportModalBackdrop').classList.remove('show');
-        activeReportRentalId = null;
-    }
-
-    async function submitRentalReport() {
-        if (!activeReportRentalId) return;
-        const response = await fetch(`http://localhost:8080/api/rent-requests/${activeReportRentalId}/report`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-                reasonCategory: document.getElementById('reportReason').value,
-                additionalDetails: document.getElementById('reportDetails').value.trim(),
-                evidenceUrl: document.getElementById('reportEvidence').value.trim()
-            })
-        });
-        alert(response.ok ? 'Report submitted.' : await getResponseError(response, 'Could not submit report.'));
-        if (response.ok) {
-            closeReportModal();
-            await showNotificationPanel(document.getElementById('notificationMenuItem'));
-        }
+    function openReportPage(rentalRequestId) {
+        window.location.href = `ReportUser.html?rentalId=${rentalRequestId}`;
     }
 
     async function showMessagesPanel(element) {
@@ -1426,7 +1479,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
         loadRecentTools();
-        refreshUnreadDot();
+        initializeAuthUi();
         const conversationUserId = sessionStorage.getItem('toolmatesOpenConversationUserId');
         const conversationName = sessionStorage.getItem('toolmatesOpenConversationName') || 'User';
         if (conversationUserId) {

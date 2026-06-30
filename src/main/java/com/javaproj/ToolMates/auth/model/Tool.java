@@ -37,6 +37,9 @@ public class Tool {
     @Column("additional_info")
     private String additionalInfo;
 
+    @Column("is_active")
+    private Boolean active = true;
+
     private List<String> imageUrls;
 
     public Tool() {}
@@ -73,6 +76,9 @@ public class Tool {
 
     public String getAdditionalInfo() { return additionalInfo; }
     public void setAdditionalInfo(String additionalInfo) { this.additionalInfo = additionalInfo; }
+
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
 
     public List<String> getImageUrls() { return imageUrls; }
     public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }

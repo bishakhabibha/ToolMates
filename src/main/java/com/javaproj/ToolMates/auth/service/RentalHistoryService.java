@@ -29,6 +29,9 @@ public class RentalHistoryService {
     );
 
     private static final List<String> REPORTED_STATUSES = List.of("REPORTED", "PICKUP_DISPUTE", "PAYMENT_DISPUTE", "RETURN_DISPUTE");
+    private static final List<String> COMPLETED_STATUSES = List.of("COMPLETED", "CLOSED");
+    private static final List<String> CANCELLED_STATUSES = List.of("CANCELLED", "REJECTED");
+    private static final List<String> FINANCIALLY_CLOSED_STATUSES = List.of("COMPLETED", "CLOSED", "CANCELLED", "REJECTED", "REPORTED");
     private static final List<String> ACCEPTED_HISTORY_STATUSES = List.of(
             "OWNER_ACCEPTED", "PICKUP_DETAILS_SUBMITTED", "BORROWER_REVIEWING_PICKUP_DETAILS",
             "PICKUP_SCHEDULED", "WAITING_FOR_PICKUP", "WAITING_FOR_PICKUP_TIME", "WAITING_FOR_PICKUP_CONFIRMATION",
@@ -158,6 +161,8 @@ public class RentalHistoryService {
                         r.remaining_balance AS remainingBalance,
                         r.owner_payment_confirmation AS ownerPaymentConfirmation,
                         r.borrower_payment_confirmation AS borrowerPaymentConfirmation,
+                        r.owner_return_confirmed_at AS ownerReturnConfirmedAt,
+                        r.borrower_return_confirmed_at AS borrowerReturnConfirmedAt,
                         r.rental_start_at AS rentalStartAt,
                         r.rental_end_at AS rentalEndAt,
                         t.id AS toolId,
@@ -198,6 +203,8 @@ public class RentalHistoryService {
                     r.remaining_balance AS remainingBalance,
                     r.owner_payment_confirmation AS ownerPaymentConfirmation,
                     r.borrower_payment_confirmation AS borrowerPaymentConfirmation,
+                    r.owner_return_confirmed_at AS ownerReturnConfirmedAt,
+                    r.borrower_return_confirmed_at AS borrowerReturnConfirmedAt,
                     r.rental_start_at AS rentalStartAt,
                     r.rental_end_at AS rentalEndAt,
                     t.id AS toolId,
@@ -301,6 +308,7 @@ public class RentalHistoryService {
         }
         String status = String.valueOf(row.getOrDefault("status", ""));
         applyMoneyFallbacks(rental);
+        applyPaymentDisplayStatus(rental, status);
         rental.put("statusLabel", humanize(status));
         rental.put("group", groupFor(status));
         rental.put("progress", progressFrom(row.get("rentalStartAt"), row.get("rentalEndAt")));
@@ -335,6 +343,18 @@ public class RentalHistoryService {
         }
     }
 
+    private void applyPaymentDisplayStatus(Map<String, Object> rental, String status) {
+        String upper = status == null ? "" : status.toUpperCase(Locale.ROOT);
+        if (COMPLETED_STATUSES.contains(upper)) {
+            rental.put("remainingBalance", 0);
+        } else if (CANCELLED_STATUSES.contains(upper)) {
+            rental.put("advancePaid", 0);
+            rental.put("remainingBalance", 0);
+        } else if (FINANCIALLY_CLOSED_STATUSES.contains(upper)) {
+            rental.put("remainingBalance", 0);
+        }
+    }
+
     private Map<String, Object> progressFrom(Object startValue, Object endValue) {
         LocalDateTime start = toLocalDateTime(startValue);
         LocalDateTime end = toLocalDateTime(endValue);
@@ -362,9 +382,9 @@ public class RentalHistoryService {
 
     private String groupFor(String status) {
         String upper = status == null ? "" : status.toUpperCase(Locale.ROOT);
-        if ("COMPLETED".equals(upper) || "CLOSED".equals(upper)) return "completed";
+        if (COMPLETED_STATUSES.contains(upper)) return "completed";
         if (REPORTED_STATUSES.contains(upper)) return "reported";
-        if ("CANCELLED".equals(upper) || "REJECTED".equals(upper)) return "cancelled";
+        if (CANCELLED_STATUSES.contains(upper)) return "cancelled";
         return "active";
     }
 

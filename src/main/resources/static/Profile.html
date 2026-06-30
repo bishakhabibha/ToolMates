@@ -17,8 +17,15 @@
         .panel { background: #ffffff; border-radius: 16px; border: 1px solid #eef2f5; padding: 24px; box-shadow: 0 4px 20px rgba(0,77,64,0.03); }
         .profile-head { display: flex; align-items: center; gap: 18px; }
         .avatar { width: 72px; height: 72px; border-radius: 50%; background: #00796b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; object-fit: cover; }
+        .profile-main { flex: 1; min-width: 0; }
+        .profile-name-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .profile-name { font-size: 24px; font-weight: 700; color: #1a2e2b; }
         .profile-bio { color: #546e7a; margin-top: 4px; }
+        .profile-actions { display: none; margin-left: auto; flex-shrink: 0; }
+        .bio-editor { display: none; margin-top: 12px; }
+        .bio-editor textarea { width: 100%; min-height: 90px; resize: vertical; padding: 10px 14px; border-radius: 8px; border: 1px solid #ced6d6; font-family: inherit; color: #2c3e50; outline: none; }
+        .bio-editor-actions { display: flex; gap: 8px; margin-top: 8px; }
+        button.secondary { background: #ffffff; color: #00796b; border: 1px solid #00796b; }
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
         .stat { background: #f4fbfa; border: 1px solid #b2dfdb; border-radius: 10px; padding: 14px; }
         .stat span { display: block; font-size: 12px; color: #546e7a; font-weight: 700; text-transform: uppercase; }
@@ -49,15 +56,29 @@
         </section>
         <section class="panel profile-head">
             <div class="avatar" id="profileAvatar">?</div>
-            <div>
-                <div class="profile-name" id="profileName">Profile</div>
+            <div class="profile-main">
+                <div class="profile-name-row">
+                    <div class="profile-name" id="profileName">Profile</div>
+                    <div class="profile-actions" id="profileActions">
+                        <button onclick="showBioEditor()">Edit Profile</button>
+                    </div>
+                </div>
                 <div class="profile-bio" id="profileBio">Load a profile to view user details.</div>
+                <div class="bio-editor" id="bioEditor">
+                    <textarea id="bioInput" maxlength="500" placeholder="Write a short bio..."></textarea>
+                    <div class="bio-editor-actions">
+                        <button onclick="saveBio()">Save</button>
+                        <button class="secondary" onclick="hideBioEditor()">Cancel</button>
+                    </div>
+                </div>
             </div>
         </section>
         <section class="stats-grid">
             <div class="stat"><span>Average Rating</span><strong id="averageRating">0</strong></div>
-            <div class="stat"><span>Suspensions</span><strong id="suspendedTimes">0</strong></div>
-            <div class="stat"><span>Listed Tools</span><strong id="listedToolCount">0</strong></div>
+            <div class="stat"><span>Total Reports Received</span><strong id="totalReportsReceived">0</strong></div>
+            <div class="stat"><span>Tools Listed</span><strong id="listedToolCount">0</strong></div>
+            <div class="stat"><span>Tools Successfully Rented</span><strong id="toolsSuccessfullyRented">0</strong></div>
+            <div class="stat"><span>Tools Successfully Borrowed</span><strong id="toolsSuccessfullyBorrowed">0</strong></div>
         </section>
         <section class="panel">
             <h2>Listed Tools</h2>
@@ -66,6 +87,9 @@
     </div>
 </main>
 <script>
+    let currentProfile = null;
+    let viewingOwnProfile = false;
+
     async function loadProfile(studentIdOverride) {
         const studentId = studentIdOverride || document.getElementById('studentIdInput').value.trim();
         const url = studentId
@@ -80,12 +104,18 @@
             return;
         }
         const profile = await response.json();
+        currentProfile = profile;
+        await updateOwnProfileState(studentId);
         document.getElementById('profileName').textContent = profile.name || 'Profile';
         document.getElementById('profileBio').textContent = profile.bio || 'No bio added yet.';
         document.getElementById('averageRating').textContent = profile.averageRating || 0;
-        document.getElementById('suspendedTimes').textContent = profile.suspendedTimes ?? 0;
+        document.getElementById('totalReportsReceived').textContent = profile.totalReportsReceived ?? 0;
+        document.getElementById('toolsSuccessfullyRented').textContent = profile.toolsSuccessfullyRented ?? 0;
+        document.getElementById('toolsSuccessfullyBorrowed').textContent = profile.toolsSuccessfullyBorrowed ?? 0;
         const tools = profile.listedTools || [];
-        document.getElementById('listedToolCount').textContent = tools.length;
+        document.getElementById('listedToolCount').textContent = profile.toolsListed ?? tools.length;
+        document.getElementById('profileActions').style.display = viewingOwnProfile ? 'flex' : 'none';
+        hideBioEditor();
 
         const avatar = document.getElementById('profileAvatar');
         if (profile.avatarUrl) {
@@ -107,6 +137,47 @@
                     <p>Successful rentals: ${tool.successfulRentalCount || 0}</p>
                 </div>`;
         });
+    }
+
+    async function updateOwnProfileState(studentId) {
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/me', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+            if (!response.ok) {
+                viewingOwnProfile = false;
+                return;
+            }
+            const me = await response.json();
+            viewingOwnProfile = !studentId || me.studentId === studentId;
+        } catch (error) {
+            viewingOwnProfile = false;
+        }
+    }
+
+    function showBioEditor() {
+        document.getElementById('bioInput').value = currentProfile && currentProfile.bio ? currentProfile.bio : '';
+        document.getElementById('bioEditor').style.display = 'block';
+    }
+
+    function hideBioEditor() {
+        document.getElementById('bioEditor').style.display = 'none';
+    }
+
+    async function saveBio() {
+        const bio = document.getElementById('bioInput').value.trim();
+        const response = await fetch('http://localhost:8080/api/profile/me/bio', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ bio })
+        });
+        if (!response.ok) {
+            alert('Could not save bio.');
+            return;
+        }
+        const profile = await response.json();
+        currentProfile = profile;
+        document.getElementById('profileBio').textContent = profile.bio || 'No bio added yet.';
+        hideBioEditor();
     }
 
     window.addEventListener('DOMContentLoaded', () => {

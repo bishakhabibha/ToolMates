@@ -86,6 +86,11 @@ public class UserDao {
         jdbc.update(sql, newPasswordHash, userId);
     }
 
+    public void updateBio(Long userId, String bio) {
+        String sql = "UPDATE users SET bio = ? WHERE user_id = ?";
+        jdbc.update(sql, bio, userId);
+    }
+
     public Optional<User> findByStudentId(String studentId) {
         String sql = "SELECT * FROM users WHERE student_id = ?";
         List<User> results = jdbc.query(sql, new UserRowMapper(), studentId);

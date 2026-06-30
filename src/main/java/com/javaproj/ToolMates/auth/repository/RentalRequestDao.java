@@ -126,6 +126,18 @@ public class RentalRequestDao {
         return jdbc.update(sql, confirmed ? "YES" : "NO", rentalRequestId);
     }
 
+    public void resetPaymentConfirmations(Long rentalRequestId) {
+        String sql = """
+                UPDATE rental_requests
+                SET owner_payment_confirmation = NULL,
+                    borrower_payment_confirmation = NULL,
+                    owner_payment_confirmed_at = NULL,
+                    borrower_payment_confirmed_at = NULL
+                WHERE id = ?
+                """;
+        jdbc.update(sql, rentalRequestId);
+    }
+
     public void startRental(Long rentalRequestId, double totalRent, double advancePaid, double remainingBalance, LocalDateTime startAt, LocalDateTime endAt) {
         String sql = """
                 UPDATE rental_requests
@@ -174,23 +186,23 @@ public class RentalRequestDao {
         jdbc.update(sql, rentalRequestId);
     }
 
-    public List<RentalRequest> findActiveRentalsDueWithinHours(int hours) {
+    public List<RentalRequest> findActiveRentalsEndingWithinSeconds(long seconds) {
         String sql = RENTAL_SELECT + """
                 WHERE r.status = 'ACTIVE'
                   AND r.rental_end_at IS NOT NULL
                   AND r.rental_end_at > NOW()
-                  AND r.rental_end_at <= DATE_ADD(NOW(), INTERVAL ? HOUR)
+                  AND r.rental_end_at <= DATE_ADD(NOW(), INTERVAL ? SECOND)
                 """;
-        return jdbc.query(sql, new RentalRequestRowMapper(), hours);
+        return jdbc.query(sql, new RentalRequestRowMapper(), seconds);
     }
 
-    public List<RentalRequest> findActiveRentalsExpiredForDays(int days) {
+    public List<RentalRequest> findRentalsReadyForReturnCheckAfterSeconds(long seconds) {
         String sql = RENTAL_SELECT + """
                 WHERE r.status IN ('ACTIVE', 'AWAITING_RETURN')
                   AND r.rental_end_at IS NOT NULL
-                  AND r.rental_end_at <= DATE_SUB(NOW(), INTERVAL ? DAY)
+                  AND r.rental_end_at <= DATE_SUB(NOW(), INTERVAL ? SECOND)
                 """;
-        return jdbc.query(sql, new RentalRequestRowMapper(), days);
+        return jdbc.query(sql, new RentalRequestRowMapper(), seconds);
     }
 
     public List<RentalRequest> findPickupRemindersDue(int minutesBefore, String notificationType) {
@@ -233,6 +245,17 @@ public class RentalRequestDao {
         return jdbc.query(sql, new RentalRequestRowMapper());
     }
 
+    public List<RentalRequest> findPickupConfirmationsWaiting() {
+        String sql = RENTAL_SELECT + """
+                WHERE r.status = 'PICKUP_CONFIRMATION'
+                  AND (
+                      r.owner_pickup_confirmation IS NULL
+                      OR r.borrower_pickup_confirmation IS NULL
+                  )
+                """;
+        return jdbc.query(sql, new RentalRequestRowMapper());
+    }
+
     public List<RentalRequest> findRentalsEndingNow() {
         String sql = RENTAL_SELECT + """
                 WHERE r.status = 'ACTIVE'
@@ -245,6 +268,31 @@ public class RentalRequestDao {
     public int countClosedByToolId(Long toolId) {
         String sql = "SELECT COUNT(*) FROM rental_requests WHERE tool_id = ? AND status IN ('COMPLETED', 'CLOSED')";
         Integer count = jdbc.queryForObject(sql, Integer.class, toolId);
+        return count == null ? 0 : count;
+    }
+
+    public int countSuccessfullyLentByOwner(Long ownerUserId) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM rental_requests r
+                JOIN tools t ON t.id = r.tool_id
+                JOIN users owner ON owner.student_id = t.owner_id
+                WHERE owner.user_id = ?
+                  AND r.status IN ('COMPLETED', 'CLOSED')
+                """;
+        Integer count = jdbc.queryForObject(sql, Integer.class, ownerUserId);
+        return count == null ? 0 : count;
+    }
+
+    public int countSuccessfullyBorrowedByUser(Long borrowerUserId) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM rental_requests r
+                JOIN users borrower ON borrower.student_id = r.renter_id
+                WHERE borrower.user_id = ?
+                  AND r.status IN ('COMPLETED', 'CLOSED')
+                """;
+        Integer count = jdbc.queryForObject(sql, Integer.class, borrowerUserId);
         return count == null ? 0 : count;
     }
 

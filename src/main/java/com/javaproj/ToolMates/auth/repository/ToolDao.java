@@ -8,6 +8,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -51,33 +53,19 @@ public class ToolDao {
     }
 
     public List<Tool> findRecent() {
-        String selectToolsSql = "SELECT * FROM tools ORDER BY id DESC LIMIT 12";
+        String selectToolsSql = "SELECT * FROM tools WHERE COALESCE(is_active, TRUE) = TRUE ORDER BY id DESC LIMIT 12";
+        return jdbcTemplate.query(selectToolsSql, (rs, rowNum) -> mapTool(rs));
+    }
 
-        return jdbcTemplate.query(selectToolsSql, (rs, rowNum) -> {
-            Tool tool = new Tool();
-            tool.setId(rs.getLong("id"));
-            tool.setOwnerName(rs.getString("owner_name"));
-            tool.setOwnerId(rs.getString("owner_id"));
-            tool.setName(rs.getString("name"));
-            tool.setCategory(rs.getString("category"));
-            tool.setCondition(rs.getString("tool_condition"));
-            tool.setPricePerDay(rs.getDouble("price_per_day"));
-            tool.setMaxRentingPeriod(rs.getInt("max_renting_period"));
-            tool.setPickupLocation(rs.getString("pickup_location"));
-            tool.setDescription(rs.getString("description"));
-            tool.setAdditionalInfo(rs.getString("additional_info"));
-
-            // Pure JDBC subquery to pull matching images for this row
-            String selectImagesSql = "SELECT image_url FROM tool_images WHERE tool_id = ?";
-            List<String> imageUrls = jdbcTemplate.query(selectImagesSql,
-                    (imgRs, imgRowNum) -> imgRs.getString("image_url"),
-                    tool.getId()
-            );
-
-            tool.setImageUrls(imageUrls);
-
-            return tool;
-        });
+    public List<Tool> searchActive(String query) {
+        String like = "%" + (query == null ? "" : query.trim().toLowerCase()) + "%";
+        String sql = """
+                SELECT * FROM tools
+                WHERE COALESCE(is_active, TRUE) = TRUE
+                  AND (LOWER(name) LIKE ? OR LOWER(category) LIKE ?)
+                ORDER BY id DESC
+                """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapTool(rs), like, like);
     }
 
     /**
@@ -88,27 +76,7 @@ public class ToolDao {
 
         try {
             return jdbcTemplate.queryForObject(selectToolSql, (rs, rowNum) -> {
-                Tool tool = new Tool();
-                tool.setId(rs.getLong("id"));
-                tool.setOwnerName(rs.getString("owner_name"));
-                tool.setOwnerId(rs.getString("owner_id"));
-                tool.setName(rs.getString("name"));
-                tool.setCategory(rs.getString("category"));
-                tool.setCondition(rs.getString("tool_condition"));
-                tool.setPricePerDay(rs.getDouble("price_per_day"));
-                tool.setMaxRentingPeriod(rs.getInt("max_renting_period"));
-                tool.setPickupLocation(rs.getString("pickup_location"));
-                tool.setDescription(rs.getString("description"));
-                tool.setAdditionalInfo(rs.getString("additional_info"));
-
-                String selectImagesSql = "SELECT image_url FROM tool_images WHERE tool_id = ?";
-                List<String> imageUrls = jdbcTemplate.query(selectImagesSql,
-                        (imgRs, imgRowNum) -> imgRs.getString("image_url"),
-                        tool.getId()
-                );
-                tool.setImageUrls(imageUrls);
-
-                return tool;
+                return mapTool(rs);
             }, id);
         } catch (org.springframework.dao.EmptyResultDataAccessException e) {
             return null;
@@ -118,26 +86,79 @@ public class ToolDao {
     public List<Tool> findByOwnerId(String ownerId) {
         String selectToolsSql = "SELECT * FROM tools WHERE owner_id = ? ORDER BY id DESC";
         return jdbcTemplate.query(selectToolsSql, (rs, rowNum) -> {
-            Tool tool = new Tool();
-            tool.setId(rs.getLong("id"));
-            tool.setOwnerName(rs.getString("owner_name"));
-            tool.setOwnerId(rs.getString("owner_id"));
-            tool.setName(rs.getString("name"));
-            tool.setCategory(rs.getString("category"));
-            tool.setCondition(rs.getString("tool_condition"));
-            tool.setPricePerDay(rs.getDouble("price_per_day"));
-            tool.setMaxRentingPeriod(rs.getInt("max_renting_period"));
-            tool.setPickupLocation(rs.getString("pickup_location"));
-            tool.setDescription(rs.getString("description"));
-            tool.setAdditionalInfo(rs.getString("additional_info"));
-
-            String selectImagesSql = "SELECT image_url FROM tool_images WHERE tool_id = ?";
-            List<String> imageUrls = jdbcTemplate.query(selectImagesSql,
-                    (imgRs, imgRowNum) -> imgRs.getString("image_url"),
-                    tool.getId()
-            );
-            tool.setImageUrls(imageUrls);
-            return tool;
+            return mapTool(rs);
         }, ownerId);
+    }
+
+    public int update(Tool tool) {
+        String sql = """
+                UPDATE tools
+                SET name = ?,
+                    category = ?,
+                    tool_condition = ?,
+                    price_per_day = ?,
+                    max_renting_period = ?,
+                    pickup_location = ?,
+                    description = ?,
+                    additional_info = ?
+                WHERE id = ? AND owner_id = ?
+                """;
+        int updated = jdbcTemplate.update(sql,
+                tool.getName(),
+                tool.getCategory(),
+                tool.getCondition(),
+                tool.getPricePerDay(),
+                tool.getMaxRentingPeriod(),
+                tool.getPickupLocation(),
+                tool.getDescription(),
+                tool.getAdditionalInfo(),
+                tool.getId(),
+                tool.getOwnerId()
+        );
+        if (updated == 1 && tool.getImageUrls() != null) {
+            jdbcTemplate.update("DELETE FROM tool_images WHERE tool_id = ?", tool.getId());
+            for (String url : tool.getImageUrls()) {
+                jdbcTemplate.update("INSERT INTO tool_images (tool_id, image_url) VALUES (?, ?)", tool.getId(), url);
+            }
+        }
+        return updated;
+    }
+
+    public int unlist(Long toolId, String ownerId) {
+        String sql = "UPDATE tools SET is_active = FALSE WHERE id = ? AND owner_id = ?";
+        return jdbcTemplate.update(sql, toolId, ownerId);
+    }
+
+    public boolean existsByExactName(String name) {
+        String sql = "SELECT COUNT(*) FROM tools WHERE BINARY name = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, name);
+        return count != null && count > 0;
+    }
+
+    private Tool mapTool(ResultSet rs) throws SQLException {
+        Tool tool = new Tool();
+        tool.setId(rs.getLong("id"));
+        tool.setOwnerName(rs.getString("owner_name"));
+        tool.setOwnerId(rs.getString("owner_id"));
+        tool.setName(rs.getString("name"));
+        tool.setCategory(rs.getString("category"));
+        tool.setCondition(rs.getString("tool_condition"));
+        tool.setPricePerDay(rs.getDouble("price_per_day"));
+        tool.setMaxRentingPeriod(rs.getInt("max_renting_period"));
+        tool.setPickupLocation(rs.getString("pickup_location"));
+        tool.setDescription(rs.getString("description"));
+        tool.setAdditionalInfo(rs.getString("additional_info"));
+        try {
+            boolean active = rs.getBoolean("is_active");
+            tool.setActive(rs.wasNull() || active);
+        } catch (SQLException ignored) {
+            tool.setActive(true);
+        }
+        List<String> imageUrls = jdbcTemplate.query("SELECT image_url FROM tool_images WHERE tool_id = ?",
+                (imgRs, imgRowNum) -> imgRs.getString("image_url"),
+                tool.getId()
+        );
+        tool.setImageUrls(imageUrls);
+        return tool;
     }
 }
