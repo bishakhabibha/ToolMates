@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/messages")
-@CrossOrigin(origins = {"http://localhost:63342", "http://127.0.0.1:63342", "http://localhost:8080"}, allowCredentials = "true")
 public class MessageController {
 
     @Autowired
@@ -22,7 +21,8 @@ public class MessageController {
     public ResponseEntity<?> saveMessage(@RequestBody MessageRequest request, HttpSession session) {
         try {
             Long userId = (Long) session.getAttribute("userId");
-            if (userId != null) request.setSenderId(userId);
+            if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Not logged in."));
+            request.setSenderId(userId);
             return new ResponseEntity<>(messageService.saveMessage(request), HttpStatus.CREATED);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
@@ -32,9 +32,13 @@ public class MessageController {
     }
 
     @GetMapping("/{rentalRequestId}")
-    public ResponseEntity<?> getChatHistory(@PathVariable Long rentalRequestId) {
+    public ResponseEntity<?> getChatHistory(@PathVariable Long rentalRequestId, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Not logged in."));
         try {
-            return ResponseEntity.ok(messageService.getChatHistory(rentalRequestId));
+            return ResponseEntity.ok(messageService.getChatHistory(rentalRequestId, userId));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", ex.getMessage()));
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

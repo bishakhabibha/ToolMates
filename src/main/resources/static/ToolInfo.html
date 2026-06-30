@@ -833,7 +833,18 @@
     </div>
 </aside>
 
-<script>
+    <script>
+    (() => {
+        const apiOrigin = (location.port === '63342' || location.protocol === 'file:') ? 'http://localhost:8080' : '';
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => {
+            if (typeof input === 'string' && input.startsWith('/api/')) {
+                return originalFetch(apiOrigin + input, init);
+            }
+            return originalFetch(input, init);
+        };
+    })();
+    </script><script>
     const categoryColors = {
         'repair & build': { bg: '#004d40', text: '#a7ffeb' },
         'photography':    { bg: '#00796b', text: '#e0f2f1' },
@@ -869,7 +880,7 @@
             return;
         }
         try {
-            const resp = await fetch(`http://localhost:8080/api/tools/${id}`, {
+            const resp = await fetch(`/api/tools/${id}`, {
                 headers: { 'Accept': 'application/json' }
             });
             if (resp.ok) {
@@ -1037,7 +1048,7 @@
         };
 
         try {
-            const resp = await fetch('http://localhost:8080/api/rent-requests/add', {
+            const resp = await fetch('/api/rent-requests/add', {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -1066,7 +1077,7 @@
 
     async function ensureCurrentUser() {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/me', {
+            const response = await fetch('/api/auth/me', {
                 credentials: 'include',
                 headers: { 'Accept': 'application/json' }
             });
@@ -1181,7 +1192,7 @@
             alert('Maximum renting period must be valid.');
             return;
         }
-        const response = await fetch(`http://localhost:8080/api/tools/${currentTool.id}`, {
+        const response = await fetch(`/api/tools/${currentTool.id}`, {
             method: 'PUT',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -1200,7 +1211,7 @@
 
     async function unlistTool() {
         if (!confirm('This tool will no longer appear for future rentals.\n\nPast and ongoing rental records will remain unchanged.\n\nDo you want to continue?')) return;
-        const response = await fetch(`http://localhost:8080/api/tools/${currentTool.id}/unlist`, {
+        const response = await fetch(`/api/tools/${currentTool.id}/unlist`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
@@ -1252,7 +1263,7 @@
         const log = document.getElementById('chatLog');
         log.innerHTML = '<div class="chat-message">Loading messages...</div>';
         try {
-            const response = await fetch(`http://localhost:8080/api/messages/me/conversations/student/${encodeURIComponent(currentTool.ownerId)}`, {
+            const response = await fetch(`/api/messages/me/conversations/student/${encodeURIComponent(currentTool.ownerId)}`, {
                 credentials: 'include',
                 headers: { 'Accept': 'application/json' }
             });
@@ -1280,7 +1291,7 @@
         const messageText = input.value.trim();
         if (!messageText || !activeChatSenderStudentId) return;
 
-        const response = await fetch('http://localhost:8080/api/messages', {
+        const response = await fetch('/api/messages', {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },

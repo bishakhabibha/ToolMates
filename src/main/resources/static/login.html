@@ -300,8 +300,19 @@
     </div>
 </div>
 
-<script>
-    const API = 'http://localhost:8080/api/auth';
+    <script>
+    (() => {
+        const apiOrigin = (location.port === '63342' || location.protocol === 'file:') ? 'http://localhost:8080' : '';
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => {
+            if (typeof input === 'string' && input.startsWith('/api/')) {
+                return originalFetch(apiOrigin + input, init);
+            }
+            return originalFetch(input, init);
+        };
+    })();
+    </script><script>
+    const API = '/api/auth';
 
     function togglePassword(inputId, btn) {
         const input = document.getElementById(inputId);

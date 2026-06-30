@@ -14,7 +14,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reviews")
-@CrossOrigin(origins = {"http://localhost:63342", "http://127.0.0.1:63342", "http://localhost:8080"}, allowCredentials = "true")
 public class ReviewController {
 
     @Autowired
@@ -29,7 +28,10 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<?> submitReview(@RequestBody ReviewRequest request, HttpSession session) {
         Long loggedInUserId = (Long) session.getAttribute("userId");
-        if (loggedInUserId != null) request.setReviewerId(loggedInUserId);
+        if (loggedInUserId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Not logged in."));
+        }
+        request.setReviewerId(loggedInUserId);
         if (request.getRatingStars() == null || request.getRatingStars() < 1 || request.getRatingStars() > 5) {
             return ResponseEntity.badRequest().body(Map.of("error", "Rating must be between 1 and 5."));
         }

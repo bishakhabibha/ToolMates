@@ -1,7 +1,9 @@
 package com.javaproj.ToolMates.auth.service;
 
 import com.javaproj.ToolMates.auth.model.Tool;
+import com.javaproj.ToolMates.auth.model.User;
 import com.javaproj.ToolMates.auth.repository.ToolDao;
+import com.javaproj.ToolMates.auth.repository.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +15,17 @@ public class ToolService {
     @Autowired
     private ToolDao toolDao;
 
-    public Tool saveToolListing(Tool tool) {
+    @Autowired
+    private UserDao userDao;
+
+    public Tool saveToolListing(Tool tool, Long actorUserId) {
+        if (actorUserId == null) throw new SecurityException("You must be logged in.");
+        User owner = userDao.findByUserId(actorUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Owner not found."));
+        if (tool == null) throw new IllegalArgumentException("Tool details are required.");
+        tool.setOwnerId(owner.getStudentId());
+        tool.setOwnerName((owner.getFirstName() + " " + owner.getLastName()).trim());
+        validateTool(tool);
         return toolDao.save(tool);
     }
 

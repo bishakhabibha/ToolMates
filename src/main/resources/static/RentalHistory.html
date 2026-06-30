@@ -90,8 +90,19 @@
     </div>
 </main>
 
-<script>
-    const API = 'http://localhost:8080/api/rental-history';
+    <script>
+    (() => {
+        const apiOrigin = (location.port === '63342' || location.protocol === 'file:') ? 'http://localhost:8080' : '';
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => {
+            if (typeof input === 'string' && input.startsWith('/api/')) {
+                return originalFetch(apiOrigin + input, init);
+            }
+            return originalFetch(input, init);
+        };
+    })();
+    </script><script>
+    const API = '/api/rental-history';
     const fallbackImage = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=300&auto=format&fit=crop&q=80';
     let activeTab = 'borrowed';
     let currentPage = 0;

@@ -292,7 +292,18 @@
     </div>
 </div>
 
-<script>
+    <script>
+    (() => {
+        const apiOrigin = (location.port === '63342' || location.protocol === 'file:') ? 'http://localhost:8080' : '';
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => {
+            if (typeof input === 'string' && input.startsWith('/api/')) {
+                return originalFetch(apiOrigin + input, init);
+            }
+            return originalFetch(input, init);
+        };
+    })();
+    </script><script>
     let emailVerified = false;
     const cuetStudentEmailPattern = /^[A-Za-z0-9._%+-]+@student\.cuet\.ac\.bd$/;
 
@@ -306,8 +317,9 @@
         document.getElementById('otpRow').classList.add('visible');
         document.getElementById('otpBtn').textContent = 'Resend';
         document.getElementById('d1').focus();
-        fetch('http://localhost:8080/api/auth/send-otp', {
+        fetch('/api/auth/send-otp', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
         }).then(r => r.json()).then(d => console.log(d)).catch(() => {});
@@ -322,8 +334,9 @@
         const code = ['d1','d2','d3','d4','d5','d6'].map(i => document.getElementById(i).value).join('');
         if (code.length < 6) return;
         const email = document.getElementById('studentEmail').value.trim();
-        fetch('http://localhost:8080/api/auth/verify-otp', {
+        fetch('/api/auth/verify-otp', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, otp: code })
         }).then(r => r.json()).then(d => {
@@ -400,7 +413,7 @@
             password:     pw
         };
 
-        fetch('http://localhost:8080/api/auth/signup', {
+        fetch('/api/auth/signup', {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },

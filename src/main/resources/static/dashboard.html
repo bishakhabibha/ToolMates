@@ -825,7 +825,18 @@
     </div>
 </div>
 
-<script>
+    <script>
+    (() => {
+        const apiOrigin = (location.port === '63342' || location.protocol === 'file:') ? 'http://localhost:8080' : '';
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => {
+            if (typeof input === 'string' && input.startsWith('/api/')) {
+                return originalFetch(apiOrigin + input, init);
+            }
+            return originalFetch(input, init);
+        };
+    })();
+    </script><script>
     let activeSlideIndex = 0;
     const slidesCount = 3;
     let cachedToolsList = [];
@@ -941,7 +952,7 @@
 
     async function loadRecentTools() {
         try {
-            const response = await fetch('http://localhost:8080/api/tools/recent', {
+            const response = await fetch('/api/tools/recent', {
                 method: 'GET',
                 headers: { 'Accept': 'application/json' }
             });
@@ -958,7 +969,7 @@
 
     async function ensureCurrentUser() {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/me', {
+            const response = await fetch('/api/auth/me', {
                 credentials: 'include',
                 headers: { 'Accept': 'application/json' }
             });
@@ -977,7 +988,7 @@
         const user = await ensureCurrentUser();
         if (!user) return;
         try {
-            const response = await fetch('http://localhost:8080/api/notifications/me/unread-count', {
+            const response = await fetch('/api/notifications/me/unread-count', {
                 credentials: 'include',
                 headers: { 'Accept': 'application/json' }
             });
@@ -1000,14 +1011,14 @@
         grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Loading notifications...</p>';
 
         try {
-            const response = await fetch('http://localhost:8080/api/notifications/me', {
+            const response = await fetch('/api/notifications/me', {
                 credentials: 'include',
                 headers: { 'Accept': 'application/json' }
             });
             if (!response.ok) throw new Error('Notification load failed');
             latestNotifications = await response.json();
             renderNotifications(latestNotifications);
-            await fetch('http://localhost:8080/api/notifications/me/read', { method: 'POST', credentials: 'include' });
+            await fetch('/api/notifications/me/read', { method: 'POST', credentials: 'include' });
             refreshUnreadDot();
         } catch (error) {
             grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Please log in to view notifications.</p>';
@@ -1095,7 +1106,7 @@
             button.classList.add('action-done');
             button.disabled = true;
         }
-        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/accept`, {
+        const response = await fetch(`/api/rent-requests/${rentalRequestId}/accept`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
@@ -1172,7 +1183,7 @@
 
         const button = document.getElementById('submitPickupDetailsButton');
         button.disabled = true;
-        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/pickup-details`, {
+        const response = await fetch(`/api/rent-requests/${rentalRequestId}/pickup-details`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -1193,7 +1204,7 @@
             button.classList.add('action-done');
             button.disabled = true;
         }
-        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/reject`, {
+        const response = await fetch(`/api/rent-requests/${rentalRequestId}/reject`, {
             method: 'POST',
             credentials: 'include'
         });
@@ -1207,20 +1218,20 @@
     }
 
     async function closeRentalRequest(rentalRequestId) {
-        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/close`, { method: 'POST', credentials: 'include' });
+        const response = await fetch(`/api/rent-requests/${rentalRequestId}/close`, { method: 'POST', credentials: 'include' });
         alert(response.ok ? 'Rental return confirmed.' : await getResponseError(response, 'Could not confirm return.'));
     }
 
     async function confirmPickup(rentalRequestId, confirmed, button) {
-        await postConfirmation(`http://localhost:8080/api/rent-requests/${rentalRequestId}/pickup-confirmation`, confirmed, button, 'Could not submit pickup confirmation.');
+        await postConfirmation(`/api/rent-requests/${rentalRequestId}/pickup-confirmation`, confirmed, button, 'Could not submit pickup confirmation.');
     }
 
     async function confirmPayment(rentalRequestId, confirmed, button) {
-        await postConfirmation(`http://localhost:8080/api/rent-requests/${rentalRequestId}/payment-confirmation`, confirmed, button, 'Could not submit payment confirmation.');
+        await postConfirmation(`/api/rent-requests/${rentalRequestId}/payment-confirmation`, confirmed, button, 'Could not submit payment confirmation.');
     }
 
     async function confirmReturn(rentalRequestId, confirmed, button) {
-        const ok = await postConfirmation(`http://localhost:8080/api/rent-requests/${rentalRequestId}/return-confirmation`, confirmed, button, 'Could not submit return confirmation.', confirmed ? 'Return confirmed successfully.' : null);
+        const ok = await postConfirmation(`/api/rent-requests/${rentalRequestId}/return-confirmation`, confirmed, button, 'Could not submit return confirmation.', confirmed ? 'Return confirmed successfully.' : null);
         if (ok && !confirmed) {
             window.location.href = `ReportUser.html?rentalId=${rentalRequestId}`;
         }
@@ -1228,7 +1239,7 @@
 
     async function cancelRental(rentalRequestId, button) {
         if (button) button.disabled = true;
-        const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/cancel`, {
+        const response = await fetch(`/api/rent-requests/${rentalRequestId}/cancel`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
@@ -1293,7 +1304,7 @@
 
     async function logoutUser() {
         try {
-            await fetch('http://localhost:8080/api/auth/logout', { method: 'POST', credentials: 'include' });
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
         } catch (error) {}
         currentUser = null;
         localStorage.removeItem('toolmatesUser');
@@ -1325,7 +1336,7 @@
         const grid = document.getElementById('itemsGrid');
         grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Loading conversations...</p>';
         try {
-            const response = await fetch('http://localhost:8080/api/messages/me/conversations', {
+            const response = await fetch('/api/messages/me/conversations', {
                 credentials: 'include',
                 headers: { 'Accept': 'application/json' }
             });
@@ -1405,7 +1416,7 @@
             </div>`;
         const body = document.getElementById('threadBody');
         try {
-            const response = await fetch(`http://localhost:8080/api/messages/me/conversations/${otherUserId}`, {
+            const response = await fetch(`/api/messages/me/conversations/${otherUserId}`, {
                 credentials: 'include',
                 headers: { 'Accept': 'application/json' }
             });
@@ -1432,7 +1443,7 @@
         const input = document.getElementById('threadMessageInput');
         const messageText = input.value.trim();
         if (!messageText || !activeConversationUserId) return;
-        const response = await fetch('http://localhost:8080/api/messages', {
+        const response = await fetch('/api/messages', {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -1447,7 +1458,7 @@
         }
         input.value = '';
         await loadConversationMessages(activeConversationUserId, activeConversationName);
-        const conversationsResponse = await fetch('http://localhost:8080/api/messages/me/conversations', {
+        const conversationsResponse = await fetch('/api/messages/me/conversations', {
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
         });
@@ -1461,7 +1472,7 @@
         if (event.key === 'Enter') {
             const query = event.target.value.trim();
             try {
-                const response = await fetch(`http://localhost:8080/api/tools/search?query=${encodeURIComponent(query)}`, {
+                const response = await fetch(`/api/tools/search?query=${encodeURIComponent(query)}`, {
                     method: 'GET',
                     headers: { 'Accept': 'application/json' }
                 });

@@ -13,17 +13,21 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tools")
-@CrossOrigin(origins = {"http://localhost:63342", "http://127.0.0.1:63342", "http://localhost:8080"}, allowCredentials = "true")
 public class ToolController {
 
     @Autowired
     private ToolService toolService;
 
     @PostMapping("/add")
-    public ResponseEntity<Tool> addTool(@RequestBody Tool tool) {
+    public ResponseEntity<?> addTool(@RequestBody Tool tool, HttpSession session) {
         try {
-            Tool savedTool = toolService.saveToolListing(tool);
+            Long userId = (Long) session.getAttribute("userId");
+            Tool savedTool = toolService.saveToolListing(tool, userId);
             return new ResponseEntity<>(savedTool, HttpStatus.CREATED);
+        } catch (SecurityException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", ex.getMessage()));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -84,9 +84,20 @@
     </div>
 </main>
 
-<script>
-    const API = 'http://localhost:8080/api/rental-history';
-    const RENT_API = 'http://localhost:8080/api/rent-requests';
+    <script>
+    (() => {
+        const apiOrigin = (location.port === '63342' || location.protocol === 'file:') ? 'http://localhost:8080' : '';
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => {
+            if (typeof input === 'string' && input.startsWith('/api/')) {
+                return originalFetch(apiOrigin + input, init);
+            }
+            return originalFetch(input, init);
+        };
+    })();
+    </script><script>
+    const API = '/api/rental-history';
+    const RENT_API = '/api/rent-requests';
     const fallbackImage = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500&auto=format&fit=crop&q=80';
     let rental = null;
     let currentUser = null;
@@ -115,7 +126,7 @@
 
     async function loadCurrentUser() {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/me', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+            const response = await fetch('/api/auth/me', { credentials: 'include', headers: { 'Accept': 'application/json' } });
             currentUser = response.ok ? await response.json() : null;
         } catch (error) {
             currentUser = null;

@@ -322,13 +322,24 @@
 
 </div>
 
-<script>
+    <script>
+    (() => {
+        const apiOrigin = (location.port === '63342' || location.protocol === 'file:') ? 'http://localhost:8080' : '';
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => {
+            if (typeof input === 'string' && input.startsWith('/api/')) {
+                return originalFetch(apiOrigin + input, init);
+            }
+            return originalFetch(input, init);
+        };
+    })();
+    </script><script>
   let primaryToolsDataset = [];
   let stateFilteredTools = [];
 
   async function fetchAllTools() {
     try {
-      const response = await fetch('http://localhost:8080/api/tools/recent', {
+      const response = await fetch('/api/tools/recent', {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       });

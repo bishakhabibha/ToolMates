@@ -23,7 +23,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:63342", allowCredentials = "true")
 public class AuthController {
 
     private static final String SESSION_VERIFIED_EMAIL = "verifiedEmail";
@@ -71,7 +70,9 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest req, HttpSession session) {
-        boolean emailVerified = true;
+        String requestedEmail = req.getStudentEmail() == null ? "" : req.getStudentEmail().trim().toLowerCase();
+        String verifiedEmail = (String) session.getAttribute(SESSION_VERIFIED_EMAIL);
+        boolean emailVerified = requestedEmail.equals(verifiedEmail);
 
         try {
             User saved = authService.register(req, emailVerified);
