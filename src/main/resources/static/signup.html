@@ -314,15 +314,26 @@
             return;
         }
         document.getElementById('err-email').classList.remove('visible');
-        document.getElementById('otpRow').classList.add('visible');
-        document.getElementById('otpBtn').textContent = 'Resend';
-        document.getElementById('d1').focus();
+        const otpButton = document.getElementById('otpBtn');
+        otpButton.disabled = true;
+        otpButton.textContent = 'Sending...';
         fetch('/api/auth/send-otp', {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
-        }).then(r => r.json()).then(d => console.log(d)).catch(() => {});
+        }).then(async r => {
+            const data = await r.json().catch(() => ({}));
+            if (!r.ok) throw new Error(data.error || 'Could not send verification code.');
+            document.getElementById('otpRow').classList.add('visible');
+            otpButton.textContent = 'Resend';
+            document.getElementById('d1').focus();
+        }).catch(error => {
+            alert(error.message || 'Could not send verification code. Please try again.');
+            otpButton.textContent = 'Send Code';
+        }).finally(() => {
+            otpButton.disabled = false;
+        });
     }
 
     function dn(el, nxt) {

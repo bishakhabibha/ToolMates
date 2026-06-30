@@ -26,8 +26,8 @@ public class OtpService {
         String key = storeKey(email, purpose);
         String otp = generateOtp();
         Instant expiresAt = Instant.now().plusSeconds(OTP_EXPIRY_SECONDS);
-        otpStore.put(key, new OtpEntry(otp, expiresAt));
         sendEmail(email, otp, purpose);
+        otpStore.put(key, new OtpEntry(otp, expiresAt));
     }
 
     public boolean verify(String email, String otp, Purpose purpose) {
