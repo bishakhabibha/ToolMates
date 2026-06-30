@@ -287,7 +287,7 @@
             <button type="submit" class="btn-submit">Create Account &rarr;</button>
         </form>
 
-        <div class="login">Already have an account? <a href="login.html">Log in with your User ID</a></div>
+        <div class="login">Already have an account? <a href="/login">Log in with your User ID</a></div>
 
     </div>
 </div>
@@ -421,7 +421,7 @@
         }).then(r => r.json()).then(d => {
             if (d.message && !d.error) {
                 alert('Account created successfully!');
-                window.location.href = 'login.html';
+                window.location.href = '/login';
             } else {
                 alert(d.error || 'Something went wrong. Please try again.');
             }

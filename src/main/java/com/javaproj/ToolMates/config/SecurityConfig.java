@@ -45,6 +45,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/",
+                                "/dashboard",
+                                "/login",
+                                "/signup",
+                                "/rental-history",
+                                "/rental-details",
                                 "/**/*.html",
                                 "/**/*.css",
                                 "/**/*.js",

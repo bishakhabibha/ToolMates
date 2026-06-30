@@ -230,7 +230,7 @@
             <button type="submit" class="btn-submit" id="loginBtn">Log In →</button>
         </form>
 
-        <div class="register-redirect">New to ToolMates? <a href="signup.html">Create an account</a></div>
+        <div class="register-redirect">New to ToolMates? <a href="/signup">Create an account</a></div>
     </div>
 </div>
 
@@ -513,7 +513,7 @@
                     firstName: data.firstName,
                     lastName: data.lastName
                 }));
-                window.location.href = 'dashboard.html';
+                window.location.href = '/dashboard';
             } else {
                 alert(data.error || 'Invalid credentials. Please try again.');
             }
