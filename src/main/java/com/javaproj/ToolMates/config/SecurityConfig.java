@@ -20,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${app.cors.allowed-origins:http://localhost:63342,http://127.0.0.1:63342,http://localhost:8080}")
+    @Value("${app.cors.allowed-origins:http://localhost:63342,http://127.0.0.1:63342,http://localhost:8080,https://toolmates.onrender.com}")
     private String allowedOrigins;
 
     @Bean
@@ -126,11 +127,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+        List<String> origins = new ArrayList<>(Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .filter(origin -> !origin.isBlank())
-                .toList();
-        configuration.setAllowedOrigins(origins);
+                .toList());
+        if (!origins.contains("https://*.onrender.com")) {
+            origins.add("https://*.onrender.com");
+        }
+        configuration.setAllowedOriginPatterns(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "Accept"));
         configuration.setAllowCredentials(true);

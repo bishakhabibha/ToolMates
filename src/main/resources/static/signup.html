@@ -317,19 +317,26 @@
         const otpButton = document.getElementById('otpBtn');
         otpButton.disabled = true;
         otpButton.textContent = 'Sending...';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
         fetch('/api/auth/send-otp', {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email }),
+            signal: controller.signal
         }).then(async r => {
+            clearTimeout(timeoutId);
             const data = await r.json().catch(() => ({}));
             if (!r.ok) throw new Error(data.error || 'Could not send verification code.');
             document.getElementById('otpRow').classList.add('visible');
             otpButton.textContent = 'Resend';
             document.getElementById('d1').focus();
         }).catch(error => {
-            alert(error.message || 'Could not send verification code. Please try again.');
+            clearTimeout(timeoutId);
+            alert(error.name === 'AbortError'
+                ? 'Sending the code took too long. Please try again.'
+                : (error.message || 'Could not send verification code. Please try again.'));
             otpButton.textContent = 'Send Code';
         }).finally(() => {
             otpButton.disabled = false;
