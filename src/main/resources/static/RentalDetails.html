@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rental Details - ToolMates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef6f4; color: #2c3e50; min-height: 100vh; }
+        .site-header { background: #ffffff; padding: 12px 24px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0, 121, 107, 0.06); }
+        .back-btn { background: #e0f2f1; border: none; color: #00796b; font-size: 18px; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .brand-name-text { font-size: 21px; font-weight: 700; color: #00796b; }
+        .page-wrapper { max-width: 1120px; margin: 0 auto; padding: 28px 20px 60px; }
+        .layout { display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; }
+        .panel { background: #ffffff; border: 1px solid #e0eeec; border-radius: 12px; padding: 20px; }
+        .hero { display: grid; grid-template-columns: 140px 1fr; gap: 16px; margin-bottom: 18px; }
+        .tool-img { width: 140px; height: 112px; border-radius: 10px; object-fit: cover; background: #d4edea; border: 1px solid #eef6f4; }
+        h1 { font-size: 24px; color: #1a2e2b; margin-bottom: 8px; }
+        h2 { font-size: 14px; color: #00564b; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; }
+        .meta { color: #546e7a; font-size: 14px; line-height: 1.6; }
+        .status-badge { display: inline-flex; width: max-content; padding: 5px 9px; border-radius: 6px; background: #e0f2f1; color: #00564b; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; }
+        .details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .detail-row { border-bottom: 1px solid #eef6f4; padding: 10px 0; }
+        .label { display: block; font-size: 11px; font-weight: 800; color: #00796b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .value { font-size: 14px; font-weight: 650; color: #1a2e2b; overflow-wrap: anywhere; }
+        .progress-box { margin-top: 8px; }
+        .linear-progress { height: 10px; background: #e0eeec; border-radius: 999px; overflow: hidden; margin: 10px 0 8px; }
+        .linear-progress span { display: block; height: 100%; width: var(--pct); background: #00796b; }
+        .linear-progress.overdue span { background: #ef6c00; }
+        .actions { display: flex; flex-direction: column; gap: 10px; }
+        .action-btn { border: 1px solid #00796b; border-radius: 8px; background: #00796b; color: #ffffff; padding: 11px 14px; font-weight: 750; cursor: pointer; text-decoration: none; text-align: center; }
+        .action-btn.secondary { background: #ffffff; color: #00796b; }
+        .timeline { display: flex; flex-direction: column; gap: 0; }
+        .timeline-item { position: relative; padding: 0 0 18px 24px; border-left: 2px solid #b2dfdb; }
+        .timeline-item::before { content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #00796b; }
+        .timeline-action { font-weight: 800; color: #1a2e2b; margin-bottom: 4px; }
+        .timeline-meta { color: #7f8c8d; font-size: 12px; }
+        .past-rentals { display: grid; gap: 10px; }
+        .past-rental-row { border: 1px solid #e0eeec; border-radius: 8px; padding: 12px; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+        .past-rental-title { font-weight: 800; color: #1a2e2b; margin-bottom: 4px; }
+        .loading-state, .error-state { background: #ffffff; border: 1px solid #e0eeec; border-radius: 12px; padding: 42px 20px; text-align: center; color: #7f8c8d; }
+        @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } .hero { grid-template-columns: 1fr; } .tool-img { width: 100%; height: 220px; } .details-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <a href="RentalHistory.html" class="back-btn"><i class="ti ti-arrow-left"></i></a>
+    <span class="brand-name-text">ToolMates</span>
+</header>
+
+<main class="page-wrapper">
+    <div id="loadingState" class="loading-state">Loading rental details...</div>
+    <div id="content" class="layout" style="display:none;">
+        <section class="panel">
+            <div class="hero">
+                <img id="toolImage" class="tool-img" alt="Tool image" />
+                <div>
+                    <span id="statusBadge" class="status-badge">Pending</span>
+                    <h1 id="toolName">Rental Details</h1>
+                    <p class="meta" id="toolMeta"></p>
+                </div>
+            </div>
+            <h2>Rental Information</h2>
+            <div class="details-grid" id="detailsGrid"></div>
+        </section>
+
+        <aside class="panel">
+            <h2>Current Progress</h2>
+            <div class="progress-box" id="progressBox"></div>
+            <h2 style="margin-top:18px;">Current Actions</h2>
+            <div class="actions" id="actionsBox"></div>
+        </aside>
+
+        <section class="panel" style="grid-column:1/-1;">
+            <h2>Past Rentals For This Tool</h2>
+            <div class="past-rentals" id="pastRentalsBox"></div>
+        </section>
+
+        <section class="panel" style="grid-column:1/-1;">
+            <h2>Rental Timeline</h2>
+            <div class="timeline" id="timelineBox"></div>
+        </section>
+    </div>
+</main>
+
+<script>
+    const API = 'http://localhost:8080/api/rental-history';
+    const RENT_API = 'http://localhost:8080/api/rent-requests';
+    const fallbackImage = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500&auto=format&fit=crop&q=80';
+    let rental = null;
+    let currentUser = null;
+
+    function rentalId() {
+        return new URLSearchParams(window.location.search).get('rentalId');
+    }
+
+    async function loadDetails() {
+        const id = rentalId();
+        if (!id) return showError('Missing rental ID.');
+        try {
+            await loadCurrentUser();
+            const [detailResponse, timelineResponse] = await Promise.all([
+                fetch(`${API}/${id}`, { credentials: 'include', headers: { 'Accept': 'application/json' } }),
+                fetch(`${API}/${id}/timeline`, { credentials: 'include', headers: { 'Accept': 'application/json' } })
+            ]);
+            if (!detailResponse.ok) throw new Error('Could not load rental details.');
+            rental = await detailResponse.json();
+            const timeline = timelineResponse.ok ? await timelineResponse.json() : [];
+            renderDetails(rental, timeline);
+        } catch (error) {
+            showError(error.message || 'Could not load rental details.');
+        }
+    }
+
+    async function loadCurrentUser() {
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/me', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+            currentUser = response.ok ? await response.json() : null;
+        } catch (error) {
+            currentUser = null;
+        }
+    }
+
+    function renderDetails(data, timeline) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('content').style.display = 'grid';
+        document.getElementById('toolImage').src = data.toolImage || fallbackImage;
+        document.getElementById('statusBadge').textContent = data.statusLabel || 'Pending';
+        document.getElementById('toolName').textContent = data.toolName || 'Rental Details';
+        document.getElementById('toolMeta').textContent = `${data.category || 'General'} | Owner: ${data.ownerName || '-'} | Borrower: ${data.borrowerName || '-'}`;
+        renderFields(data);
+        renderProgress(data.progress || {});
+        renderActions(data);
+        renderPastRentals(data.pastRentals || []);
+        renderTimeline(timeline);
+    }
+
+    function renderFields(data) {
+        const rows = [
+            ['Owner Information', `${data.ownerName || '-'} (${data.ownerStudentId || '-'})`],
+            ['Borrower Information', `${data.borrowerName || '-'} (${data.borrowerStudentId || '-'})`],
+            ['Rental Duration', `${data.durationDays || 0} day(s)`],
+            ['Rental Start Date', formatDate(data.rentalStartAt)],
+            ['Rental End Date', formatDate(data.rentalEndAt)],
+            ['Pickup Date', data.pickupDate || '-'],
+            ['Pickup Time', data.pickupTime || '-'],
+            ['Scheduled Pickup Location', data.scheduledPickupLocation || '-'],
+            ['Current Status', data.statusLabel || '-'],
+            ['Total Rent', money(data.totalRent)],
+            ['Advance Paid', money(data.advancePaid)],
+            ['To Be Paid', money(data.remainingBalance)]
+        ];
+        document.getElementById('detailsGrid').innerHTML = rows.map(([label, value]) => `
+            <div class="detail-row"><span class="label">${label}</span><span class="value">${escapeHtml(value)}</span></div>
+        `).join('');
+    }
+
+    function renderProgress(progress) {
+        const pct = `${Number(progress.percentage || 0)}%`;
+        document.getElementById('progressBox').innerHTML = `
+            <div class="value">${pct} Complete</div>
+            <div class="linear-progress ${progress.overdue ? 'overdue' : ''}" style="--pct:${pct};"><span></span></div>
+            <div class="meta">${progress.remainingText || 'Not started'}</div>
+            <div class="meta">Elapsed: ${progress.elapsedText || '0 minutes'}</div>
+        `;
+    }
+
+    function renderActions(data) {
+        const status = (data.status || '').toUpperCase();
+        const isOwner = currentUser && Number(currentUser.userId) === Number(data.ownerUserId);
+        const isBorrower = currentUser && Number(currentUser.userId) === Number(data.borrowerUserId);
+        const actions = [];
+        actions.push(`<button class="action-btn" onclick="messageUser(${isOwner ? data.borrowerUserId : data.ownerUserId}, '${escapeAttr(isOwner ? data.borrowerName : data.ownerName)}')">Message User</button>`);
+        if (['PICKUP_DETAILS_SUBMITTED', 'PICKUP_SCHEDULED', 'WAITING_FOR_PICKUP_TIME', 'PICKUP_CONFIRMATION'].includes(status)) {
+            actions.push(`<button class="action-btn secondary" onclick="window.location.href='PickupDetails.html?rentalRequestId=${data.rentalRequestId}'">View Pickup Details</button>`);
+        }
+        if (['PICKUP_CONFIRMATION', 'WAITING_FOR_PICKUP', 'WAITING_FOR_PICKUP_CONFIRMATION', 'WAITING_FOR_PICKUP_TIME'].includes(status)) {
+            actions.push(`<button class="action-btn" onclick="postConfirm('pickup-confirmation', true)">Confirm Pickup</button>`);
+        }
+        if (['ADVANCE_PAYMENT_CONFIRMATION', 'PAYMENT_PENDING'].includes(status)) {
+            actions.push(`<button class="action-btn" onclick="postConfirm('payment-confirmation', true)">Confirm Advance Payment</button>`);
+        }
+        if (['AWAITING_RETURN', 'RETURN_CONFIRMATION'].includes(status)) {
+            actions.push(`<button class="action-btn" onclick="postConfirm('return-confirmation', true)">Confirm Return</button>`);
+        }
+        if (isOwner && ['AWAITING_RETURN', 'RETURN_CONFIRMATION', 'RETURN_DISPUTE'].includes(status)) {
+            actions.push(`<button class="action-btn secondary" onclick="reportUser()">Report User</button>`);
+        }
+        if (['COMPLETED', 'CLOSED'].includes(status)) {
+            actions.push(`<button class="action-btn secondary" onclick="window.location.href='UserReviews.html'">Leave Review</button>`);
+        }
+        if (!actions.length) actions.push('<div class="meta">No actions available.</div>');
+        document.getElementById('actionsBox').innerHTML = actions.join('');
+    }
+
+    function renderTimeline(timeline) {
+        const box = document.getElementById('timelineBox');
+        if (!timeline.length) {
+            box.innerHTML = '<div class="meta">No timeline entries yet.</div>';
+            return;
+        }
+        box.innerHTML = timeline.map(item => `
+            <div class="timeline-item">
+                <div class="timeline-action">${escapeHtml(item.action || 'Rental Update')}</div>
+                <div class="timeline-meta">${escapeHtml(item.status || '')}</div>
+                <div class="timeline-meta">${formatDate(item.createdAt)}</div>
+            </div>
+        `).join('');
+    }
+
+    function renderPastRentals(pastRentals) {
+        const box = document.getElementById('pastRentalsBox');
+        if (!pastRentals.length) {
+            box.innerHTML = '<div class="meta">No accepted rentals for this tool yet.</div>';
+            return;
+        }
+        box.innerHTML = pastRentals.map(item => `
+            <div class="past-rental-row">
+                <div>
+                    <div class="past-rental-title">${escapeHtml(item.borrowerName || 'Borrower')} | ${escapeHtml(item.statusLabel || item.status || '')}</div>
+                    <div class="meta">Start: ${formatDate(item.rentalStartAt || item.pickupDate)} | End: ${formatDate(item.rentalEndAt)} | Duration: ${item.durationDays || 0} day(s)</div>
+                    <div class="meta">Total: ${money(item.totalRent)} | Advance Paid: ${money(item.advancePaid)} | To Be Paid: ${money(item.remainingBalance)}</div>
+                </div>
+                <button class="action-btn secondary" onclick="window.location.href='RentalDetails.html?rentalId=${item.rentalRequestId}'">Open</button>
+            </div>
+        `).join('');
+    }
+
+    async function postConfirm(action, confirmed) {
+        const response = await fetch(`${RENT_API}/${rental.rentalRequestId}/${action}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ confirmed })
+        });
+        if (!response.ok) {
+            alert(await responseError(response));
+            return;
+        }
+        await loadDetails();
+    }
+
+    function messageUser(userId, name) {
+        sessionStorage.setItem('toolmatesOpenConversationUserId', userId);
+        sessionStorage.setItem('toolmatesOpenConversationName', name || 'User');
+        window.location.href = 'dashboard.html';
+    }
+
+    function reportUser() {
+        window.location.href = `dashboard.html`;
+    }
+
+    async function responseError(response) {
+        try {
+            const body = await response.json();
+            return body.error || 'Action failed.';
+        } catch (error) {
+            return 'Action failed.';
+        }
+    }
+
+    function showError(message) {
+        document.getElementById('loadingState').className = 'error-state';
+        document.getElementById('loadingState').textContent = message;
+    }
+
+    function money(value) {
+        const number = Number(value || 0);
+        return `Tk ${number.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+    }
+
+    function formatDate(value) {
+        if (!value) return '-';
+        const date = new Date(String(value).replace(' ', 'T'));
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    function escapeAttr(value) {
+        return escapeHtml(value).replace(/'/g, '&#039;');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        loadDetails();
+        setInterval(loadDetails, 30000);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pickup Details - ToolMates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #eef6f4;
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+        .site-header {
+            background: #ffffff;
+            padding: 12px 24px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 121, 107, 0.06);
+        }
+        .back-btn {
+            background: #e0f2f1;
+            border: none;
+            color: #00796b;
+            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .brand-name-text { font-size: 21px; font-weight: 700; color: #00796b; }
+        .page-wrapper {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+        .details-card {
+            background: #ffffff;
+            border: 1.5px solid #e0eeec;
+            border-radius: 16px;
+            padding: 26px;
+            box-shadow: 0 4px 14px rgba(0, 77, 64, 0.04);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+            border-bottom: 1px solid #eef6f4;
+            padding-bottom: 18px;
+            margin-bottom: 18px;
+        }
+        h1 { font-size: 22px; color: #1a2e2b; margin-bottom: 6px; }
+        .subtle { color: #7f8c8d; font-size: 13px; }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 6px;
+            background: #e0f2f1;
+            color: #00564b;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+        .detail-row {
+            border-bottom: 1px solid #eef6f4;
+            padding: 12px 0;
+        }
+        .detail-row.full { grid-column: 1 / -1; }
+        .label {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            color: #00796b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        .value {
+            font-size: 15px;
+            font-weight: 650;
+            color: #1a2e2b;
+            overflow-wrap: anywhere;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+        .action-btn {
+            border: 1px solid #00796b;
+            border-radius: 8px;
+            background: #00796b;
+            color: #ffffff;
+            padding: 11px 14px;
+            font-weight: 750;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .action-btn.secondary {
+            background: #ffffff;
+            color: #00796b;
+        }
+        .loading, .error {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 70px 20px;
+        }
+        @media (max-width: 620px) {
+            .details-grid { grid-template-columns: 1fr; }
+            .card-header { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <a href="dashboard.html" class="back-btn"><i class="ti ti-arrow-left"></i></a>
+    <span class="brand-name-text">ToolMates</span>
+</header>
+
+<main class="page-wrapper">
+    <div id="loadingState" class="loading">Loading pickup details...</div>
+    <section id="detailsCard" class="details-card" style="display:none;">
+        <div class="card-header">
+            <div>
+                <h1 id="toolName">Pickup Details</h1>
+                <p class="subtle">These details were submitted by the owner and cannot be edited.</p>
+            </div>
+            <span class="status-pill" id="rentalStatus">Pickup Scheduled</span>
+        </div>
+        <div class="details-grid">
+            <div class="detail-row">
+                <span class="label">Owner Name</span>
+                <span class="value" id="ownerName">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Tool Name</span>
+                <span class="value" id="toolNameValue">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Pickup Date</span>
+                <span class="value" id="pickupDate">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Pickup Time</span>
+                <span class="value" id="pickupTime">-</span>
+            </div>
+            <div class="detail-row full">
+                <span class="label">Pickup Location</span>
+                <span class="value" id="pickupLocation">-</span>
+            </div>
+            <div class="detail-row full">
+                <span class="label">Instructions</span>
+                <span class="value" id="instructions">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Rental Duration</span>
+                <span class="value" id="durationDays">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Total Rent</span>
+                <span class="value" id="totalRent">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">40% Advance Amount</span>
+                <span class="value" id="advancePaid">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Remaining Amount</span>
+                <span class="value" id="remainingBalance">-</span>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="action-btn" onclick="messageOwner()">Message Owner</button>
+            <button class="action-btn secondary" onclick="window.location.href='dashboard.html'">Close</button>
+        </div>
+    </section>
+</main>
+
+<script>
+    let pickupDetails = null;
+
+    function getRentalRequestId() {
+        return new URLSearchParams(window.location.search).get('rentalRequestId');
+    }
+
+    function money(value) {
+        const number = Number(value || 0);
+        return `Tk ${number.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+
+    async function loadPickupDetails() {
+        const rentalRequestId = getRentalRequestId();
+        if (!rentalRequestId) {
+            showError('Missing rental request ID.');
+            return;
+        }
+        try {
+            const response = await fetch(`http://localhost:8080/api/rent-requests/${rentalRequestId}/pickup-details`, {
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) throw new Error(await getResponseError(response, 'Could not load pickup details.'));
+            pickupDetails = await response.json();
+            renderDetails(pickupDetails);
+        } catch (error) {
+            showError(error.message || 'Could not load pickup details.');
+        }
+    }
+
+    function renderDetails(details) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('detailsCard').style.display = 'block';
+        document.getElementById('toolName').textContent = details.toolName || 'Pickup Details';
+        document.getElementById('toolNameValue').textContent = details.toolName || '-';
+        document.getElementById('ownerName').textContent = details.ownerName || '-';
+        document.getElementById('pickupDate').textContent = details.pickupDate || '-';
+        document.getElementById('pickupTime').textContent = details.pickupTime || '-';
+        document.getElementById('pickupLocation').textContent = details.pickupLocation || '-';
+        document.getElementById('instructions').textContent = details.instructions || 'No instructions provided.';
+        document.getElementById('durationDays').textContent = `${details.durationDays || 0} day(s)`;
+        document.getElementById('totalRent').textContent = money(details.totalRent);
+        document.getElementById('advancePaid').textContent = money(details.advancePaid);
+        document.getElementById('remainingBalance').textContent = money(details.remainingBalance);
+        document.getElementById('rentalStatus').textContent = (details.status || 'PICKUP_SCHEDULED').replaceAll('_', ' ');
+    }
+
+    function showError(message) {
+        document.getElementById('loadingState').className = 'error';
+        document.getElementById('loadingState').textContent = message;
+    }
+
+    async function getResponseError(response, fallbackMessage) {
+        try {
+            const body = await response.json();
+            return body.error || fallbackMessage;
+        } catch (error) {
+            return fallbackMessage;
+        }
+    }
+
+    function messageOwner() {
+        if (pickupDetails && pickupDetails.ownerUserId) {
+            sessionStorage.setItem('toolmatesOpenConversationUserId', pickupDetails.ownerUserId);
+            sessionStorage.setItem('toolmatesOpenConversationName', pickupDetails.ownerName || 'Owner');
+        }
+        window.location.href = 'dashboard.html';
+    }
+
+    window.addEventListener('DOMContentLoaded', loadPickupDetails);
+</script>
+</body>
+</html>

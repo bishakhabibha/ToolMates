@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Reviews - ToolMates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #ffffff; color: #2c3e50; min-height: 100vh; }
+        .navbar { background-color: #ffffff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eef2f5; height: 70px; }
+        .nav-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn { background: #f4f7f6; border: 1px solid #e0eae9; color: #00796b; font-size: 20px; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .brand-name { font-size: 22px; font-weight: 700; color: #00796b; letter-spacing: -0.5px; }
+        .content-area { background-color: #f4f7f6; padding: 30px; min-height: calc(100vh - 70px); }
+        .page-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; gap: 24px; }
+        .panel { background: #ffffff; border-radius: 16px; border: 1px solid #eef2f5; padding: 24px; box-shadow: 0 4px 20px rgba(0,77,64,0.03); }
+        .panel h2 { font-size: 16px; color: #00564b; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+        label { font-size: 13px; font-weight: 700; color: #34495e; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, textarea { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid #ced6d6; font-size: 14px; color: #2c3e50; background-color: #ffffff; outline: none; font-family: inherit; }
+        textarea { resize: vertical; min-height: 90px; }
+        .stars { display: flex; gap: 6px; font-size: 28px; color: #b2dfdb; cursor: pointer; margin-bottom: 14px; }
+        .stars span.active { color: #00796b; }
+        .btn-submit { width: 100%; padding: 12px 28px; border-radius: 8px; border: 1px solid transparent; background-color: #00796b; color: #ffffff; font-size: 14px; font-weight: 600; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eef2f5; font-size: 14px; }
+        th { color: #00796b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        @media (max-width: 820px) { .page-grid { grid-template-columns: 1fr; } .content-area { padding: 18px; } }
+    </style>
+</head>
+<body>
+<header class="navbar">
+    <div class="nav-left">
+        <a href="dashboard.html" class="menu-btn"><i class="ti ti-arrow-left"></i></a>
+        <span class="brand-name">ToolMates</span>
+    </div>
+</header>
+<main class="content-area">
+    <div class="page-grid">
+        <section class="panel">
+            <h2>Submit User Review</h2>
+            <p id="reviewerHint" style="font-size:13px;color:#7f8c8d;margin-bottom:14px;">Reviewer will be set from your logged-in account.</p>
+            <div class="form-group">
+                <label for="reviewedStudentId">Reviewed Student ID</label>
+                <input id="reviewedStudentId" type="text" />
+            </div>
+            <label>Rating</label>
+            <div class="stars" id="starPicker">
+                <span data-value="1">★</span><span data-value="2">★</span><span data-value="3">★</span><span data-value="4">★</span><span data-value="5">★</span>
+            </div>
+            <div class="form-group">
+                <label for="reviewText">Comment</label>
+                <textarea id="reviewText" placeholder="Optional feedback..."></textarea>
+            </div>
+            <button class="btn-submit" onclick="submitReview()">Submit Review</button>
+        </section>
+        <section class="panel">
+            <h2>Global Leaderboard</h2>
+            <table>
+                <thead>
+                <tr><th>Rank</th><th>User</th><th>Average</th><th>Reviews</th></tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                <tr><td colspan="4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</main>
+<script>
+    let selectedRating = 0;
+    let currentUser = JSON.parse(localStorage.getItem('toolmatesUser') || 'null');
+    document.querySelectorAll('#starPicker span').forEach(star => {
+        star.onclick = () => {
+            selectedRating = parseInt(star.dataset.value);
+            document.querySelectorAll('#starPicker span').forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.value) <= selectedRating);
+            });
+        };
+    });
+
+    async function submitReview() {
+        const reviewedStudentId = document.getElementById('reviewedStudentId').value.trim();
+        if (!reviewedStudentId || !selectedRating) {
+            alert('Reviewed user and rating are required.');
+            return;
+        }
+        const response = await fetch('http://localhost:8080/api/reviews', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                reviewedStudentId,
+                ratingStars: selectedRating,
+                reviewText: document.getElementById('reviewText').value.trim()
+            })
+        });
+        if (response.ok) {
+            alert('Review submitted.');
+            document.getElementById('reviewedStudentId').value = '';
+            document.getElementById('reviewText').value = '';
+            selectedRating = 0;
+            document.querySelectorAll('#starPicker span').forEach(s => s.classList.remove('active'));
+            loadLeaderboard();
+        } else {
+            let message = 'Could not submit review.';
+            try {
+                const body = await response.json();
+                if (body.error) message = body.error;
+            } catch (ignored) {}
+            alert(message);
+        }
+    }
+
+    async function loadLeaderboard() {
+        const body = document.getElementById('leaderboardBody');
+        try {
+            const response = await fetch('http://localhost:8080/api/reviews/leaderboard');
+            if (!response.ok) throw new Error('Failed');
+            const rows = await response.json();
+            body.innerHTML = rows.length ? '' : '<tr><td colspan="4">No reviews yet.</td></tr>';
+            rows.forEach((row, index) => {
+                body.innerHTML += `<tr><td>${index + 1}</td><td>${row.name}</td><td>${row.averageRating || 0}</td><td>${row.reviewCount || 0}</td></tr>`;
+            });
+        } catch (error) {
+            body.innerHTML = '<tr><td colspan="4">Leaderboard unavailable.</td></tr>';
+        }
+    }
+
+    async function loadLoggedInReviewer() {
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/me', {
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (response.ok) {
+                currentUser = await response.json();
+                localStorage.setItem('toolmatesUser', JSON.stringify(currentUser));
+                document.getElementById('reviewerHint').textContent = `Reviewing as ${currentUser.studentId}.`;
+            }
+        } catch (error) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        loadLoggedInReviewer();
+        loadLeaderboard();
+    });
+</script>
+</body>
+</html>

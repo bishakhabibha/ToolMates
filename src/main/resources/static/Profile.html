@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - ToolMates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #ffffff; color: #2c3e50; min-height: 100vh; }
+        .navbar { background-color: #ffffff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eef2f5; height: 70px; }
+        .nav-left { display: flex; align-items: center; gap: 16px; }
+        .menu-btn { background: #f4f7f6; border: 1px solid #e0eae9; color: #00796b; font-size: 20px; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .brand-name { font-size: 22px; font-weight: 700; color: #00796b; letter-spacing: -0.5px; }
+        .content-area { background-color: #f4f7f6; padding: 30px; min-height: calc(100vh - 70px); }
+        .profile-shell { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+        .panel { background: #ffffff; border-radius: 16px; border: 1px solid #eef2f5; padding: 24px; box-shadow: 0 4px 20px rgba(0,77,64,0.03); }
+        .profile-head { display: flex; align-items: center; gap: 18px; }
+        .avatar { width: 72px; height: 72px; border-radius: 50%; background: #00796b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; object-fit: cover; }
+        .profile-name { font-size: 24px; font-weight: 700; color: #1a2e2b; }
+        .profile-bio { color: #546e7a; margin-top: 4px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .stat { background: #f4fbfa; border: 1px solid #b2dfdb; border-radius: 10px; padding: 14px; }
+        .stat span { display: block; font-size: 12px; color: #546e7a; font-weight: 700; text-transform: uppercase; }
+        .stat strong { font-size: 20px; color: #00564b; }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+        .tool-card { background: #ffffff; border: 1px solid #eef2f5; border-radius: 16px; padding: 16px; cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
+        .tool-card:hover { border-color: #00796b; transform: translateY(-1px); }
+        .tool-card img { width: 100%; height: 120px; border-radius: 12px; object-fit: cover; background: #d4edea; margin-bottom: 10px; }
+        .tool-card h3 { font-size: 15px; color: #1a2e2b; margin-bottom: 4px; }
+        .tool-card p { font-size: 13px; color: #7f8c8d; margin-bottom: 2px; }
+        input { padding: 10px 14px; border-radius: 8px; border: 1px solid #ced6d6; outline: none; }
+        button { padding: 10px 16px; border-radius: 8px; border: none; background: #00796b; color: #ffffff; font-weight: 700; cursor: pointer; }
+        @media (max-width: 700px) { .stats-grid { grid-template-columns: 1fr; } .profile-head { align-items: flex-start; } }
+    </style>
+</head>
+<body>
+<header class="navbar">
+    <div class="nav-left">
+        <a href="dashboard.html" class="menu-btn"><i class="ti ti-arrow-left"></i></a>
+        <span class="brand-name">ToolMates</span>
+    </div>
+</header>
+<main class="content-area">
+    <div class="profile-shell">
+        <section class="panel">
+            <input id="studentIdInput" aria-label="Student ID" />
+            <button onclick="loadProfile()">Load Profile</button>
+        </section>
+        <section class="panel profile-head">
+            <div class="avatar" id="profileAvatar">?</div>
+            <div>
+                <div class="profile-name" id="profileName">Profile</div>
+                <div class="profile-bio" id="profileBio">Load a profile to view user details.</div>
+            </div>
+        </section>
+        <section class="stats-grid">
+            <div class="stat"><span>Average Rating</span><strong id="averageRating">0</strong></div>
+            <div class="stat"><span>Suspensions</span><strong id="suspendedTimes">0</strong></div>
+            <div class="stat"><span>Listed Tools</span><strong id="listedToolCount">0</strong></div>
+        </section>
+        <section class="panel">
+            <h2>Listed Tools</h2>
+            <div class="tools-grid" id="profileTools"></div>
+        </section>
+    </div>
+</main>
+<script>
+    async function loadProfile(studentIdOverride) {
+        const studentId = studentIdOverride || document.getElementById('studentIdInput').value.trim();
+        const url = studentId
+                ? `http://localhost:8080/api/profile/${encodeURIComponent(studentId)}`
+                : 'http://localhost:8080/api/profile/me';
+        const response = await fetch(url, {
+            credentials: 'include',
+            headers: { 'Accept': 'application/json' }
+        });
+        if (!response.ok) {
+            alert('Profile not found or you are not logged in.');
+            return;
+        }
+        const profile = await response.json();
+        document.getElementById('profileName').textContent = profile.name || 'Profile';
+        document.getElementById('profileBio').textContent = profile.bio || 'No bio added yet.';
+        document.getElementById('averageRating').textContent = profile.averageRating || 0;
+        document.getElementById('suspendedTimes').textContent = profile.suspendedTimes ?? 0;
+        const tools = profile.listedTools || [];
+        document.getElementById('listedToolCount').textContent = tools.length;
+
+        const avatar = document.getElementById('profileAvatar');
+        if (profile.avatarUrl) {
+            avatar.outerHTML = `<img class="avatar" id="profileAvatar" src="${profile.avatarUrl}" alt="${profile.name || 'Avatar'}" />`;
+        } else {
+            avatar.textContent = (profile.name || '?').split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase();
+        }
+
+        const grid = document.getElementById('profileTools');
+        grid.innerHTML = tools.length ? '' : '<p>No listed tools yet.</p>';
+        tools.forEach(tool => {
+            const image = tool.imageUrls && tool.imageUrls.length ? tool.imageUrls[0] : 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=400&auto=format&fit=crop&q=80';
+            grid.innerHTML += `
+                <div class="tool-card" onclick="window.location.href='ToolInfo.html?id=${tool.id}'">
+                    <img src="${image}" alt="${tool.name || 'Tool'}" />
+                    <h3>${tool.name || 'Unnamed Tool'}</h3>
+                    <p>${tool.category || 'General'} - Tk ${tool.pricePerDay || 0}/day</p>
+                    <p>Rating: ${tool.rating || 0}</p>
+                    <p>Successful rentals: ${tool.successfulRentalCount || 0}</p>
+                </div>`;
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const studentId = params.get('studentId');
+        if (studentId) {
+            document.getElementById('studentIdInput').value = studentId;
+            loadProfile(studentId);
+        } else {
+            loadProfile('');
+        }
+    });
+</script>
+</body>
+</html>

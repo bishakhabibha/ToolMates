@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rental History - ToolMates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef6f4; color: #2c3e50; min-height: 100vh; }
+        .site-header { background: #ffffff; padding: 12px 24px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0, 121, 107, 0.06); }
+        .back-btn { background: #e0f2f1; border: none; color: #00796b; font-size: 18px; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .brand-name-text { font-size: 21px; font-weight: 700; color: #00796b; }
+        .page-wrapper { max-width: 1180px; margin: 0 auto; padding: 28px 20px 60px; }
+        .page-title-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+        h1 { font-size: 24px; color: #1a2e2b; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .tab-btn, .load-more-btn { border: 1px solid #00796b; background: #ffffff; color: #00796b; border-radius: 8px; padding: 10px 14px; font-weight: 750; cursor: pointer; }
+        .tab-btn.active, .load-more-btn { background: #00796b; color: #ffffff; }
+        .toolbar { background: #ffffff; border: 1px solid #e0eeec; border-radius: 12px; padding: 14px; display: grid; grid-template-columns: 1fr 160px 160px; gap: 10px; margin-bottom: 18px; }
+        .toolbar input, .toolbar select { width: 100%; border: 1px solid #ced6d6; border-radius: 8px; padding: 10px 12px; font-family: inherit; outline: none; }
+        .section-block { margin-bottom: 24px; }
+        .section-heading { font-size: 14px; font-weight: 800; color: #00564b; margin: 16px 0 10px; text-transform: uppercase; letter-spacing: 0.6px; }
+        .cards-grid { display: grid; gap: 14px; }
+        .rental-card { background: #ffffff; border: 1px solid #e0eeec; border-radius: 12px; padding: 14px; display: grid; grid-template-columns: 92px 1fr 132px; gap: 14px; align-items: center; cursor: pointer; transition: border-color 0.18s, transform 0.18s; }
+        .rental-card:hover { border-color: #00796b; transform: translateY(-1px); }
+        .tool-img { width: 92px; height: 76px; border-radius: 8px; object-fit: cover; background: #d4edea; border: 1px solid #eef6f4; }
+        .card-main { min-width: 0; }
+        .tool-name { font-size: 16px; font-weight: 800; color: #1a2e2b; margin-bottom: 4px; }
+        .meta { color: #546e7a; font-size: 13px; line-height: 1.55; }
+        .numbers { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+        .number-pill { background: #f4fbfa; border: 1px solid #e0eeec; border-radius: 8px; padding: 6px 8px; font-size: 12px; color: #00564b; font-weight: 700; }
+        .status-badge { display: inline-flex; width: max-content; padding: 5px 9px; border-radius: 6px; background: #e0f2f1; color: #00564b; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
+        .status-badge.reported, .status-badge.dispute { background: #fff3e0; color: #b26a00; }
+        .status-badge.cancelled { background: #ffebee; color: #c62828; }
+        .progress-ring { width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(#00796b var(--pct), #e0eeec 0); position: relative; }
+        .progress-ring.overdue { background: conic-gradient(#ef6c00 var(--pct), #e0eeec 0); }
+        .progress-ring::after { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: #ffffff; }
+        .progress-text { position: relative; z-index: 1; text-align: center; color: #00564b; font-weight: 800; font-size: 13px; }
+        .remaining { font-size: 12px; color: #7f8c8d; margin-top: 6px; text-align: center; }
+        .linear-progress { display: none; height: 8px; background: #e0eeec; border-radius: 999px; overflow: hidden; margin-top: 10px; }
+        .linear-progress span { display: block; height: 100%; width: var(--pct); background: #00796b; }
+        .linear-progress.overdue span { background: #ef6c00; }
+        .empty-state, .loading-state, .error-state { background: #ffffff; border: 1px solid #e0eeec; border-radius: 12px; padding: 36px 20px; text-align: center; color: #7f8c8d; }
+        .load-more-wrap { display: flex; justify-content: center; margin-top: 18px; }
+        @media (max-width: 760px) {
+            .toolbar { grid-template-columns: 1fr; }
+            .rental-card { grid-template-columns: 72px 1fr; align-items: start; }
+            .tool-img { width: 72px; height: 68px; }
+            .progress-ring { display: none; }
+            .linear-progress { display: block; grid-column: 1 / -1; }
+            .remaining { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <a href="dashboard.html" class="back-btn"><i class="ti ti-arrow-left"></i></a>
+    <span class="brand-name-text">ToolMates</span>
+</header>
+
+<main class="page-wrapper">
+    <div class="page-title-row">
+        <h1>Rental History</h1>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="borrowedTab" onclick="switchTab('borrowed')">Borrowed Tools</button>
+        <button class="tab-btn" id="lentTab" onclick="switchTab('lent')">Lent Tools</button>
+    </div>
+
+    <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="Search by tool, owner, or borrower" oninput="debouncedReload()" />
+        <select id="filterSelect" onchange="reloadRentals()">
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="reported">Reported</option>
+            <option value="cancelled">Cancelled</option>
+        </select>
+        <select id="sortSelect" onchange="reloadRentals()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+        </select>
+    </div>
+
+    <section id="rentalContent" class="loading-state">Loading rentals...</section>
+    <div class="load-more-wrap" id="loadMoreWrap" style="display:none;">
+        <button class="load-more-btn" onclick="loadMore()">Load More</button>
+    </div>
+</main>
+
+<script>
+    const API = 'http://localhost:8080/api/rental-history';
+    const fallbackImage = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=300&auto=format&fit=crop&q=80';
+    let activeTab = 'borrowed';
+    let currentPage = 0;
+    let hasMore = false;
+    let items = [];
+    let searchTimer = null;
+
+    function switchTab(tab) {
+        activeTab = tab;
+        document.getElementById('borrowedTab').classList.toggle('active', tab === 'borrowed');
+        document.getElementById('lentTab').classList.toggle('active', tab === 'lent');
+        reloadRentals();
+    }
+
+    function debouncedReload() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(reloadRentals, 250);
+    }
+
+    async function reloadRentals() {
+        currentPage = 0;
+        items = [];
+        await fetchRentals(false);
+    }
+
+    async function loadMore() {
+        if (!hasMore) return;
+        currentPage += 1;
+        await fetchRentals(true);
+    }
+
+    async function fetchRentals(append) {
+        const content = document.getElementById('rentalContent');
+        if (!append) content.className = 'loading-state';
+        if (!append) content.textContent = 'Loading rentals...';
+        const params = new URLSearchParams({
+            search: document.getElementById('searchInput').value.trim(),
+            filter: document.getElementById('filterSelect').value,
+            sort: document.getElementById('sortSelect').value,
+            page: currentPage,
+            size: 20
+        });
+        try {
+            const response = await fetch(`${API}/${activeTab}?${params.toString()}`, { credentials: 'include', headers: { 'Accept': 'application/json' } });
+            if (!response.ok) throw new Error('Could not load rentals.');
+            const data = await response.json();
+            items = append ? items.concat(data.items || []) : (data.items || []);
+            hasMore = Boolean(data.hasMore);
+            renderRentals();
+        } catch (error) {
+            content.className = 'error-state';
+            content.textContent = 'Could not load rentals. Please log in and try again.';
+            document.getElementById('loadMoreWrap').style.display = 'none';
+        }
+    }
+
+    function renderRentals() {
+        const content = document.getElementById('rentalContent');
+        content.className = '';
+        if (!items.length) {
+            content.className = 'empty-state';
+            content.textContent = activeTab === 'borrowed' ? 'No borrowed tools found.' : 'No lent tools found.';
+            document.getElementById('loadMoreWrap').style.display = 'none';
+            return;
+        }
+        const groups = {
+            active: items.filter(item => item.group === 'active'),
+            completed: items.filter(item => item.group === 'completed'),
+            reported: items.filter(item => item.group === 'reported'),
+            cancelled: items.filter(item => item.group === 'cancelled')
+        };
+        content.innerHTML = '';
+        renderGroup(content, 'Active', groups.active);
+        renderGroup(content, 'Completed', groups.completed);
+        renderGroup(content, 'Reported', groups.reported);
+        renderGroup(content, 'Cancelled / Rejected', groups.cancelled);
+        document.getElementById('loadMoreWrap').style.display = hasMore ? 'flex' : 'none';
+    }
+
+    function renderGroup(parent, title, rentals) {
+        if (!rentals.length) return;
+        const section = document.createElement('section');
+        section.className = 'section-block';
+        section.innerHTML = `<h2 class="section-heading">${title}</h2><div class="cards-grid"></div>`;
+        const grid = section.querySelector('.cards-grid');
+        rentals.forEach(rental => grid.appendChild(createRentalCard(rental)));
+        parent.appendChild(section);
+    }
+
+    function createRentalCard(rental) {
+        const card = document.createElement('article');
+        const progress = rental.progress || {};
+        const pct = `${Number(progress.percentage || 0)}%`;
+        card.className = 'rental-card';
+        card.onclick = () => window.location.href = `RentalDetails.html?rentalId=${rental.rentalRequestId}`;
+        card.style.setProperty('--pct', pct);
+        const statusClass = statusClassFor(rental.status);
+        const showProgress = rental.status === 'ACTIVE';
+        card.innerHTML = `
+            <img class="tool-img" src="${rental.toolImage || fallbackImage}" alt="${escapeHtml(rental.toolName || 'Tool')}" />
+            <div class="card-main">
+                <span class="status-badge ${statusClass}">${rental.statusLabel || 'Pending'}</span>
+                <div class="tool-name">${escapeHtml(rental.toolName || 'Tool')}</div>
+                <div class="meta">${escapeHtml(rental.category || 'General')} | Owner: ${escapeHtml(rental.ownerName || '-')} | Borrower: ${escapeHtml(rental.borrowerName || '-')}</div>
+                <div class="meta">Start: ${formatDate(rental.rentalStartAt || rental.pickupDate)} | End: ${formatDate(rental.rentalEndAt)}</div>
+                <div class="numbers">
+                    <span class="number-pill">Total: ${money(rental.totalRent)}</span>
+                    <span class="number-pill">To Be Paid: ${money(rental.remainingBalance)}</span>
+                    ${Number(rental.rentalCount || 0) > 1 ? `<span class="number-pill">${rental.rentalCount} Rentals</span>` : ''}
+                </div>
+                ${showProgress ? `<div class="linear-progress ${progress.overdue ? 'overdue' : ''}" style="--pct:${pct};"><span></span></div><div class="remaining">${progress.remainingText || ''}</div>` : ''}
+            </div>
+            ${showProgress ? `
+                <div>
+                    <div class="progress-ring ${progress.overdue ? 'overdue' : ''}" style="--pct:${pct};">
+                        <div class="progress-text">${pct}<br/>Complete</div>
+                    </div>
+                    <div class="remaining">${progress.remainingText || ''}</div>
+                </div>` : '<div></div>'}
+        `;
+        return card;
+    }
+
+    function statusClassFor(status) {
+        const upper = (status || '').toUpperCase();
+        if (upper.includes('DISPUTE')) return 'dispute';
+        if (upper === 'REPORTED') return 'reported';
+        if (upper === 'CANCELLED' || upper === 'REJECTED') return 'cancelled';
+        return '';
+    }
+
+    function money(value) {
+        const number = Number(value || 0);
+        return `Tk ${number.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+    }
+
+    function formatDate(value) {
+        if (!value) return '-';
+        const date = new Date(String(value).replace(' ', 'T'));
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        reloadRentals();
+        setInterval(reloadRentals, 30000);
+    });
+</script>
+</body>
+</html>
