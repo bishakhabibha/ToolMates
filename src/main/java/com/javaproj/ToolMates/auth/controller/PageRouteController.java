@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class PageRouteController {
 
+    @GetMapping("/")
+    public String home() {
+        return "forward:/login.html";
+    }
+
     @GetMapping("/rental-history")
     public String rentalHistory() {
         return "forward:/RentalHistory.html";
