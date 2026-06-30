@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community Guide - ToolMates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef6f4; color: #2c3e50; min-height: 100vh; }
+        .site-header { background: #ffffff; padding: 12px 24px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0, 121, 107, 0.06); position: sticky; top: 0; z-index: 10; }
+        .back-btn { background: #e0f2f1; border: none; color: #00796b; font-size: 18px; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .back-btn:hover { background: #b2dfdb; }
+        .brand-name-text { font-size: 21px; font-weight: 700; color: #00796b; letter-spacing: -0.4px; }
+        .page-wrapper { max-width: 1120px; margin: 0 auto; padding: 30px 20px 64px; }
+        .hero { background: linear-gradient(135deg, #005b4f 0%, #008374 100%); color: #ffffff; border-radius: 18px; padding: 42px; display: grid; grid-template-columns: 1fr 140px; gap: 24px; align-items: center; box-shadow: 0 8px 28px rgba(0, 77, 64, 0.12); }
+        .hero h1 { font-size: 34px; line-height: 1.15; margin-bottom: 12px; color: #ffffff; }
+        .hero p { font-size: 16px; line-height: 1.65; color: #e0f2f1; max-width: 680px; }
+        .hero-icon { justify-self: end; width: 118px; height: 118px; border-radius: 18px; background: rgba(255, 255, 255, 0.14); display: grid; place-items: center; color: #ffffff; font-size: 58px; }
+        .section-title { font-size: 16px; font-weight: 800; color: #00564b; text-transform: uppercase; letter-spacing: 0.7px; margin: 32px 0 16px; }
+        .timeline { position: relative; display: grid; gap: 14px; }
+        .timeline::before { content: ''; position: absolute; left: 25px; top: 8px; bottom: 8px; width: 2px; background: #b2dfdb; }
+        .timeline-card { position: relative; background: #ffffff; border: 1px solid #e0eeec; border-radius: 14px; padding: 18px 20px 18px 72px; box-shadow: 0 4px 12px rgba(0, 77, 64, 0.03); }
+        .step-icon { position: absolute; left: 0; top: 18px; width: 52px; height: 52px; border-radius: 14px; background: #e0f2f1; border: 1px solid #b2dfdb; color: #00796b; display: grid; place-items: center; font-size: 24px; z-index: 1; }
+        .timeline-card h2 { font-size: 18px; color: #1a2e2b; margin-bottom: 8px; }
+        .timeline-card p { color: #546e7a; font-size: 14px; line-height: 1.65; }
+        .mini-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .mini-list span { background: #f4fbfa; border: 1px solid #e0eeec; color: #00564b; border-radius: 8px; padding: 6px 9px; font-size: 12px; font-weight: 700; }
+        .info-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        .info-card { background: #ffffff; border: 1px solid #e0eeec; border-radius: 14px; padding: 22px; min-height: 158px; box-shadow: 0 4px 12px rgba(0, 77, 64, 0.03); }
+        .info-card i { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: #e0f2f1; color: #00796b; font-size: 22px; margin-bottom: 14px; }
+        .info-card h3 { font-size: 17px; color: #1a2e2b; margin-bottom: 8px; }
+        .info-card p { color: #546e7a; font-size: 14px; line-height: 1.6; }
+        .closing { margin-top: 28px; background: #ffffff; border: 1px solid #e0eeec; border-radius: 16px; padding: 30px; text-align: center; }
+        .closing h2 { color: #00564b; font-size: 26px; line-height: 1.3; }
+        @media (max-width: 760px) {
+            .page-wrapper { padding: 22px 14px 42px; }
+            .hero { grid-template-columns: 1fr; padding: 28px 22px; }
+            .hero h1 { font-size: 28px; }
+            .hero-icon { justify-self: start; width: 76px; height: 76px; font-size: 38px; }
+            .timeline::before { left: 21px; }
+            .timeline-card { padding-left: 62px; }
+            .step-icon { width: 44px; height: 44px; border-radius: 12px; font-size: 21px; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <a href="dashboard.html" class="back-btn" aria-label="Back to Dashboard"><i class="ti ti-arrow-left"></i></a>
+    <span class="brand-name-text">ToolMates</span>
+</header>
+
+<main class="page-wrapper">
+    <section class="hero">
+        <div>
+            <h1>Welcome to ToolMates 👋</h1>
+            <p>Everything you need to know before listing or borrowing your first tool.</p>
+        </div>
+        <div class="hero-icon"><i class="ti ti-users-group"></i></div>
+    </section>
+
+    <h2 class="section-title">Community Guide</h2>
+    <section class="timeline">
+        <article class="timeline-card">
+            <div class="step-icon"><i class="ti ti-user-plus"></i></div>
+            <h2>Create an Account</h2>
+            <p>Register using your official CUET student email. Verify your account using the OTP sent to your email. Complete your profile.</p>
+        </article>
+        <article class="timeline-card">
+            <div class="step-icon"><i class="ti ti-tool"></i></div>
+            <h2>List a Tool</h2>
+            <p>List your tool with the details students need. Only the owner can edit their own tools. Edits affect only future rentals.</p>
+            <div class="mini-list"><span>Images</span><span>Condition</span><span>Rental Price</span><span>Pickup Location</span><span>Description</span></div>
+        </article>
+        <article class="timeline-card">
+            <div class="step-icon"><i class="ti ti-send"></i></div>
+            <h2>Request a Rental</h2>
+            <p>Browse available tools. You cannot rent your own tool. Your name and student ID are filled automatically. Send your rental request.</p>
+        </article>
+        <article class="timeline-card">
+            <div class="step-icon"><i class="ti ti-messages"></i></div>
+            <h2>Chat Before Renting</h2>
+            <p>Use the built-in messaging system to discuss availability, pickup and questions before accepting the rental.</p>
+        </article>
+        <article class="timeline-card">
+            <div class="step-icon"><i class="ti ti-calendar-check"></i></div>
+            <h2>Owner Approval</h2>
+            <p>The owner reviews the request. If accepted, they schedule the pickup date, pickup time and pickup location. You'll receive a notification to review these details.</p>
+        </article>
+        <article class="timeline-card">
+            <div class="step-icon"><i class="ti ti-checkup-list"></i></div>
+            <h2>Pickup Day</h2>
+            <p>At the scheduled pickup time, both users confirm the tool was handed over, the tool was received and the 40% advance payment was completed. Only after BOTH users confirm does the rental officially begin.</p>
+        </article>
+        <article class="timeline-card">
+            <div class="step-icon"><i class="ti ti-progress-check"></i></div>
+            <h2>During the Rental</h2>
+            <p>Track everything from Rental History. Automatic reminders help ensure on-time returns.</p>
+            <div class="mini-list"><span>Progress</span><span>Time Remaining</span><span>Rental Status</span><span>Payment Status</span></div>
+        </article>
+        <article class="timeline-card">
+            <div class="step-icon"><i class="ti ti-refresh"></i></div>
+            <h2>Returning the Tool</h2>
+            <p>When the rental period ends, both users confirm the return. If any issue occurs, either user may report the other. Reports do NOT cancel rentals automatically.</p>
+        </article>
+        <article class="timeline-card">
+            <div class="step-icon"><i class="ti ti-star"></i></div>
+            <h2>Leave a Review</h2>
+            <p>After a successful rental, both participants may leave one review. Your reputation is built through ratings, reviews and successful rentals.</p>
+        </article>
+    </section>
+
+    <h2 class="section-title">Shared Values</h2>
+    <section class="info-grid">
+        <article class="info-card">
+            <i class="ti ti-heart-handshake"></i>
+            <h3>Respect Others</h3>
+            <p>Treat borrowed tools as if they were your own.</p>
+        </article>
+        <article class="info-card">
+            <i class="ti ti-scale"></i>
+            <h3>Be Honest</h3>
+            <p>Pay fairly. Return on time. Describe tools accurately.</p>
+        </article>
+        <article class="info-card">
+            <i class="ti ti-award"></i>
+            <h3>Build Your Reputation</h3>
+            <p>Helpful reviews and successful rentals make you a trusted community member.</p>
+        </article>
+    </section>
+
+    <section class="closing">
+        <h2>Let's build a trusted sharing community together!</h2>
+    </section>
+</main>
+</body>
+</html>

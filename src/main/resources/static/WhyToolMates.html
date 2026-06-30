@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Why ToolMates - ToolMates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef6f4; color: #2c3e50; min-height: 100vh; }
+        .site-header { background: #ffffff; padding: 12px 24px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0, 121, 107, 0.06); position: sticky; top: 0; z-index: 10; }
+        .back-btn { background: #e0f2f1; border: none; color: #00796b; font-size: 18px; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .back-btn:hover { background: #b2dfdb; }
+        .brand-name-text { font-size: 21px; font-weight: 700; color: #00796b; letter-spacing: -0.4px; }
+        .page-wrapper { max-width: 1120px; margin: 0 auto; padding: 30px 20px 64px; }
+        .hero { background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%); color: #ffffff; border-radius: 18px; padding: 42px; display: grid; grid-template-columns: 1fr 140px; gap: 24px; align-items: center; box-shadow: 0 8px 28px rgba(46, 125, 50, 0.14); }
+        .hero h1 { font-size: 34px; line-height: 1.15; margin-bottom: 12px; color: #ffffff; }
+        .hero p { font-size: 16px; line-height: 1.65; color: #e8f5e9; max-width: 690px; }
+        .hero-icon { justify-self: end; width: 118px; height: 118px; border-radius: 18px; background: rgba(255, 255, 255, 0.14); display: grid; place-items: center; color: #ffffff; font-size: 58px; }
+        .section-title { font-size: 16px; font-weight: 800; color: #00564b; text-transform: uppercase; letter-spacing: 0.7px; margin: 32px 0 16px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        .feature-card, .compare-card, .remember-card, .cta-card { background: #ffffff; border: 1px solid #e0eeec; border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 77, 64, 0.03); }
+        .feature-card { padding: 22px; min-height: 206px; }
+        .feature-icon { width: 46px; height: 46px; border-radius: 13px; background: #e0f2f1; color: #00796b; display: grid; place-items: center; font-size: 24px; margin-bottom: 14px; }
+        .feature-card h2 { font-size: 18px; color: #1a2e2b; margin-bottom: 8px; }
+        .feature-card p { color: #546e7a; font-size: 14px; line-height: 1.65; }
+        .compare-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .compare-card { padding: 24px; }
+        .compare-card h2 { font-size: 19px; color: #1a2e2b; margin-bottom: 14px; }
+        .compare-list { display: grid; gap: 10px; }
+        .compare-list li, .remember-card li { list-style: none; display: flex; gap: 10px; align-items: flex-start; color: #546e7a; font-size: 14px; line-height: 1.5; }
+        .bad { color: #c62828; font-weight: 900; }
+        .good { color: #00796b; font-weight: 900; }
+        .remember-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+        .remember-card { padding: 16px; min-height: 122px; display: flex; align-items: flex-start; gap: 10px; color: #546e7a; font-size: 14px; line-height: 1.5; }
+        .remember-card i { color: #00796b; font-size: 20px; margin-top: 1px; }
+        .cta-card { margin-top: 28px; padding: 32px; display: flex; align-items: center; justify-content: space-between; gap: 18px; background: linear-gradient(135deg, #ffffff 0%, #f4fbfa 100%); }
+        .cta-card h2 { font-size: 25px; line-height: 1.35; color: #00564b; max-width: 720px; }
+        .cta-button { border: 1px solid #00796b; border-radius: 8px; background: #00796b; color: #ffffff; padding: 12px 18px; font-weight: 800; cursor: pointer; text-decoration: none; white-space: nowrap; }
+        .cta-button:hover { background: #004d40; }
+        @media (max-width: 900px) {
+            .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .remember-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 680px) {
+            .page-wrapper { padding: 22px 14px 42px; }
+            .hero { grid-template-columns: 1fr; padding: 28px 22px; }
+            .hero h1 { font-size: 28px; }
+            .hero-icon { justify-self: start; width: 76px; height: 76px; font-size: 38px; }
+            .feature-grid, .compare-grid, .remember-grid { grid-template-columns: 1fr; }
+            .cta-card { align-items: stretch; flex-direction: column; }
+            .cta-card h2 { font-size: 22px; }
+            .cta-button { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <a href="dashboard.html" class="back-btn" aria-label="Back to Dashboard"><i class="ti ti-arrow-left"></i></a>
+    <span class="brand-name-text">ToolMates</span>
+</header>
+
+<main class="page-wrapper">
+    <section class="hero">
+        <div>
+            <h1>Why Buy When You Can Borrow?</h1>
+            <p>Save money, reduce waste, and help fellow students by sharing tools across campus.</p>
+        </div>
+        <div class="hero-icon"><i class="ti ti-bulb"></i></div>
+    </section>
+
+    <h2 class="section-title">Why ToolMates?</h2>
+    <section class="feature-grid">
+        <article class="feature-card">
+            <div class="feature-icon"><i class="ti ti-coin"></i></div>
+            <h2>Save Money</h2>
+            <p>Borrow tools only when needed instead of purchasing expensive equipment.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon"><i class="ti ti-refresh"></i></div>
+            <h2>Share Resources</h2>
+            <p>Many tools sit unused most of the year. ToolMates helps them reach students who actually need them.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon"><i class="ti ti-leaf"></i></div>
+            <h2>Sustainable Campus</h2>
+            <p>Sharing reduces unnecessary purchases and promotes responsible resource use.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon"><i class="ti ti-trending-up"></i></div>
+            <h2>Earn Extra Income</h2>
+            <p>Turn your idle tools into useful campus resources while earning rental income.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon"><i class="ti ti-heart-handshake"></i></div>
+            <h2>Trusted Community</h2>
+            <p>Ratings, reviews, rental history and reports help everyone make informed decisions.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon"><i class="ti ti-bolt"></i></div>
+            <h2>Convenient & Simple</h2>
+            <p>Everything happens in one place. Browse, chat, rent, track, review.</p>
+        </article>
+    </section>
+
+    <h2 class="section-title">A Smarter Choice</h2>
+    <section class="compare-grid">
+        <article class="compare-card">
+            <h2>Without ToolMates</h2>
+            <ul class="compare-list">
+                <li><span class="bad">✕</span> Buy expensive tools</li>
+                <li><span class="bad">✕</span> Rarely use them</li>
+                <li><span class="bad">✕</span> Tools remain unused</li>
+                <li><span class="bad">✕</span> Higher costs</li>
+            </ul>
+        </article>
+        <article class="compare-card">
+            <h2>With ToolMates</h2>
+            <ul class="compare-list">
+                <li><span class="good">✓</span> Borrow only when needed</li>
+                <li><span class="good">✓</span> Earn from idle tools</li>
+                <li><span class="good">✓</span> Help fellow students</li>
+                <li><span class="good">✓</span> Save money</li>
+                <li><span class="good">✓</span> Reduce waste</li>
+            </ul>
+        </article>
+    </section>
+
+    <h2 class="section-title">Things to Remember</h2>
+    <section class="remember-grid">
+        <article class="remember-card"><i class="ti ti-check"></i><span>Inspect tools before pickup</span></article>
+        <article class="remember-card"><i class="ti ti-check"></i><span>Return tools on time</span></article>
+        <article class="remember-card"><i class="ti ti-check"></i><span>Communicate respectfully</span></article>
+        <article class="remember-card"><i class="ti ti-check"></i><span>Report genuine issues honestly</span></article>
+        <article class="remember-card"><i class="ti ti-check"></i><span>Leave reviews after completed rentals</span></article>
+    </section>
+
+    <section class="cta-card">
+        <h2>Together, we can build a smarter and more connected CUET community.</h2>
+        <a class="cta-button" href="Browse Tools.html">Browse Tools</a>
+    </section>
+</main>
+</body>
+</html>

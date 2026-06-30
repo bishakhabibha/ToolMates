@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report User - ToolMates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #ffffff; color: #2c3e50; min-height: 100vh; }
+        .navbar { background-color: #ffffff; padding: 16px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #eef2f5; height: 70px; }
+        .menu-btn { background: #f4f7f6; border: 1px solid #e0eae9; color: #00796b; font-size: 20px; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .brand-name { font-size: 22px; font-weight: 700; color: #00796b; letter-spacing: -0.5px; }
+        .content-area { background-color: #f4f7f6; padding: 30px; min-height: calc(100vh - 70px); }
+        .page-shell { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+        .panel { background: #ffffff; border-radius: 16px; border: 1px solid #eef2f5; padding: 24px; box-shadow: 0 4px 20px rgba(0,77,64,0.03); }
+        h1 { font-size: 20px; color: #00564b; margin-bottom: 16px; }
+        .details-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+        .detail { background: #f4fbfa; border: 1px solid #b2dfdb; border-radius: 10px; padding: 14px; }
+        .detail span { display: block; font-size: 12px; color: #546e7a; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .detail strong { font-size: 15px; color: #1a2e2b; overflow-wrap: anywhere; }
+        .reason-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .reason-option { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid #e0eae9; border-radius: 8px; background: #ffffff; font-size: 14px; font-weight: 650; color: #34495e; }
+        .reason-option input { width: 16px; height: 16px; accent-color: #00796b; }
+        label { font-size: 13px; font-weight: 700; color: #34495e; text-transform: uppercase; letter-spacing: 0.5px; }
+        textarea { width: 100%; min-height: 110px; resize: vertical; padding: 12px 16px; border-radius: 8px; border: 1px solid #ced6d6; font-size: 14px; font-family: inherit; color: #2c3e50; outline: none; margin-top: 8px; }
+        .hint { font-size: 13px; color: #7f8c8d; margin-bottom: 14px; }
+        .message { font-size: 14px; font-weight: 700; color: #b26a00; margin-bottom: 14px; }
+        .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+        button { padding: 11px 18px; border-radius: 8px; border: 1px solid #00796b; background: #00796b; color: #ffffff; font-weight: 700; cursor: pointer; }
+        button.secondary { background: #ffffff; color: #00796b; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        @media (max-width: 700px) { .content-area { padding: 18px; } .details-grid, .reason-grid { grid-template-columns: 1fr; } .actions { flex-direction: column; } }
+    </style>
+</head>
+<body>
+<header class="navbar">
+    <a href="dashboard.html" class="menu-btn"><i class="ti ti-arrow-left"></i></a>
+    <span class="brand-name">ToolMates</span>
+</header>
+<main class="content-area">
+    <div class="page-shell">
+        <section class="panel">
+            <h1>Report User</h1>
+            <p class="hint">Reports are stored for reputation history and do not change this rental workflow.</p>
+            <div id="statusMessage" class="message" style="display:none;"></div>
+            <div class="details-grid">
+                <div class="detail"><span>Rental ID</span><strong id="rentalIdText">-</strong></div>
+                <div class="detail"><span>Tool Name</span><strong id="toolNameText">-</strong></div>
+                <div class="detail"><span>Reported User</span><strong id="reportedUserText">-</strong></div>
+            </div>
+            <label>Reason</label>
+            <div class="reason-grid" id="reasonGrid"></div>
+            <div id="otherDetailsWrap" style="display:none;">
+                <label for="otherDetails">Other Details</label>
+                <textarea id="otherDetails"></textarea>
+            </div>
+            <div class="actions">
+                <button class="secondary" onclick="history.back()">Cancel</button>
+                <button id="submitButton" onclick="submitReport()">Submit Report</button>
+            </div>
+        </section>
+    </div>
+</main>
+    <script>
+    (() => {
+        const apiOrigin = (location.port === '63342' || location.protocol === 'file:') ? 'http://localhost:8080' : '';
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => {
+            if (typeof input === 'string' && input.startsWith('/api/')) {
+                return originalFetch(apiOrigin + input, init);
+            }
+            return originalFetch(input, init);
+        };
+    })();
+    </script><script>
+    const RENT_API = '/api/rent-requests';
+    const HISTORY_API = '/api/rental-history';
+    const reasons = [
+        "Didn't pay",
+        "Payment issue",
+        "Didn't return tool",
+        "Returned tool late",
+        "Damaged tool",
+        "Tool condition different from listing",
+        "Poor communication",
+        "Inappropriate behaviour",
+        "Other"
+    ];
+    let currentUser = null;
+    let rental = null;
+
+    function rentalId() {
+        return new URLSearchParams(window.location.search).get('rentalId') || new URLSearchParams(window.location.search).get('rentalRequestId');
+    }
+
+    function renderReasons() {
+        document.getElementById('reasonGrid').innerHTML = reasons.map(reason => `
+            <label class="reason-option">
+                <input type="checkbox" value="${escapeAttr(reason)}" onchange="toggleOtherDetails()" />
+                ${escapeHtml(reason)}
+            </label>
+        `).join('');
+    }
+
+    async function loadPage() {
+        renderReasons();
+        const id = rentalId();
+        if (!id) return showMessage('Missing rental ID.', true);
+        document.getElementById('rentalIdText').textContent = id;
+        try {
+            const [meResponse, detailResponse, statusResponse] = await Promise.all([
+                fetch('/api/auth/me', { credentials: 'include', headers: { 'Accept': 'application/json' } }),
+                fetch(`${HISTORY_API}/${id}`, { credentials: 'include', headers: { 'Accept': 'application/json' } }),
+                fetch(`${RENT_API}/${id}/report-status`, { credentials: 'include', headers: { 'Accept': 'application/json' } })
+            ]);
+            currentUser = meResponse.ok ? await meResponse.json() : null;
+            if (!detailResponse.ok) throw new Error('Could not load rental details.');
+            rental = await detailResponse.json();
+            const status = statusResponse.ok ? await statusResponse.json() : {};
+            const isOwner = currentUser && Number(currentUser.userId) === Number(rental.ownerUserId);
+            document.getElementById('toolNameText').textContent = rental.toolName || '-';
+            document.getElementById('reportedUserText').textContent = isOwner ? (rental.borrowerName || '-') : (rental.ownerName || '-');
+            if (status.alreadyReported) {
+                showMessage(`You reported ${rental.toolName || 'this tool'} for this rental. Thank you for your feedback.`, true);
+            }
+        } catch (error) {
+            showMessage(error.message || 'Could not load report form.', true);
+        }
+    }
+
+    function toggleOtherDetails() {
+        const selected = selectedReasons();
+        document.getElementById('otherDetailsWrap').style.display = selected.includes('Other') ? 'block' : 'none';
+    }
+
+    function selectedReasons() {
+        return Array.from(document.querySelectorAll('#reasonGrid input:checked')).map(input => input.value);
+    }
+
+    async function submitReport() {
+        const selected = selectedReasons();
+        const otherDetails = document.getElementById('otherDetails').value.trim();
+        if (!selected.length) {
+            alert('Please select at least one reason.');
+            return;
+        }
+        if (selected.includes('Other') && !otherDetails) {
+            alert('Additional details are required when Other is selected.');
+            return;
+        }
+        const button = document.getElementById('submitButton');
+        button.disabled = true;
+        const response = await fetch(`${RENT_API}/${rentalId()}/report`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                reasonCategory: selected.join(', '),
+                additionalDetails: otherDetails
+            })
+        });
+        if (response.ok) {
+            showMessage(`You reported ${rental && rental.toolName ? rental.toolName : 'this tool'} for this rental. Thank you for your feedback.`, true);
+        } else {
+            button.disabled = false;
+            alert(await responseError(response));
+        }
+    }
+
+    function showMessage(message, disableSubmit) {
+        const status = document.getElementById('statusMessage');
+        status.style.display = 'block';
+        status.textContent = message;
+        document.getElementById('submitButton').disabled = Boolean(disableSubmit);
+    }
+
+    async function responseError(response) {
+        try {
+            const body = await response.json();
+            return body.error || 'Could not submit report.';
+        } catch (error) {
+            return 'Could not submit report.';
+        }
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    function escapeAttr(value) {
+        return escapeHtml(value).replace(/'/g, '&#039;');
+    }
+
+    window.addEventListener('DOMContentLoaded', loadPage);
+</script>
+</body>
+</html>
