@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/error",
+                                "/favicon.ico",
                                 "/dashboard",
                                 "/login",
                                 "/signup",

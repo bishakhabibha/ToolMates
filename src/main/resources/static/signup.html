@@ -143,7 +143,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit">Create Account &rarr;</button>
+            <button type="submit" class="btn-submit" id="signupBtn">Create Account &rarr;</button>
         </form>
 
         <div class="login">Already have an account? <a href="/login">Log in with your User ID</a></div>
@@ -188,8 +188,18 @@
         document.getElementById(id).classList.toggle('visible', show);
     }
 
-    document.getElementById('signupForm').addEventListener('submit', function(e) {
+    function setBtn(id, loading) {
+        const btn = document.getElementById(id);
+        btn.disabled = loading;
+        if (loading) btn.dataset.orig = btn.textContent;
+        btn.textContent = loading ? 'Please wait...' : btn.dataset.orig;
+    }
+
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        const signupBtn = document.getElementById('signupBtn');
+        if (signupBtn.disabled) return;
+
         let valid = true;
         const req = (id, errId, test) => {
             const v = document.getElementById(id).value;
@@ -223,19 +233,26 @@
             password:     pw
         };
 
-        fetch('/api/auth/signup', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        }).then(r => r.json()).then(d => {
+        setBtn('signupBtn', true);
+        try {
+            const r = await fetch('/api/auth/signup', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const d = await r.json().catch(() => ({}));
             if (d.message && !d.error) {
                 alert('Account created successfully!');
                 window.location.href = '/login';
             } else {
                 alert(d.error || 'Something went wrong. Please try again.');
             }
-        }).catch(() => alert('Could not connect to server. Make sure the app is running.'));
+        } catch {
+            alert('Could not connect to server. Make sure the app is running.');
+        } finally {
+            setBtn('signupBtn', false);
+        }
     });
 </script>
 </body>

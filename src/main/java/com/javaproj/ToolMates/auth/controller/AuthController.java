@@ -25,10 +25,9 @@ public class AuthController {
     @Autowired private UserDao userDao;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest req, HttpSession session) {
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest req) {
         try {
             User saved = authService.register(req);
-            session.invalidate();
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     "firstName", saved.getFirstName(),
                     "lastName",  saved.getLastName(),
