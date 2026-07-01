@@ -3,9 +3,7 @@ package com.javaproj.ToolMates.auth.service;
 import com.javaproj.ToolMates.auth.dto.LoginRequest;
 import com.javaproj.ToolMates.auth.dto.SignupRequest;
 import com.javaproj.ToolMates.auth.exception.DuplicateFieldException;
-import com.javaproj.ToolMates.auth.exception.EmailNotVerifiedException;
 import com.javaproj.ToolMates.auth.exception.InvalidCredentialsException;
-import com.javaproj.ToolMates.auth.exception.UserNotFoundException;
 import com.javaproj.ToolMates.auth.model.User;
 import com.javaproj.ToolMates.auth.repository.UserDao;
 import jakarta.servlet.http.HttpSession;
@@ -18,29 +16,10 @@ import java.util.Optional;
 @Service
 public class AuthService {
 
-    public static final String SESSION_RESET_VERIFIED_EMAIL = "resetVerifiedEmail";
-
-    @Autowired private UserDao        userDao;
+    @Autowired private UserDao userDao;
     @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private OtpService     otpService;
 
-    // ── Existing: Signup ─────────────────────────────────────────────────
-
-    public void sendVerificationOtp(String email) {
-        validateCuetStudentEmail(email);
-        otpService.generateAndSend(email, OtpService.Purpose.SIGNUP);
-    }
-
-    public boolean verifyOtp(String email, String otp) {
-        validateCuetStudentEmail(email);
-        return otpService.verify(email, otp, OtpService.Purpose.SIGNUP);
-    }
-
-    public User register(SignupRequest req, boolean emailVerified) {
-
-        if (!emailVerified)
-            throw new EmailNotVerifiedException("Please verify your email before signing up.");
-
+    public User register(SignupRequest req) {
         validateCuetStudentEmail(req.getStudentEmail());
 
         if (userDao.existsByStudentId(req.getStudentId()))
@@ -63,12 +42,9 @@ public class AuthService {
         return userDao.save(user);
     }
 
-    // ── New: Login ───────────────────────────────────────────────────────
-
     public User login(LoginRequest req, HttpSession session) {
         String identifier = req.getUsername().trim();
 
-        // Try student ID first, then email
         Optional<User> optUser = userDao.findByStudentId(identifier);
         if (optUser.isEmpty()) {
             optUser = userDao.findByEmail(identifier.toLowerCase());
@@ -97,34 +73,5 @@ public class AuthService {
         if (email == null || !email.trim().toLowerCase().matches("^[a-z0-9._%+-]+@student\\.cuet\\.ac\\.bd$")) {
             throw new IllegalArgumentException("Please enter a valid CUET student email address.");
         }
-    }
-
-    // ── New: Forgot / Reset Password ─────────────────────────────────────
-
-    public void sendPasswordResetOtp(String email) {
-        String normalised = email.trim().toLowerCase();
-        if (!userDao.existsByEmail(normalised))
-            throw new UserNotFoundException(normalised);
-        otpService.generateAndSend(normalised, OtpService.Purpose.PASSWORD_RESET);
-    }
-
-    public boolean verifyPasswordResetOtp(String email, String otp) {
-        return otpService.verify(email.trim().toLowerCase(), otp.trim(), OtpService.Purpose.PASSWORD_RESET);
-    }
-
-    public void resetPassword(String email, String newPassword, HttpSession session) {
-        String normalised = email.trim().toLowerCase();
-
-        String sessionEmail = (String) session.getAttribute(SESSION_RESET_VERIFIED_EMAIL);
-        if (sessionEmail == null || !sessionEmail.equals(normalised))
-            throw new SecurityException("Password reset was not authorised for this email.");
-
-        User user = userDao.findByEmail(normalised)
-                .orElseThrow(() -> new UserNotFoundException(normalised));
-
-        user.setPasswordHash(passwordEncoder.encode(newPassword));
-        userDao.updatePassword(user.getUserId(), user.getPasswordHash());
-
-        session.removeAttribute(SESSION_RESET_VERIFIED_EMAIL);
     }
 }

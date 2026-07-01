@@ -39,6 +39,10 @@ public class ProfileService {
         Map<String, Object> profile = new LinkedHashMap<>();
         profile.put("userId", user.getUserId());
         profile.put("name", user.getFirstName() + " " + user.getLastName());
+        profile.put("department", user.getDepartment());
+        profile.put("studentId", user.getStudentId());
+        profile.put("phone", user.getPhone());
+        profile.put("studentEmail", user.getStudentEmail());
         profile.put("avatarUrl", user.getAvatarUrl());
         profile.put("bio", user.getBio());
         Double averageRating = reviewDao.findAverageForUser(user.getUserId());

@@ -20,6 +20,9 @@
         .profile-main { flex: 1; min-width: 0; }
         .profile-name-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .profile-name { font-size: 24px; font-weight: 700; color: #1a2e2b; }
+        .profile-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; margin-top: 10px; }
+        .profile-detail span { display: block; font-size: 11px; color: #78909c; font-weight: 700; text-transform: uppercase; }
+        .profile-detail strong { display: block; margin-top: 1px; font-size: 13px; color: #2c3e50; font-weight: 600; word-break: break-word; }
         .profile-bio { color: #546e7a; margin-top: 4px; }
         .profile-actions { display: none; margin-left: auto; flex-shrink: 0; }
         .bio-editor { display: none; margin-top: 12px; }
@@ -38,7 +41,7 @@
         .tool-card p { font-size: 13px; color: #7f8c8d; margin-bottom: 2px; }
         input { padding: 10px 14px; border-radius: 8px; border: 1px solid #ced6d6; outline: none; }
         button { padding: 10px 16px; border-radius: 8px; border: none; background: #00796b; color: #ffffff; font-weight: 700; cursor: pointer; }
-        @media (max-width: 700px) { .stats-grid { grid-template-columns: 1fr; } .profile-head { align-items: flex-start; } }
+        @media (max-width: 700px) { .stats-grid { grid-template-columns: 1fr; } .profile-head { align-items: flex-start; } .profile-details { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -62,6 +65,12 @@
                     <div class="profile-actions" id="profileActions">
                         <button onclick="showBioEditor()">Edit Profile</button>
                     </div>
+                </div>
+                <div class="profile-details">
+                    <div class="profile-detail"><span>Department</span><strong id="profileDepartment">-</strong></div>
+                    <div class="profile-detail"><span>Student ID</span><strong id="profileStudentId">-</strong></div>
+                    <div class="profile-detail"><span>Phone</span><strong id="profilePhone">-</strong></div>
+                    <div class="profile-detail"><span>Student Email</span><strong id="profileStudentEmail">-</strong></div>
                 </div>
                 <div class="profile-bio" id="profileBio">Load a profile to view user details.</div>
                 <div class="bio-editor" id="bioEditor">
@@ -118,6 +127,10 @@
         currentProfile = profile;
         await updateOwnProfileState(studentId);
         document.getElementById('profileName').textContent = profile.name || 'Profile';
+        document.getElementById('profileDepartment').textContent = profile.department || '-';
+        document.getElementById('profileStudentId').textContent = profile.studentId || '-';
+        document.getElementById('profilePhone').textContent = profile.phone || '-';
+        document.getElementById('profileStudentEmail').textContent = profile.studentEmail || '-';
         document.getElementById('profileBio').textContent = profile.bio || 'No bio added yet.';
         document.getElementById('averageRating').textContent = profile.averageRating || 0;
         document.getElementById('totalReportsReceived').textContent = profile.totalReportsReceived ?? 0;

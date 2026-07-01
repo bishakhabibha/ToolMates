@@ -3,162 +3,48 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign Up — ToolMates</title>
+    <title>Sign Up - ToolMates</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 16px;
-            background-color: #e9eeed;
-        }
-
-        .card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 0;
-            width: 100%;
-            max-width: 620px;
-            border: 1px solid #dde6e5;
-            box-shadow: 0 4px 24px rgba(0,40,36,0.10);
-            overflow: hidden;
-        }
-
-        .accent-bar {
-            height: 4px;
-            background-color: #00564b;
-        }
-
+        body { font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 16px; background-color: #e9eeed; }
+        .card { background: #ffffff; border-radius: 20px; padding: 0; width: 100%; max-width: 620px; border: 1px solid #dde6e5; box-shadow: 0 4px 24px rgba(0,40,36,0.10); overflow: hidden; }
+        .accent-bar { height: 4px; background-color: #00564b; }
         .inner { padding: 42px 46px; }
-
         .brand { display: flex; align-items: center; gap: 13px; justify-content: center; margin-bottom: 6px; }
-
-        .logo {
-            width: 48px; height: 48px;
-            border-radius: 13px;
-            background-color: #d3e6e3;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
+        .logo { width: 48px; height: 48px; border-radius: 13px; background-color: #d3e6e3; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .logo svg { width: 25px; height: 25px; fill: #00564b; }
-
         .brand-name { font-size: 24px; font-weight: 700; color: #00564b; letter-spacing: -0.3px; }
-
-        .brand-sub {
-            text-align: center;
-            font-size: 11.5px;
-            color: #6b7d7b;
-            margin-bottom: 28px;
-            margin-top: 4px;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
+        .brand-sub { text-align: center; font-size: 11.5px; color: #6b7d7b; margin-bottom: 28px; margin-top: 4px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 500; }
         .brand-sub span { color: #00564b; margin: 0 6px; font-size: 10px; vertical-align: middle; }
-
-        .sec {
-            font-size: 11px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1.4px; color: #6b7d7b;
-            margin: 20px 0 11px;
-            display: flex; align-items: center; gap: 7px;
-        }
+        .sec { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px; color: #6b7d7b; margin: 20px 0 11px; display: flex; align-items: center; gap: 7px; }
         .sec i { font-size: 13px; color: #00564b; }
         .sec::after { content: ''; flex: 1; height: 1px; background-color: #e2e9e8; }
         .sec:first-of-type { margin-top: 0; }
-
         .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
-
         .field { display: flex; flex-direction: column; gap: 5px; }
-
         .lbl { font-size: 12px; font-weight: 600; color: #3e4f4d; letter-spacing: 0.2px; }
         .req { color: #00564b; margin-left: 2px; }
-
-        input, select {
-            width: 100%;
-            background-color: #eef2f1;
-            border: 1.5px solid #d6e0de;
-            border-radius: 10px;
-            color: #1e2a28;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 13.5px;
-            padding: 10px 13px;
-            outline: none;
-            transition: border-color .2s, box-shadow .2s, background .2s;
-            -webkit-appearance: none;
-        }
-        input:focus, select:focus {
-            border-color: #00564b;
-            box-shadow: 0 0 0 3px rgba(0,86,75,0.12);
-            background-color: #ffffff;
-        }
+        input, select { width: 100%; background-color: #eef2f1; border: 1.5px solid #d6e0de; border-radius: 10px; color: #1e2a28; font-family: 'Segoe UI', sans-serif; font-size: 13.5px; padding: 10px 13px; outline: none; transition: border-color .2s, box-shadow .2s, background .2s; -webkit-appearance: none; }
+        input:focus, select:focus { border-color: #00564b; box-shadow: 0 0 0 3px rgba(0,86,75,0.12); background-color: #ffffff; }
         input::placeholder { color: #94a3a1; }
         select { color: #1e2a28; }
         select option { background: #ffffff; color: #1e2a28; }
-
-        .email-row { display: flex; gap: 8px; align-items: flex-end; }
-        .email-row .field { flex: 1; margin: 0; }
-
-        .btn-otp {
-            height: 40px; padding: 0 16px;
-            background-color: #d3e6e3;
-            border: 1.5px solid #00564b;
-            border-radius: 10px; color: #00564b;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 12px; font-weight: 600;
-            cursor: pointer; white-space: nowrap;
-            transition: background .2s;
-        }
-        .btn-otp:hover { background-color: #b9d6d1; }
-        .btn-otp:disabled { opacity: 0.5; cursor: not-allowed; }
-
         .helper { font-size: 11px; color: #6b7d7b; margin-top: 3px; }
         .err { font-size: 11px; color: #b3261e; margin-top: 3px; display: none; }
         .err.visible { display: block; }
-
-        .otp-row { display: none; gap: 6px; align-items: center; margin-top: 10px; }
-        .otp-row.visible { display: flex; }
-        .otp-digit {
-            width: 40px !important; padding: 10px 4px !important;
-            text-align: center !important; font-size: 16px; font-weight: 700;
-        }
-
-        .verified-badge {
-            display: none; font-size: 11px; color: #00564b;
-            font-weight: 600; margin-top: 4px; align-items: center; gap: 4px;
-        }
-        .verified-badge.visible { display: flex; }
-
         .phone-row { display: flex; gap: 8px; }
         .phone-code { width: 85px; flex-shrink: 0; }
         .phone-code input { text-align: center; }
-
         .strength-bar { height: 3px; border-radius: 2px; background-color: #e2e9e8; margin-top: 6px; overflow: hidden; }
         .strength-fill { height: 100%; border-radius: 2px; transition: width .4s, background .4s; width: 0; }
         .strength-text { font-size: 11px; margin-top: 3px; color: #6b7d7b; }
-
-        .btn-submit {
-            width: 100%; margin-top: 18px; padding: 13px;
-            background-color: #00564b;
-            border: 1px solid transparent;
-            border-radius: 10px; color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 14.5px; font-weight: 600; cursor: pointer;
-            letter-spacing: 0.3px;
-            transition: background-color .2s, transform .15s;
-        }
+        .btn-submit { width: 100%; margin-top: 18px; padding: 13px; background-color: #00564b; border: 1px solid transparent; border-radius: 10px; color: #ffffff; font-family: 'Segoe UI', sans-serif; font-size: 14.5px; font-weight: 600; cursor: pointer; letter-spacing: 0.3px; transition: background-color .2s, transform .15s; }
         .btn-submit:hover { background-color: #003c34; transform: translateY(-1px); }
-
         .divider { border: none; border-top: 1px solid #e2e9e8; margin: 20px 0; }
-
         .login { text-align: center; font-size: 12.5px; color: #6b7d7b; margin-top: 14px; }
         .login a { color: #00564b; text-decoration: none; font-weight: 600; }
         .login a:hover { color: #003c34; }
-
         @media (max-width: 520px) {
             .inner { padding: 28px 20px; }
             .grid2 { grid-template-columns: 1fr; }
@@ -166,11 +52,9 @@
     </style>
 </head>
 <body>
-
 <div class="card">
     <div class="accent-bar"></div>
     <div class="inner">
-
         <div class="brand">
             <div class="logo">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -182,7 +66,6 @@
         <div class="brand-sub">Connect <span>&#9670;</span> Share <span>&#9670;</span> Create</div>
 
         <form id="signupForm" novalidate>
-
             <div class="sec"><i class="ti ti-user" aria-hidden="true"></i>Personal Information</div>
             <div class="grid2">
                 <div class="field">
@@ -220,37 +103,16 @@
                 </div>
             </div>
 
-            <div class="sec"><i class="ti ti-mail" aria-hidden="true"></i>Contact &amp; Verification</div>
-
+            <div class="sec"><i class="ti ti-mail" aria-hidden="true"></i>Contact</div>
             <div class="field" style="margin-bottom:13px">
                 <label class="lbl">Institutional Email <span class="req">*</span></label>
-                <div class="email-row">
-                    <div class="field">
-                        <input type="email" id="studentEmail" />
-                    </div>
-                    <button type="button" class="btn-otp" id="otpBtn" onclick="sendOTP()">Send Code</button>
-                </div>
-                <span class="helper">A 6-digit code will be sent to verify your address</span>
+                <input type="email" id="studentEmail" />
+                <span class="helper">Use your CUET student email address</span>
                 <span class="err" id="err-email">Please enter a valid CUET student email address.</span>
-                <div class="otp-row" id="otpRow">
-                    <input class="otp-digit" maxlength="1" id="d1" oninput="dn(this,'d2')" />
-                    <input class="otp-digit" maxlength="1" id="d2" oninput="dn(this,'d3')" />
-                    <input class="otp-digit" maxlength="1" id="d3" oninput="dn(this,'d4')" />
-                    <input class="otp-digit" maxlength="1" id="d4" oninput="dn(this,'d5')" />
-                    <input class="otp-digit" maxlength="1" id="d5" oninput="dn(this,'d6')" />
-                    <input class="otp-digit" maxlength="1" id="d6" oninput="checkOtp()" />
-                    <span style="font-size:11px;color:#6b7d7b;margin-left:4px">Enter code</span>
-                </div>
-                <div class="verified-badge" id="verifiedBadge">
-                    <i class="ti ti-circle-check"></i> Email verified
-                </div>
             </div>
 
             <div class="field" style="margin-bottom:13px">
-                <label class="lbl">
-                    <i class="ti ti-device-mobile" style="font-size:12px;color:#00564b;margin-right:4px" aria-hidden="true"></i>
-                    Phone Number <span class="req">*</span>
-                </label>
+                <label class="lbl"><i class="ti ti-device-mobile" style="font-size:12px;color:#00564b;margin-right:4px" aria-hidden="true"></i>Phone Number <span class="req">*</span></label>
                 <div class="phone-row">
                     <div class="phone-code"><input type="text" value="+880" id="phoneCode" /></div>
                     <input type="tel" id="phone" placeholder="01XXXXXXXXX" style="flex:1" />
@@ -259,10 +121,7 @@
             </div>
 
             <div class="field">
-                <label class="lbl">
-                    <i class="ti ti-map-pin" style="font-size:12px;color:#00564b;margin-right:4px" aria-hidden="true"></i>
-                    Campus Address
-                </label>
+                <label class="lbl"><i class="ti ti-map-pin" style="font-size:12px;color:#00564b;margin-right:4px" aria-hidden="true"></i>Campus Address</label>
                 <input type="text" id="campusAddress" placeholder="Campus Address" />
             </div>
 
@@ -288,11 +147,10 @@
         </form>
 
         <div class="login">Already have an account? <a href="/login">Log in with your User ID</a></div>
-
     </div>
 </div>
 
-    <script>
+<script>
     (() => {
         const apiOrigin = (location.port === '63342' || location.protocol === 'file:') ? 'http://localhost:8080' : '';
         const originalFetch = window.fetch.bind(window);
@@ -303,72 +161,8 @@
             return originalFetch(input, init);
         };
     })();
-    </script><script>
-    let emailVerified = false;
+
     const cuetStudentEmailPattern = /^[A-Za-z0-9._%+-]+@student\.cuet\.ac\.bd$/;
-
-    function sendOTP() {
-        const email = document.getElementById('studentEmail').value.trim();
-        if (!cuetStudentEmailPattern.test(email)) {
-            document.getElementById('err-email').classList.add('visible');
-            return;
-        }
-        document.getElementById('err-email').classList.remove('visible');
-        const otpButton = document.getElementById('otpBtn');
-        otpButton.disabled = true;
-        otpButton.textContent = 'Sending...';
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
-        fetch('/api/auth/send-otp', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
-            signal: controller.signal
-        }).then(async r => {
-            clearTimeout(timeoutId);
-            const data = await r.json().catch(() => ({}));
-            if (!r.ok) throw new Error(data.error || 'Could not send verification code.');
-            document.getElementById('otpRow').classList.add('visible');
-            otpButton.textContent = 'Resend';
-            document.getElementById('d1').focus();
-        }).catch(error => {
-            clearTimeout(timeoutId);
-            alert(error.name === 'AbortError'
-                ? 'Sending the code took too long. Please try again.'
-                : (error.message || 'Could not send verification code. Please try again.'));
-            otpButton.textContent = 'Send Code';
-        }).finally(() => {
-            otpButton.disabled = false;
-        });
-    }
-
-    function dn(el, nxt) {
-        el.value = el.value.replace(/\D/, '');
-        if (el.value && nxt) document.getElementById(nxt).focus();
-    }
-
-    function checkOtp() {
-        const code = ['d1','d2','d3','d4','d5','d6'].map(i => document.getElementById(i).value).join('');
-        if (code.length < 6) return;
-        const email = document.getElementById('studentEmail').value.trim();
-        fetch('/api/auth/verify-otp', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, otp: code })
-        }).then(r => r.json()).then(d => {
-            if (d.message) {
-                emailVerified = true;
-                document.getElementById('otpRow').classList.remove('visible');
-                document.getElementById('verifiedBadge').classList.add('visible');
-                document.getElementById('otpBtn').disabled = true;
-                document.getElementById('otpBtn').textContent = '✓ Verified';
-            } else {
-                alert(d.error || 'Invalid code. Please try again.');
-            }
-        }).catch(() => {});
-    }
 
     function checkStrength(v) {
         let s = 0;
@@ -416,10 +210,8 @@
         if (pw !== cpw) valid = false;
 
         if (!valid) return;
-        if (!emailVerified) { alert('Please verify your email first.'); return; }
 
         const address = document.getElementById('campusAddress').value.trim();
-
         const payload = {
             firstName:    document.getElementById('firstName').value.trim(),
             lastName:     document.getElementById('lastName').value.trim(),
