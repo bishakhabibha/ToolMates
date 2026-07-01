@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,7 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     private static final String SESSION_VERIFIED_EMAIL = "verifiedEmail";
 
     @Autowired private AuthService authService;
@@ -44,10 +47,20 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("message", "OTP sent. Please check your inbox."));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
-        } catch (MailException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                    .body(Map.of("error", "Could not send OTP email. Please check the mail configuration and try again."));
-        }
+        }  catch (Exception ex) {
+        log.error("SEND OTP FAILED", ex);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of(
+                        "error", ex.getClass().getName(),
+                        "message", ex.getMessage()
+                ));
+    }
+//        catch (MailException ex) {
+//            log.error("Failed to send signup OTP email to {}", email.trim().toLowerCase(), ex);
+//            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+//                    .body(Map.of("error", "Could not send OTP email. Please check the mail configuration and try again."));
+//        }
     }
 
     @PostMapping("/verify-otp")
