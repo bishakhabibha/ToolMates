@@ -60,10 +60,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
+      transition: background 200ms ease;
       flex-shrink: 0;
     }
     .back-btn:hover { background: #b2dfdb; }
+    .back-btn:focus-visible,
+    .search-teal-btn:focus-visible,
+    .select-custom:focus-visible,
+    .favorite-btn:focus-visible {
+      outline: 3px solid rgba(0, 191, 165, 0.24);
+      outline-offset: 2px;
+    }
 
     .search-container-bar {
       display: flex;
@@ -74,9 +81,9 @@
       border-radius: 8px;
       overflow: hidden;
       height: 44px;
-      transition: border-color 0.2s;
+      transition: border-color 200ms ease, box-shadow 200ms ease;
     }
-    .search-container-bar:focus-within { border-color: #00796b; }
+    .search-container-bar:focus-within { border-color: #00796b; box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.12); }
 
     .search-input {
       flex: 1;
@@ -99,7 +106,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.2s;
+      transition: background-color 200ms ease;
       flex-shrink: 0;
     }
     .search-teal-btn:hover { background-color: #00564b; }
@@ -147,9 +154,9 @@
       cursor: pointer;
       appearance: none;
       min-width: 180px;
-      transition: border-color 0.2s;
+      transition: border-color 200ms ease, box-shadow 200ms ease;
     }
-    .select-custom:focus { border-color: #00796b; }
+    .select-custom:focus { border-color: #00796b; box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.12); }
     .select-custom-wrapper::after {
       content: "\ea5f";
       font-family: 'tabler-icons';
@@ -164,8 +171,9 @@
 
     .browse-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 24px;
+      isolation: isolate;
     }
 
     .tool-card {
@@ -173,25 +181,49 @@
       border-radius: 16px;
       border: 1.5px solid #e0eeec;
       overflow: hidden;
-      transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
       display: flex;
       flex-direction: column;
       position: relative;
       cursor: pointer;
+      height: 100%;
+      transform-origin: center;
+      will-change: transform;
     }
     .tool-card:hover {
-      transform: translateY(-4px);
+      transform: scale(1.015);
+      z-index: 2;
       border-color: #00796b;
-      box-shadow: 0 10px 28px rgba(0, 121, 107, 0.09);
+      box-shadow: 0 12px 28px rgba(0, 121, 107, 0.11);
     }
 
     .image-container {
       width: 100%;
-      height: 180px;
+      height: auto;
+      aspect-ratio: 1 / 0.72;
       position: relative;
       background-color: #d4edea;
+      overflow: hidden;
     }
     .tool-img { width: 100%; height: 100%; object-fit: cover; }
+
+    .favorite-btn {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      border: none;
+      background: rgba(255,255,255,0.9);
+      color: #00796b;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: background 200ms ease, color 200ms ease;
+    }
+    .favorite-btn:hover,
+    .favorite-btn.saved { background: #e0f2f1; }
 
     .status-badge {
       position: absolute;
@@ -211,7 +243,7 @@
     }
 
     .card-body {
-      padding: 16px;
+      padding: 14px 15px 15px;
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -221,20 +253,61 @@
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
       width: max-content;
       margin-bottom: 8px;
       letter-spacing: 0.4px;
     }
+    .tool-info-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .inline-availability {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+      padding: 4px 8px;
+      background: #ffffff;
+      color: #00796b;
+      border: 1px solid #b2dfdb;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
 
     .tool-title {
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 17px;
+      font-weight: 800;
       color: #1a2e2b;
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       line-height: 1.3;
     }
+
+    .tool-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .rating-pill,
+    .verified-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .rating-pill { background: #f4f7f6; color: #546e7a; }
+    .verified-pill { background: #e8f5e9; color: #2e7d32; }
 
     .tool-rent-details {
       display: flex;
@@ -242,21 +315,78 @@
       gap: 4px;
       margin-bottom: 12px;
     }
-    .price-tag { font-size: 18px; font-weight: 800; color: #00796b; }
+    .price-tag { font-size: 21px; font-weight: 800; color: #00796b; }
     .price-unit { font-size: 12px; color: #7f8c8d; font-weight: 500; }
 
     .card-footer {
       margin-top: auto;
-      border-top: 1px solid #eef6f4;
-      padding-top: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       font-size: 12px;
-      color: #7f8c8d;
-      font-weight: 500;
+      color: #546e7a;
+      font-weight: 600;
+      line-height: 1.3;
     }
-    .max-period { color: #00796b; font-weight: 700; }
+    .max-period { color: #546e7a; font-weight: 600; }
+    .listed-by {
+      margin-top: 7px;
+      font-size: 12px;
+      color: #546e7a;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .listed-by span { color: #00796b; font-weight: 800; }
+
+    .view-details-bar {
+      margin-top: 12px;
+      border-radius: 8px;
+      background: #00564b;
+      color: #ffffff;
+      text-align: center;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      transition: background-color 200ms ease, color 200ms ease;
+    }
+    .tool-card:hover .view-details-bar { background: #004d40; color: #a7ffeb; }
+
+    .site-footer {
+      width: 100vw;
+      margin: 34px calc(50% - 50vw) -28px;
+      background: #1a2e2b;
+      color: #dfe9e7;
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr repeat(3, 1fr);
+      gap: 22px;
+      padding: 26px 28px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-brand { color: #ffffff; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .footer-copy { color: #b2dfdb; font-size: 13px; line-height: 1.55; max-width: 300px; }
+    .footer-title { color: #a7ffeb; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .footer-links { display: flex; flex-direction: column; gap: 8px; }
+    .footer-links a,
+    .footer-links span {
+      color: #dfe9e7;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.35;
+      transition: color 200ms ease;
+    }
+    .footer-links a:hover { color: #a7ffeb; }
+    .footer-bottom {
+      border-top: 1px solid rgba(224, 242, 241, 0.12);
+      padding: 12px 28px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: #b2dfdb;
+      font-size: 12px;
+    }
 
     .no-results {
       grid-column: 1 / -1;
@@ -273,6 +403,14 @@
       .site-header { padding: 12px 16px 14px 16px; }
       .meta-sort-row { flex-direction: column; align-items: flex-start; }
       .sort-wrapper-right { width: 100%; justify-content: space-between; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .browse-container { padding: 22px 16px; }
+      .browse-grid { grid-template-columns: 1fr; gap: 18px; }
+      .footer-grid { grid-template-columns: 1fr; padding: 24px; }
+      .footer-bottom { flex-direction: column; padding: 12px 24px; }
     }
   </style>
 </head>
@@ -319,6 +457,45 @@
   </section>
 
   <main class="browse-grid" id="toolsDisplayGrid"></main>
+
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">ToolMates</div>
+        <p class="footer-copy">Connecting students through safe and affordable campus tool sharing.</p>
+      </div>
+      <div>
+        <div class="footer-title">Quick Links</div>
+        <div class="footer-links">
+          <a href="Browse Tools.html">Browse Tools</a>
+          <a href="ListATool.html">List a Tool</a>
+          <a href="RentalHistory.html">Rental History</a>
+          <a href="UserReviews.html">Reviews</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-title">Support</div>
+        <div class="footer-links">
+          <a href="mailto:toolmates.support@gmail.com">Contact Us</a>
+          <span>toolmates.support@gmail.com</span>
+          <a href="CommunityGuide.html">Campus Guidelines</a>
+          <a href="PrivacyPolicy.html">Privacy Policy</a>
+          <a href="TermsOfService.html">Terms of Service</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-title">Follow</div>
+        <div class="footer-links">
+          <a href="https://github.com/bishakhabibha/ToolMates" aria-label="ToolMates GitHub">GitHub</a>
+          <a href="mailto:toolmates.support@gmail.com">Email</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 ToolMates.</span>
+      <span>Built for students.</span>
+    </div>
+  </footer>
 
 </div>
 
@@ -386,6 +563,24 @@
     renderToolsList(sortedOutput);
   }
 
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char]));
+  }
+
+  function getToolRating(tool) {
+    return tool.rating || tool.averageRating || tool.ratingStars || null;
+  }
+
+  function isToolVerified(tool) {
+    return tool.verified === true || tool.ownerVerified === true || tool.isVerified === true;
+  }
+
   function renderToolsList(tools) {
     const grid = document.getElementById('toolsDisplayGrid');
     const counter = document.getElementById('resultsCount');
@@ -419,22 +614,36 @@
 
       const rawCat = (tool.category || 'General').toLowerCase().trim();
       const scheme = categoryColors[rawCat] || categoryColors['default'];
+      const rating = getToolRating(tool);
+      const ratingNumber = Number(rating);
+      const ratingText = rating && !Number.isNaN(ratingNumber) ? ratingNumber.toFixed(1) : rating;
+      const verified = isToolVerified(tool);
+      const isAvailable = tool.active !== false;
 
       card.innerHTML = `
         <div class="image-container">
-          <img src="${activeImg}" alt="${tool.name || 'Tool'}" class="tool-img" />
-          <span class="status-badge status-available">Available</span>
+          <img src="${escapeHtml(activeImg)}" alt="${escapeHtml(tool.name || 'Tool')}" class="tool-img" />
+          <button type="button" class="favorite-btn" aria-label="Save ${escapeHtml(tool.name || 'tool')}" onclick="event.stopPropagation(); this.classList.toggle('saved');"><i class="ti ti-heart"></i></button>
         </div>
         <div class="card-body">
-          <span class="tool-cat" style="background-color: ${scheme.bg}; color: ${scheme.text};">${tool.category || 'General'}</span>
-          <h3 class="tool-title">${tool.name || 'Unnamed Tool'}</h3>
+          <h3 class="tool-title">${escapeHtml(tool.name || 'Unnamed Tool')}</h3>
+          <div class="tool-info-row">
+            <span class="tool-cat" style="background-color: ${scheme.bg}; color: ${scheme.text};">${escapeHtml(tool.category || 'General')}</span>
+            <span class="inline-availability">${isAvailable ? 'Available' : 'Unavailable'}</span>
+          </div>
+          ${rating || verified ? `<div class="tool-meta-row">
+            ${rating ? `<span class="rating-pill"><i class="ti ti-star-filled"></i>${escapeHtml(ratingText)}</span>` : ''}
+            ${verified ? '<span class="verified-pill"><i class="ti ti-circle-check"></i>Verified</span>' : ''}
+          </div>` : ''}
           <div class="tool-rent-details">
-            <span class="price-tag">Tk ${tool.pricePerDay || 0}</span>
+            <span class="price-tag">Tk ${escapeHtml(tool.pricePerDay || 0)}</span>
             <span class="price-unit">/ day</span>
           </div>
           <div class="card-footer">
-            <span>Max Rent: <span class="max-period">${tool.maxRentingPeriod || 0} days</span></span>
+            <span>Max Rent Period: <span class="max-period">${escapeHtml(tool.maxRentingPeriod || 0)} days</span></span>
           </div>
+          <div class="listed-by">Listed By: <span>${escapeHtml(tool.ownerId || 'UserID')}</span></div>
+          <div class="view-details-bar">View Details</div>
         </div>`;
 
       card.onclick = () => window.location.href = `ToolInfo.html?id=${tool.id}`;

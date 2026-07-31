@@ -42,6 +42,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+        }
+        .menu-btn:hover { background: #e0f2f1; border-color: #b2dfdb; }
+        .menu-btn:focus-visible,
+        .btn-nav:focus-visible,
+        .slide-btn:focus-visible,
+        .back-home-btn:focus-visible,
+        .notification-actions button:focus-visible,
+        .thread-compose button:focus-visible {
+            outline: 3px solid rgba(0, 191, 165, 0.24);
+            outline-offset: 2px;
         }
 
         .brand-name { font-size: 22px; font-weight: 700; color: #00796b; letter-spacing: -0.5px; }
@@ -54,12 +65,12 @@
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.2s;
+            transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
         }
         .btn-login { color: #00796b; border: 1px solid #00796b; background: transparent; }
         .btn-login:hover { background: rgba(0, 121, 107, 0.05); }
         .btn-signup { background-color: #00796b; color: #ffffff; border: 1px solid transparent; }
-        .btn-signup:hover { background-color: #004d40; }
+        .btn-signup:hover { background-color: #004d40; box-shadow: 0 6px 14px rgba(0, 77, 64, 0.14); }
         .top-welcome {
             display: none;
             color: #546e7a;
@@ -86,7 +97,9 @@
             cursor: pointer;
             align-items: center;
             justify-content: center;
+            transition: background 200ms ease, border-color 200ms ease;
         }
+        .top-notification-btn:hover { background: #e0f2f1; border-color: #b2dfdb; }
 
         /* --- Main Layout Wrapper --- */
         .main-layout {
@@ -129,7 +142,7 @@
             font-size: 14px;
             border-radius: 8px;
             margin-bottom: 4px;
-            transition: all 0.2s;
+            transition: background-color 200ms ease, color 200ms ease;
             position: relative;
             cursor: pointer;
         }
@@ -203,32 +216,51 @@
             position: relative;
             margin-bottom: 30px;
             box-shadow: 0 4px 20px rgba(0,77,64,0.05);
+            background: #00564b;
         }
 
         .carousel-track {
-            display: flex;
-            width: 300%;
+            position: relative;
+            display: block;
+            width: 100%;
             height: 100%;
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .slide {
-            width: 33.333%;
+            position: absolute;
+            inset: 0;
+            width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 50px;
             color: #ffffff;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 300ms ease, visibility 300ms ease;
+        }
+        .slide.active { opacity: 1; visibility: visible; z-index: 1; }
+        .slide::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0.16;
+            background-image:
+                radial-gradient(circle at 18px 18px, rgba(255,255,255,0.7) 1px, transparent 1.5px),
+                radial-gradient(circle at 58px 54px, rgba(255,255,255,0.45) 1px, transparent 1.5px);
+            background-size: 74px 74px;
+            pointer-events: none;
         }
         .slide-1 { background: linear-gradient(135deg, #005b4f 0%, #008374 100%); }
-        .slide-2 { background: linear-gradient(135deg, #00667a 0%, #008ba3 100%); }
+        .slide-2 { background: linear-gradient(135deg, #00564b 0%, #00796b 100%); }
         .slide-3 { background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%); }
 
-        .slide-info { max-width: 50%; }
-        .slide-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #a7ffeb; margin-bottom: 8px; }
-        .slide h2 { font-size: 26px; font-weight: 700; margin-bottom: 12px; line-height: 1.2; color: #ffffff; }
-        .slide p { font-size: 14px; color: #e0f2f1; margin-bottom: 16px; }
+        .slide-info { max-width: 58%; position: relative; z-index: 2; }
+        .slide-tag { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #a7ffeb; margin-bottom: 8px; }
+        .slide h2 { font-size: 34px; font-weight: 800; margin-bottom: 10px; line-height: 1.08; color: #ffffff; letter-spacing: -0.4px; }
+        .slide p { font-size: 15px; color: #e0f2f1; margin-bottom: 18px; line-height: 1.5; }
+        .slide-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
         .slide-btn {
             background-color: transparent;
@@ -239,15 +271,73 @@
             font-weight: 600;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
         }
-        .slide-btn:hover { background-color: #ffffff; color: #005b4f; }
+        .slide-btn.primary { background-color: #ffffff; color: #00564b; border-color: #ffffff; }
+        .slide-btn:hover { background-color: #ffffff; color: #005b4f; box-shadow: 0 8px 16px rgba(0, 77, 64, 0.12); }
+        .slide-btn.primary:hover { background-color: #e0f2f1; border-color: #e0f2f1; }
 
         .slide-graphic {
-            font-size: 80px;
-            opacity: 0.15;
+            position: relative;
+            z-index: 2;
+            width: 260px;
+            height: 170px;
             color: #ffffff;
-            padding-right: 20px;
+            margin-right: 4px;
+            flex-shrink: 0;
+        }
+        .slide-graphic::before {
+            content: "";
+            position: absolute;
+            right: 4px;
+            top: 4px;
+            width: 126px;
+            height: 118px;
+            background: rgba(224, 242, 241, 0.14);
+            border-radius: 22px;
+            transform: rotate(5deg);
+            box-shadow: -72px 62px 0 rgba(167, 255, 235, 0.09);
+        }
+        .slide-graphic .hero-icon {
+            position: absolute;
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            color: #e0f2f1;
+            font-size: 31px;
+            box-shadow: 0 12px 24px rgba(0, 77, 64, 0.13);
+            transform: rotate(var(--tilt, 0deg));
+        }
+        .slide-graphic .hero-icon::after {
+            content: "";
+            position: absolute;
+            right: -8px;
+            top: 8px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(167, 255, 235, 0.75);
+        }
+        .slide-graphic .hero-icon:nth-child(1) { top: 4px; right: 128px; --tilt: -8deg; animation-delay: -0.8s; }
+        .slide-graphic .hero-icon:nth-child(2) { top: 36px; right: 36px; width: 72px; height: 72px; font-size: 38px; --tilt: 7deg; animation-delay: -1.9s; background: rgba(255, 255, 255, 0.24); }
+        .slide-graphic .hero-icon:nth-child(3) { top: 100px; right: 142px; --tilt: 6deg; animation-delay: -3.1s; }
+        .slide-graphic .hero-icon:nth-child(4) { top: 116px; right: 54px; --tilt: -7deg; animation-delay: -4.2s; }
+        .slide-2 .slide-graphic .hero-icon { color: #a7ffeb; }
+        .slide-3 .slide-graphic .hero-icon { color: #e8f5e9; }
+        .slide-graphic::after {
+            content: "";
+            position: absolute;
+            right: 28px;
+            top: 16px;
+            width: 180px;
+            height: 138px;
+            border: 1px dashed rgba(255, 255, 255, 0.16);
+            border-radius: 22px;
+            transform: rotate(-7deg);
         }
 
         .carousel-dots {
@@ -256,6 +346,7 @@
             left: 50px;
             display: flex;
             gap: 8px;
+            z-index: 4;
         }
         .dot {
             width: 24px;
@@ -263,7 +354,7 @@
             background-color: rgba(255, 255, 255, 0.3);
             border-radius: 3px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 200ms ease, width 200ms ease;
         }
         .dot.active { background-color: #ffffff; }
 
@@ -317,7 +408,7 @@
             padding: 24px;
             text-align: center;
             cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 200ms ease, box-shadow 200ms ease;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -326,7 +417,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.01);
         }
         .action-card:hover {
-            transform: translateY(-2px);
             border-color: #00796b;
             box-shadow: 0 6px 18px rgba(0, 121, 107, 0.08);
         }
@@ -336,12 +426,11 @@
             font-size: 32px;
             color: #00667a;
             margin-bottom: 4px;
-            transition: transform 0.2s, color 0.2s;
+            transition: color 200ms ease;
         }
 
         .action-card:hover .tool-icon-main {
             color: #008ba3;
-            transform: scale(1.08);
         }
 
         .action-card.list-tool i { font-size: 28px; color: #00bfa5; margin-bottom: 4px; }
@@ -352,58 +441,157 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+            isolation: isolate;
         }
 
         .product-card {
             background: #ffffff;
             border-radius: 16px;
-            padding: 16px;
+            padding: 12px;
             display: flex;
-            align-items: center;
-            gap: 16px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
             border: 1px solid #eef2f5;
             box-shadow: 0 4px 12px rgba(0,0,0,0.01);
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
             cursor: pointer;
+            min-width: 0;
+            height: 100%;
+            transform-origin: center;
+            will-change: transform;
         }
         .product-card:hover {
-            transform: translateY(-2px);
+            transform: scale(1.015);
+            z-index: 2;
             border-color: #00796b;
-            box-shadow: 0 6px 18px rgba(0, 121, 107, 0.06);
+            box-shadow: 0 10px 24px rgba(0, 121, 107, 0.09);
+        }
+
+        .product-image-wrap {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 12px;
         }
 
         .item-image-thumb {
-            width: 52px;
-            height: 52px;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 0.72;
             border-radius: 12px;
             object-fit: cover;
             flex-shrink: 0;
             border: 1px solid #eef2f5;
         }
 
-        .item-details { display: flex; flex-direction: column; }
-        .item-name { font-size: 14px; font-weight: 700; color: #2c3e50; margin-bottom: 2px; }
-        .item-meta { font-size: 12px; color: #7f8c8d; font-weight: 500; }
+        .item-details { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
+        .item-topline { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .item-name { font-size: 15px; font-weight: 800; color: #1a2e2b; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .favorite-btn {
+            border: none;
+            background: rgba(255,255,255,0.9);
+            color: #00796b;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: background 200ms ease, color 200ms ease;
+        }
+        .favorite-btn:hover { background: #e0f2f1; }
+        .product-image-wrap .favorite-btn {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+        }
+        .item-pill-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+        .item-category-pill,
+        .item-availability,
+        .item-verified,
+        .item-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border-radius: 6px;
+            padding: 3px 7px;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+        .item-category-pill { background: #e0f2f1; color: #00564b; }
+        .item-availability { background: #ffffff; color: #00796b; border: 1px solid #b2dfdb; }
+        .item-verified { background: #e8f5e9; color: #2e7d32; }
+        .item-rating { background: #f4f7f6; color: #546e7a; }
+        .item-meta { font-size: 12px; color: #7f8c8d; font-weight: 500; line-height: 1.25; }
+        .item-price-row { display: flex; align-items: baseline; gap: 6px; }
+        .item-price { color: #00796b; font-size: 16px; font-weight: 800; }
+        .item-price-unit { color: #7f8c8d; font-size: 11px; font-weight: 600; }
+        .item-max-period,
+        .item-listed-by {
+            color: #546e7a;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .item-listed-by span { color: #00796b; font-weight: 800; }
+        .view-details-bar {
+            margin-top: auto;
+            border-radius: 8px;
+            background: #00564b;
+            color: #ffffff;
+            text-align: center;
+            padding: 9px 12px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            transition: background-color 200ms ease, color 200ms ease;
+        }
+        .product-card:hover .view-details-bar { background: #004d40; color: #a7ffeb; }
 
         .notification-item {
             grid-column: 1 / -1;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid #dfe9e7;
-            border-radius: 0;
-            padding: 18px 4px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-family: Arial, sans-serif;
-            font-weight: 400;
+            background: #ffffff;
+            border: 1px solid #e0eeec;
+            border-left: 4px solid #00796b;
+            border-radius: 12px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 42px 1fr;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0, 77, 64, 0.03);
+            transition: box-shadow 220ms ease, border-color 220ms ease;
         }
+        .notification-item:hover {
+            box-shadow: 0 8px 20px rgba(0, 121, 107, 0.08);
+        }
+        .notification-item.unread {
+            background: #f4fbfa;
+            border-color: #b2dfdb;
+            border-left-color: #00bfa5;
+        }
+        .notification-item.type-action { border-left-color: #00bfa5; }
+        .notification-item.type-warning { border-left-color: #4caf50; }
+        .notification-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #e0f2f1;
+            color: #00796b;
+            display: grid;
+            place-items: center;
+            font-size: 21px;
+        }
+        .notification-content { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+        .notification-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .notification-title { font-size: 15px; font-weight: 800; color: #1a2e2b; }
 
         .notification-text {
-            font-family: Arial, sans-serif;
-            font-size: 15px;
-            font-weight: 400;
-            color: #2c3e50;
+            font-size: 14px;
+            font-weight: 500;
+            color: #546e7a;
             line-height: 1.55;
         }
 
@@ -414,9 +602,9 @@
         }
 
         .notification-time {
-            align-self: flex-end;
             font-size: 11px;
             color: #7f8c8d;
+            white-space: nowrap;
         }
 
         .notification-actions {
@@ -433,13 +621,13 @@
             color: #ffffff;
             font-weight: 700;
             cursor: pointer;
-            transition: opacity 0.18s, transform 0.18s, background 0.18s;
+            transition: opacity 180ms ease, background 180ms ease, box-shadow 180ms ease;
         }
+        .notification-actions button:hover { box-shadow: 0 6px 14px rgba(0, 77, 64, 0.12); }
 
         .notification-actions button:active,
         .notification-actions button.action-done {
             opacity: 0.58;
-            transform: scale(0.98);
         }
 
         .notification-actions button:disabled {
@@ -682,6 +870,42 @@
         .search-overlay-input.visible { display: block; }
         .search-overlay-input:focus { border-color: #00796b; }
 
+        .site-footer {
+            margin: 34px -30px -30px;
+            background: #1a2e2b;
+            color: #dfe9e7;
+            border-radius: 0;
+            overflow: hidden;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.4fr repeat(3, 1fr);
+            gap: 22px;
+            padding: 26px 28px 20px;
+        }
+        .footer-brand { color: #ffffff; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+        .footer-copy { color: #b2dfdb; font-size: 13px; line-height: 1.55; max-width: 300px; }
+        .footer-title { color: #a7ffeb; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .footer-links { display: flex; flex-direction: column; gap: 8px; }
+        .footer-links a,
+        .footer-links span {
+            color: #dfe9e7;
+            text-decoration: none;
+            font-size: 13px;
+            line-height: 1.35;
+            transition: color 200ms ease;
+        }
+        .footer-links a:hover { color: #a7ffeb; }
+        .footer-bottom {
+            border-top: 1px solid rgba(224, 242, 241, 0.12);
+            padding: 12px 28px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            color: #b2dfdb;
+            font-size: 12px;
+        }
+
         /* Hide sidebar utility class for hamburger action */
         .sidebar.hidden { display: none; }
 
@@ -691,6 +915,27 @@
             .conversation-pane { border-right: none; border-bottom: 1px solid #eef2f5; max-height: 260px; }
             .sidebar { display: none; }
             .sidebar.mobile-show { display: flex; position: absolute; z-index: 10; height: calc(100vh - 70px); }
+            .slide { padding: 0 26px; }
+            .slide-info { max-width: 76%; }
+            .slide h2 { font-size: 27px; }
+            .slide-graphic { width: 190px; height: 150px; margin-right: 0; }
+            .slide-graphic .hero-icon { width: 48px; height: 48px; font-size: 25px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 560px) {
+            .content-area { padding: 20px; }
+            .carousel-container { height: 230px; border-radius: 16px; }
+            .slide { padding: 24px; align-items: flex-start; }
+            .slide-info { max-width: 100%; }
+            .slide h2 { font-size: 25px; }
+            .slide-graphic { display: none; }
+            .carousel-dots { left: 24px; }
+            .notification-item { grid-template-columns: 1fr; }
+            .notification-head { align-items: flex-start; flex-direction: column; gap: 4px; }
+            .footer-grid { grid-template-columns: 1fr; padding: 24px; }
+            .footer-bottom { flex-direction: column; padding: 12px 24px; }
+            .site-footer { margin: 34px -20px -20px; }
         }
     </style>
 </head>
@@ -739,32 +984,53 @@
         <div id="promoBannerSection">
             <div class="carousel-container">
                 <div class="carousel-track" id="carouselTrack">
-                    <div class="slide slide-1">
+                    <div class="slide slide-1 active">
                         <div class="slide-info">
                             <div class="slide-tag">Smart Thinking</div>
                             <h2>Why buy when you can borrow?</h2>
                             <p>Save money, reduce waste, and help your community.</p>
-                            <button class="slide-btn" onclick="window.location.href='WhyToolMates.html'">Learn more</button>
+                            <div class="slide-actions">
+                                <button class="slide-btn" onclick="window.location.href='WhyToolMates.html'">Learn more</button>
+                            </div>
                         </div>
-                        <div class="slide-graphic"><i class="ti ti-bulb"></i></div>
+                        <div class="slide-graphic" aria-hidden="true">
+                            <span class="hero-icon"><i class="ti ti-camera"></i></span>
+                            <span class="hero-icon"><i class="ti ti-hammer"></i></span>
+                            <span class="hero-icon"><i class="ti ti-device-laptop"></i></span>
+                            <span class="hero-icon"><i class="ti ti-settings"></i></span>
+                        </div>
                     </div>
                     <div class="slide slide-2">
                         <div class="slide-info">
                             <div class="slide-tag">Earn Cash</div>
                             <h2>List Your Idle Tools</h2>
                             <p>Turn your tools into passive campus cash safely.</p>
-                            <button class="slide-btn" onclick="window.location.href='ListATool.html'">Get started</button>
+                            <div class="slide-actions">
+                                <button class="slide-btn" onclick="window.location.href='ListATool.html'">Get started</button>
+                            </div>
                         </div>
-                        <div class="slide-graphic"><i class="ti ti-coin"></i></div>
+                        <div class="slide-graphic" aria-hidden="true">
+                            <span class="hero-icon"><i class="ti ti-cash"></i></span>
+                            <span class="hero-icon"><i class="ti ti-coin"></i></span>
+                            <span class="hero-icon"><i class="ti ti-receipt"></i></span>
+                            <span class="hero-icon"><i class="ti ti-wallet"></i></span>
+                        </div>
                     </div>
                     <div class="slide slide-3">
                         <div class="slide-info">
                             <div class="slide-tag">Safety First</div>
                             <h2>Join the Community</h2>
                             <p>Connecting students to share physical resources efficiently.</p>
-                            <button class="slide-btn" onclick="window.location.href='CommunityGuide.html'">Read rules</button>
+                            <div class="slide-actions">
+                                <button class="slide-btn" onclick="window.location.href='CommunityGuide.html'">Read rules</button>
+                            </div>
                         </div>
-                        <div class="slide-graphic"><i class="ti ti-shield-check"></i></div>
+                        <div class="slide-graphic" aria-hidden="true">
+                            <span class="hero-icon"><i class="ti ti-shield-check"></i></span>
+                            <span class="hero-icon"><i class="ti ti-user-check"></i></span>
+                            <span class="hero-icon"><i class="ti ti-message-circle"></i></span>
+                            <span class="hero-icon"><i class="ti ti-calendar-check"></i></span>
+                        </div>
                     </div>
                 </div>
                 <div class="carousel-dots">
@@ -800,6 +1066,45 @@
 
         <section class="items-grid" id="itemsGrid">
         </section>
+
+        <footer class="site-footer">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">ToolMates</div>
+                    <p class="footer-copy">Connecting students through safe and affordable campus tool sharing.</p>
+                </div>
+                <div>
+                    <div class="footer-title">Quick Links</div>
+                    <div class="footer-links">
+                        <a href="Browse Tools.html">Browse Tools</a>
+                        <a href="ListATool.html">List a Tool</a>
+                        <a href="RentalHistory.html">Rental History</a>
+                        <a href="UserReviews.html">Reviews</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="footer-title">Support</div>
+                    <div class="footer-links">
+                        <a href="mailto:toolmates.support@gmail.com">Contact Us</a>
+                        <span>toolmates.support@gmail.com</span>
+                        <a href="CommunityGuide.html">Campus Guidelines</a>
+                        <a href="PrivacyPolicy.html">Privacy Policy</a>
+                        <a href="TermsOfService.html">Terms of Service</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="footer-title">Follow</div>
+                    <div class="footer-links">
+                        <a href="https://github.com/bishakhabibha/ToolMates" aria-label="ToolMates GitHub">GitHub</a>
+                        <a href="mailto:toolmates.support@gmail.com">Email</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 ToolMates.</span>
+                <span>Built for students.</span>
+            </div>
+        </footer>
 
     </main>
 </div>
@@ -838,7 +1143,7 @@
     })();
     </script><script>
     let activeSlideIndex = 0;
-    const slidesCount = 3;
+    let carouselTimer = null;
     let cachedToolsList = [];
     let currentUser = JSON.parse(localStorage.getItem('toolmatesUser') || 'null');
     let latestNotifications = [];
@@ -848,9 +1153,13 @@
     let activePickupButton = null;
 
     function jumpToSlide(index) {
-        activeSlideIndex = index;
-        const track = document.getElementById('carouselTrack');
-        if(track) track.style.transform = `translateX(-${activeSlideIndex * 33.3333}%)`;
+        const slides = document.querySelectorAll('.slide');
+        if (!slides.length) return;
+
+        activeSlideIndex = (index + slides.length) % slides.length;
+        slides.forEach((slide, idx) => {
+            slide.classList.toggle('active', idx === activeSlideIndex);
+        });
 
         const dots = document.querySelectorAll('.dot');
         dots.forEach((dot, idx) => {
@@ -858,13 +1167,48 @@
         });
     }
 
-    setInterval(() => {
-        const track = document.getElementById('carouselTrack');
-        if (track) {
-            activeSlideIndex = (activeSlideIndex + 1) % slidesCount;
-            jumpToSlide(activeSlideIndex);
-        }
-    }, 5000);
+    function startCarouselAutoplay() {
+        if (carouselTimer) clearInterval(carouselTimer);
+        jumpToSlide(activeSlideIndex);
+        carouselTimer = setInterval(() => {
+            jumpToSlide(activeSlideIndex + 1);
+        }, 4500);
+    }
+
+    document.addEventListener('DOMContentLoaded', startCarouselAutoplay);
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char]));
+    }
+
+    function formatRelativeTime(value) {
+        if (!value) return '';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+        if (seconds < 60) return 'Just now';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days}d ago`;
+        return date.toLocaleDateString();
+    }
+
+    function getToolRating(tool) {
+        return tool.rating || tool.averageRating || tool.ratingStars || null;
+    }
+
+    function isToolVerified(tool) {
+        return tool.verified === true || tool.ownerVerified === true || tool.isVerified === true;
+    }
 
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebarPanel');
@@ -931,18 +1275,36 @@
             card.className = 'product-card';
 
             const fallbackImage = 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=150&auto=format&fit=crop&q=80';
-
-            let imgUrl = fallbackImage;
-            if (tool.imageUrls && tool.imageUrls.length > 0 && tool.imageUrls[0]) {
-                imgUrl = tool.imageUrls[0];
-            }
+            const imgUrl = (tool.imageUrls && tool.imageUrls.length > 0 && tool.imageUrls[0])
+                    ? tool.imageUrls[0] : fallbackImage;
+            const rating = getToolRating(tool);
+            const verified = isToolVerified(tool);
+            const isAvailable = tool.active !== false;
+            const ratingNumber = Number(rating);
+            const ratingText = rating && !Number.isNaN(ratingNumber) ? ratingNumber.toFixed(1) : rating;
 
             card.innerHTML = `
-                <img src="${imgUrl}" alt="${tool.name || 'Tool'}" class="item-image-thumb" />
+                <div class="product-image-wrap">
+                    <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(tool.name || 'Tool')}" class="item-image-thumb" />
+                    <button type="button" class="favorite-btn" aria-label="Save ${escapeHtml(tool.name || 'tool')}" onclick="event.stopPropagation(); this.classList.toggle('saved');"><i class="ti ti-heart"></i></button>
+                </div>
                 <div class="item-details">
-                    <span class="item-name">${tool.name || 'Unnamed Tool'}</span>
-                    <span class="item-meta">${tool.category || 'General'} · Tk ${tool.pricePerDay || 0}/day</span>
-                    <span class="item-meta" style="color: #e67e22; font-size: 11px;">Max Period: ${tool.maxRentingPeriod || 0} days</span>
+                    <div class="item-topline">
+                        <span class="item-name">${escapeHtml(tool.name || 'Unnamed Tool')}</span>
+                    </div>
+                    <div class="item-pill-row">
+                        <span class="item-category-pill">${escapeHtml(tool.category || 'General')}</span>
+                        <span class="item-availability">${isAvailable ? 'Available' : 'Unavailable'}</span>
+                        ${rating ? `<span class="item-rating"><i class="ti ti-star-filled"></i>${escapeHtml(ratingText)}</span>` : ''}
+                        ${verified ? '<span class="item-verified"><i class="ti ti-circle-check"></i>Verified</span>' : ''}
+                    </div>
+                    <div class="item-price-row">
+                        <span class="item-price">Tk ${escapeHtml(tool.pricePerDay || 0)}</span>
+                        <span class="item-price-unit">/ day</span>
+                    </div>
+                    <div class="item-max-period">Max Rent Period: ${escapeHtml(tool.maxRentingPeriod || 0)} days</div>
+                    <div class="item-listed-by">Listed By: <span>${escapeHtml(tool.ownerId || 'UserID')}</span></div>
+                    <div class="view-details-bar">View Details</div>
                 </div>
             `;
             card.onclick = () => window.location.href = `ToolInfo.html?id=${tool.id}`;
@@ -1030,14 +1392,22 @@
         grid.innerHTML = '';
 
         if (!notifications || notifications.length === 0) {
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">No notifications yet.</p>';
+            grid.innerHTML = `
+                <div class="notification-item" style="text-align:left;">
+                    <div class="notification-icon"><i class="ti ti-circle-check"></i></div>
+                    <div class="notification-content">
+                        <div class="notification-title">You're all caught up!</div>
+                        <div class="notification-text">We'll notify you whenever something important happens.</div>
+                    </div>
+                </div>`;
             return;
         }
 
         notifications.forEach(notification => {
             const item = document.createElement('div');
-            item.className = 'notification-item';
             const type = notification.notificationType;
+            const meta = getNotificationMeta(type);
+            item.className = `notification-item ${meta.tone} ${notification.read ? '' : 'unread'}`;
             const isRentalRequest = type === 'rental_request' && notification.rentalRequestId;
             const isPickupDetails = type === 'pickup_details_available' && notification.rentalRequestId;
             const isPickupConfirmation = ['pickup_confirmation_owner', 'pickup_confirmation_borrower', 'pickup_confirmation_waiting'].includes(type) && notification.rentalRequestId;
@@ -1051,51 +1421,57 @@
             const paymentAnswered = userIsOwner ? notification.ownerPaymentConfirmation : notification.borrowerPaymentConfirmation;
             const returnAnswered = status !== 'AWAITING_RETURN' && status !== 'RETURN_CONFIRMATION'
                     || (userIsOwner ? notification.ownerReturnConfirmedAt : notification.borrowerReturnConfirmedAt);
-            const createdAt = notification.createdAt ? new Date(notification.createdAt).toLocaleString() : '';
+            const relativeTime = formatRelativeTime(notification.createdAt);
             const requestedDate = formatNotificationDate(notification.pickupDate);
             const messageHtml = isRentalRequest
-                    ? `<a href="Profile.html?studentId=${encodeURIComponent(notification.renterStudentId || '')}">${notification.renterStudentId || 'User'} (${notification.renterName || 'Unknown'})</a> wants to rent your <a href="ToolInfo.html?id=${notification.toolId || ''}">${notification.toolName || 'tool'}</a> from ${requestedDate || 'the pickup date'}.`
-                    : `${notification.messageText || 'Notification'}${notification.toolName ? ` <a href="ToolInfo.html?id=${notification.toolId || ''}">${notification.toolName}</a>` : ''}`;
+                    ? `<a href="Profile.html?studentId=${encodeURIComponent(notification.renterStudentId || '')}">${escapeHtml(notification.renterStudentId || 'User')} (${escapeHtml(notification.renterName || 'Unknown')})</a> wants to rent your <a href="ToolInfo.html?id=${notification.toolId || ''}">${escapeHtml(notification.toolName || 'tool')}</a> from ${escapeHtml(requestedDate || 'the pickup date')}.`
+                    : `${escapeHtml(notification.messageText || 'Notification')}${notification.toolName ? ` <a href="ToolInfo.html?id=${notification.toolId || ''}">${escapeHtml(notification.toolName)}</a>` : ''}`;
             item.innerHTML = `
-                <div class="notification-text">${messageHtml}</div>
-                ${notification.rentalStatus ? `<span class="status-pill">${notification.rentalStatus.replaceAll('_', ' ')}</span>` : ''}
-                ${isRentalRequest ? `
-                    <div class="notification-actions">
-                        <button ${status !== 'PENDING' ? 'disabled' : ''} onclick="acceptRentalRequest(${notification.rentalRequestId}, this)">Accept Request</button>
-                        <button ${status === 'REJECTED' ? 'disabled' : ''} class="reject-btn" onclick="rejectRentalRequest(${notification.rentalRequestId}, this)">Reject Request</button>
-                        <button class="reject-btn" onclick="openMessageWithUser(${notification.borrowerUserId || 'null'})">Message Borrower</button>
-                    </div>` : ''}
-                ${isPickupDetails ? `
-                    <div class="notification-actions">
-                        <button onclick="window.location.href='PickupDetails.html?rentalRequestId=${notification.rentalRequestId}'">View Pickup Details</button>
-                    </div>` : ''}
-                ${isPickupConfirmation ? `
-                    <div class="notification-actions">
-                        <button ${pickupAnswered ? 'disabled' : ''} onclick="confirmPickup(${notification.rentalRequestId}, true, this)">YES</button>
-                        <button ${pickupAnswered ? 'disabled' : ''} class="reject-btn" onclick="confirmPickup(${notification.rentalRequestId}, false, this)">NO</button>
-                    </div>` : ''}
-                ${isPaymentConfirmation ? `
-                    <div class="notification-actions">
-                        <button ${paymentAnswered ? 'disabled' : ''} onclick="confirmPayment(${notification.rentalRequestId}, true, this)">YES</button>
-                        <button ${paymentAnswered ? 'disabled' : ''} class="reject-btn" onclick="confirmPayment(${notification.rentalRequestId}, false, this)">NO</button>
-                    </div>` : ''}
-                ${isReturnConfirmation ? `
-                    <div class="notification-actions">
-                        <button ${returnAnswered ? 'disabled' : ''} onclick="confirmReturn(${notification.rentalRequestId}, true, this)">Yes</button>
-                        <button ${returnAnswered ? 'disabled' : ''} class="reject-btn" onclick="confirmReturn(${notification.rentalRequestId}, false, this)">No</button>
-                    </div>` : ''}
-                ${isReportRequired ? `
-                    <div class="notification-actions">
-                        <button onclick="openReportPage(${notification.rentalRequestId})">Report User</button>
-                    </div>` : ''}
-                ${isIssue ? `
-                    <div class="notification-actions">
-                        <button onclick="showMessagesPanel(document.querySelectorAll('.menu-item')[6])">Continue Chat</button>
-                        <button class="reject-btn" onclick="openReportPage(${notification.rentalRequestId})">Report User</button>
-                        ${userIsOwner && ['PICKUP_DISPUTE', 'PICKUP_FAILED'].includes(status) ? `<button onclick="openPickupModal(${notification.rentalRequestId}, this)">Reschedule Pickup</button>` : ''}
-                        <button onclick="cancelRental(${notification.rentalRequestId}, this)">Cancel Rental</button>
-                    </div>` : ''}
-                <div class="notification-time">${createdAt}</div>
+                <div class="notification-icon"><i class="ti ${meta.icon}"></i></div>
+                <div class="notification-content">
+                    <div class="notification-head">
+                        <div class="notification-title">${meta.title}</div>
+                        <div class="notification-time">${relativeTime}</div>
+                    </div>
+                    <div class="notification-text">${messageHtml}</div>
+                    ${notification.rentalStatus ? `<span class="status-pill">${escapeHtml(notification.rentalStatus.replaceAll('_', ' '))}</span>` : ''}
+                    ${isRentalRequest ? `
+                        <div class="notification-actions">
+                            <button ${status !== 'PENDING' ? 'disabled' : ''} onclick="acceptRentalRequest(${notification.rentalRequestId}, this)">Accept Request</button>
+                            <button ${status === 'REJECTED' ? 'disabled' : ''} class="reject-btn" onclick="rejectRentalRequest(${notification.rentalRequestId}, this)">Reject Request</button>
+                            <button class="reject-btn" onclick="openMessageWithUser(${notification.borrowerUserId || 'null'})">Message Borrower</button>
+                        </div>` : ''}
+                    ${isPickupDetails ? `
+                        <div class="notification-actions">
+                            <button onclick="window.location.href='PickupDetails.html?rentalRequestId=${notification.rentalRequestId}'">View Pickup Details</button>
+                        </div>` : ''}
+                    ${isPickupConfirmation ? `
+                        <div class="notification-actions">
+                            <button ${pickupAnswered ? 'disabled' : ''} onclick="confirmPickup(${notification.rentalRequestId}, true, this)">YES</button>
+                            <button ${pickupAnswered ? 'disabled' : ''} class="reject-btn" onclick="confirmPickup(${notification.rentalRequestId}, false, this)">NO</button>
+                        </div>` : ''}
+                    ${isPaymentConfirmation ? `
+                        <div class="notification-actions">
+                            <button ${paymentAnswered ? 'disabled' : ''} onclick="confirmPayment(${notification.rentalRequestId}, true, this)">YES</button>
+                            <button ${paymentAnswered ? 'disabled' : ''} class="reject-btn" onclick="confirmPayment(${notification.rentalRequestId}, false, this)">NO</button>
+                        </div>` : ''}
+                    ${isReturnConfirmation ? `
+                        <div class="notification-actions">
+                            <button ${returnAnswered ? 'disabled' : ''} onclick="confirmReturn(${notification.rentalRequestId}, true, this)">Yes</button>
+                            <button ${returnAnswered ? 'disabled' : ''} class="reject-btn" onclick="confirmReturn(${notification.rentalRequestId}, false, this)">No</button>
+                        </div>` : ''}
+                    ${isReportRequired ? `
+                        <div class="notification-actions">
+                            <button onclick="openReportPage(${notification.rentalRequestId})">Report User</button>
+                        </div>` : ''}
+                    ${isIssue ? `
+                        <div class="notification-actions">
+                            <button onclick="showMessagesPanel(document.querySelectorAll('.menu-item')[6])">Continue Chat</button>
+                            <button class="reject-btn" onclick="openReportPage(${notification.rentalRequestId})">Report User</button>
+                            ${userIsOwner && ['PICKUP_DISPUTE', 'PICKUP_FAILED'].includes(status) ? `<button onclick="openPickupModal(${notification.rentalRequestId}, this)">Reschedule Pickup</button>` : ''}
+                            <button onclick="cancelRental(${notification.rentalRequestId}, this)">Cancel Rental</button>
+                        </div>` : ''}
+                </div>
             `;
             grid.appendChild(item);
         });
