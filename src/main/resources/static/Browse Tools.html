@@ -118,6 +118,8 @@
       margin: 0 auto;
       padding: 28px 24px;
       flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .meta-sort-row {
@@ -174,6 +176,9 @@
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 24px;
       isolation: isolate;
+      align-content: start;
+      flex: 1;
+      margin-bottom: 34px;
     }
 
     .tool-card {
@@ -267,7 +272,7 @@
 
     .site-footer {
       width: 100vw;
-      margin: 34px calc(50% - 50vw) -28px;
+      margin: auto calc(50% - 50vw) -28px;
       background: #1a2e2b;
       color: #dfe9e7;
       border-radius: 0;

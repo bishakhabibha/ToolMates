@@ -205,6 +205,8 @@
             color: #2c3e50;
             padding: 30px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         /* --- Slider Carousel Banner --- */
@@ -440,6 +442,9 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             isolation: isolate;
+            align-content: start;
+            flex: 1;
+            margin-bottom: 34px;
         }
 
         .product-card {
@@ -851,7 +856,7 @@
         .search-overlay-input:focus { border-color: #00796b; }
 
         .site-footer {
-            margin: 34px -30px -30px;
+            margin: auto -30px -30px;
             background: #1a2e2b;
             color: #dfe9e7;
             border-radius: 0;
@@ -915,7 +920,7 @@
             .notification-head { align-items: flex-start; flex-direction: column; gap: 4px; }
             .footer-grid { grid-template-columns: 1fr; padding: 24px; }
             .footer-bottom { flex-direction: column; padding: 12px 24px; }
-            .site-footer { margin: 34px -20px -20px; }
+            .site-footer { margin: auto -20px -20px; }
         }
     </style>
 </head>
