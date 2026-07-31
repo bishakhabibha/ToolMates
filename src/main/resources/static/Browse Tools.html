@@ -179,13 +179,16 @@
     .tool-card {
       background: #ffffff;
       border-radius: 16px;
-      border: 1.5px solid #e0eeec;
-      overflow: hidden;
-      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      position: relative;
+      align-items: stretch;
+      gap: 12px;
+      border: 1px solid #eef2f5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
       cursor: pointer;
+      min-width: 0;
       height: 100%;
       transform-origin: center;
       will-change: transform;
@@ -194,109 +197,34 @@
       transform: scale(1.015);
       z-index: 2;
       border-color: #00796b;
-      box-shadow: 0 12px 28px rgba(0, 121, 107, 0.11);
+      box-shadow: 0 10px 24px rgba(0, 121, 107, 0.09);
     }
 
-    .image-container {
+    .product-image-wrap {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .item-image-thumb {
       width: 100%;
       height: auto;
       aspect-ratio: 1 / 0.72;
-      position: relative;
-      background-color: #d4edea;
-      overflow: hidden;
-    }
-    .tool-img { width: 100%; height: 100%; object-fit: cover; }
-
-    .favorite-btn {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      border: none;
-      background: rgba(255,255,255,0.9);
-      color: #00796b;
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: background 200ms ease, color 200ms ease;
-    }
-    .favorite-btn:hover,
-    .favorite-btn.saved { background: #e0f2f1; }
-
-    .status-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      padding: 4px 9px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .status-available {
-      background-color: rgba(255,255,255,0.88);
-      color: #00796b;
-      border: 1px solid #a7ffeb;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid #eef2f5;
     }
 
-    .card-body {
-      padding: 14px 15px 15px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .tool-cat {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 4px 8px;
-      border-radius: 6px;
-      width: max-content;
-      margin-bottom: 8px;
-      letter-spacing: 0.4px;
-    }
-    .tool-info-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      flex-wrap: wrap;
-      margin-bottom: 8px;
-    }
-    .inline-availability {
-      display: inline-flex;
-      align-items: center;
-      border-radius: 6px;
-      padding: 4px 8px;
-      background: #ffffff;
-      color: #00796b;
-      border: 1px solid #b2dfdb;
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-
-    .tool-title {
-      font-size: 17px;
-      font-weight: 800;
-      color: #1a2e2b;
-      margin-bottom: 7px;
-      line-height: 1.3;
-    }
-
-    .tool-meta-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      flex-wrap: wrap;
-      margin-bottom: 8px;
-    }
-    .rating-pill,
-    .verified-pill {
+    .item-details { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
+    .item-topline { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .item-name { font-size: 15px; font-weight: 800; color: #1a2e2b; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .item-pill-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .item-category-pill,
+    .item-availability,
+    .item-verified,
+    .item-rating {
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -304,44 +232,32 @@
       padding: 3px 7px;
       font-size: 10px;
       font-weight: 800;
+      line-height: 1;
       text-transform: uppercase;
     }
-    .rating-pill { background: #f4f7f6; color: #546e7a; }
-    .verified-pill { background: #e8f5e9; color: #2e7d32; }
-
-    .tool-rent-details {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-      margin-bottom: 12px;
-    }
-    .price-tag { font-size: 21px; font-weight: 800; color: #00796b; }
-    .price-unit { font-size: 12px; color: #7f8c8d; font-weight: 500; }
-
-    .card-footer {
-      margin-top: auto;
-      font-size: 12px;
+    .item-category-pill { background: #e0f2f1; color: #00564b; }
+    .item-availability { background: #ffffff; color: #00796b; border: 1px solid #b2dfdb; }
+    .item-verified { background: #e8f5e9; color: #2e7d32; }
+    .item-rating { background: #f4f7f6; color: #546e7a; }
+    .item-price-row { display: flex; align-items: baseline; gap: 6px; }
+    .item-price { color: #00796b; font-size: 16px; font-weight: 800; }
+    .item-price-unit { color: #7f8c8d; font-size: 11px; font-weight: 600; }
+    .item-max-period,
+    .item-listed-by {
       color: #546e7a;
+      font-size: 12px;
       font-weight: 600;
       line-height: 1.3;
     }
-    .max-period { color: #546e7a; font-weight: 600; }
-    .listed-by {
-      margin-top: 7px;
-      font-size: 12px;
-      color: #546e7a;
-      font-weight: 600;
-      line-height: 1.3;
-    }
-    .listed-by span { color: #00796b; font-weight: 800; }
+    .item-listed-by span { color: #00796b; font-weight: 800; }
 
     .view-details-bar {
-      margin-top: 12px;
+      margin-top: auto;
       border-radius: 8px;
       background: #00564b;
       color: #ffffff;
       text-align: center;
-      padding: 10px 12px;
+      padding: 9px 12px;
       font-size: 12px;
       font-weight: 800;
       letter-spacing: 0.2px;
@@ -597,14 +513,6 @@
       return;
     }
 
-    const categoryColors = {
-      'repair & build': { bg: '#004d40', text: '#a7ffeb' },
-      'photography': { bg: '#00796b', text: '#e0f2f1' },
-      'technology': { bg: '#00695c', text: '#b2dfdb' },
-      'heavy equipment': { bg: '#00332c', text: '#80cbc4' },
-      'default': { bg: '#144d44', text: '#b4f0e6' }
-    };
-
     tools.forEach(tool => {
       const card = document.createElement('div');
       card.className = 'tool-card';
@@ -612,8 +520,6 @@
       const activeImg = (tool.imageUrls && tool.imageUrls.length > 0 && tool.imageUrls[0])
               ? tool.imageUrls[0] : defaultImg;
 
-      const rawCat = (tool.category || 'General').toLowerCase().trim();
-      const scheme = categoryColors[rawCat] || categoryColors['default'];
       const rating = getToolRating(tool);
       const ratingNumber = Number(rating);
       const ratingText = rating && !Number.isNaN(ratingNumber) ? ratingNumber.toFixed(1) : rating;
@@ -621,28 +527,25 @@
       const isAvailable = tool.active !== false;
 
       card.innerHTML = `
-        <div class="image-container">
-          <img src="${escapeHtml(activeImg)}" alt="${escapeHtml(tool.name || 'Tool')}" class="tool-img" />
-          <button type="button" class="favorite-btn" aria-label="Save ${escapeHtml(tool.name || 'tool')}" onclick="event.stopPropagation(); this.classList.toggle('saved');"><i class="ti ti-heart"></i></button>
+        <div class="product-image-wrap">
+          <img src="${escapeHtml(activeImg)}" alt="${escapeHtml(tool.name || 'Tool')}" class="item-image-thumb" />
         </div>
-        <div class="card-body">
-          <h3 class="tool-title">${escapeHtml(tool.name || 'Unnamed Tool')}</h3>
-          <div class="tool-info-row">
-            <span class="tool-cat" style="background-color: ${scheme.bg}; color: ${scheme.text};">${escapeHtml(tool.category || 'General')}</span>
-            <span class="inline-availability">${isAvailable ? 'Available' : 'Unavailable'}</span>
+        <div class="item-details">
+          <div class="item-topline">
+            <span class="item-name">${escapeHtml(tool.name || 'Unnamed Tool')}</span>
           </div>
-          ${rating || verified ? `<div class="tool-meta-row">
-            ${rating ? `<span class="rating-pill"><i class="ti ti-star-filled"></i>${escapeHtml(ratingText)}</span>` : ''}
-            ${verified ? '<span class="verified-pill"><i class="ti ti-circle-check"></i>Verified</span>' : ''}
-          </div>` : ''}
-          <div class="tool-rent-details">
-            <span class="price-tag">Tk ${escapeHtml(tool.pricePerDay || 0)}</span>
-            <span class="price-unit">/ day</span>
+          <div class="item-pill-row">
+            <span class="item-category-pill">${escapeHtml(tool.category || 'General')}</span>
+            <span class="item-availability">${isAvailable ? 'Available' : 'Unavailable'}</span>
+            ${rating ? `<span class="item-rating"><i class="ti ti-star-filled"></i>${escapeHtml(ratingText)}</span>` : ''}
+            ${verified ? '<span class="item-verified"><i class="ti ti-circle-check"></i>Verified</span>' : ''}
           </div>
-          <div class="card-footer">
-            <span>Max Rent Period: <span class="max-period">${escapeHtml(tool.maxRentingPeriod || 0)} days</span></span>
+          <div class="item-price-row">
+            <span class="item-price">Tk ${escapeHtml(tool.pricePerDay || 0)}</span>
+            <span class="item-price-unit">/ day</span>
           </div>
-          <div class="listed-by">Listed By: <span>${escapeHtml(tool.ownerId || 'UserID')}</span></div>
+          <div class="item-max-period">Max Rent Period: ${escapeHtml(tool.maxRentingPeriod || 0)} days</div>
+          <div class="item-listed-by">Listed By: <span>${escapeHtml(tool.ownerId || 'UserID')}</span></div>
           <div class="view-details-bar">View Details</div>
         </div>`;
 

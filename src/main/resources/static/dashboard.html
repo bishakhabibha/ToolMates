@@ -941,17 +941,21 @@
 
     <aside class="sidebar" id="sidebarPanel">
         <div class="sidebar-section-title">Navigate</div>
-        <div onclick="filterCategory('Home', this)" class="menu-item active"><i class="ti ti-home"></i> Home</div>
+        <div onclick="filterCategory('Home', this)" class="menu-item active" id="homeMenuItem"><i class="ti ti-home"></i> Home</div>
 
         <div class="sidebar-section-title">Categories</div>
         <div onclick="filterCategory('Repair & Build', this)" class="menu-item"><i class="ti ti-hammer"></i> Repair & Build</div>
         <div onclick="filterCategory('Photography', this)" class="menu-item"><i class="ti ti-camera"></i> Photography</div>
         <div onclick="filterCategory('Technology', this)" class="menu-item"><i class="ti ti-device-laptop"></i> Technology</div>
         <div onclick="filterCategory('Heavy Equipment', this)" class="menu-item"><i class="ti ti-shovel"></i> Heavy Equipment</div>
+        <div onclick="filterCategory('Arts & Crafts', this)" class="menu-item"><i class="ti ti-palette"></i> Arts & Crafts</div>
+        <div onclick="filterCategory('Gardening', this)" class="menu-item"><i class="ti ti-plant-2"></i> Gardening</div>
+        <div onclick="filterCategory('Stationery', this)" class="menu-item"><i class="ti ti-notebook"></i> Stationery</div>
+        <div onclick="filterCategory('General', this)" class="menu-item"><i class="ti ti-box"></i> General</div>
 
         <div class="sidebar-section-title">Other</div>
         <div onclick="showNotificationPanel(this)" class="menu-item auth-only" id="notificationMenuItem"><i class="ti ti-bell"></i> Notifications <span class="unread-dot" id="notificationDot"></span></div>
-        <div onclick="showMessagesPanel(this)" class="menu-item auth-only"><i class="ti ti-messages"></i> My Messages</div>
+        <div onclick="showMessagesPanel(this)" class="menu-item auth-only" id="messagesMenuItem"><i class="ti ti-messages"></i> My Messages</div>
         <div onclick="window.location.href='RentalHistory.html'" class="menu-item auth-only"><i class="ti ti-history"></i> Rental History</div>
         <div onclick="window.location.href='UserReviews.html'" class="menu-item"><i class="ti ti-star"></i> Reviews</div>
         <div onclick="window.location.href='Profile.html'" class="menu-item auth-only"><i class="ti ti-user"></i> My Account</div>
@@ -1039,7 +1043,7 @@
             <div>
                 <h2 class="section-title" id="gridDisplayTitle">Recently listed</h2>
             </div>
-            <button id="backToHomeBtn" class="back-home-btn" style="display: none;" onclick="filterCategory('Home', document.querySelectorAll('.menu-item')[0])">
+            <button id="backToHomeBtn" class="back-home-btn" style="display: none;" onclick="filterCategory('Home', document.getElementById('homeMenuItem'))">
                 <i class="ti ti-arrow-left"></i> Home
             </button>
         </div>
@@ -1203,6 +1207,11 @@
     function filterCategory(category, element) {
         document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
         if (element) element.classList.add('active');
+        if (category === 'Home') {
+            history.replaceState(null, '', 'dashboard.html');
+        } else if (!['All', 'Reviews', 'My Account'].includes(category)) {
+            history.replaceState(null, '', `dashboard.html?category=${encodeURIComponent(category)}`);
+        }
 
         const banner = document.getElementById('promoBannerSection');
         const title = document.getElementById('gridDisplayTitle');
@@ -1296,13 +1305,28 @@
             });
             if (response.ok) {
                 cachedToolsList = await response.json();
-                displayTools(cachedToolsList);
+                const requestedCategory = getRequestedCategory();
+                if (requestedCategory) {
+                    const categoryItem = findCategoryMenuItem(requestedCategory);
+                    filterCategory(requestedCategory, categoryItem);
+                } else {
+                    displayTools(cachedToolsList);
+                }
             } else {
                 console.error('Backend server responded with error:', response.status);
             }
         } catch (error) {
             console.error('Connection to backend failed. Check if server is running:', error);
         }
+    }
+
+    function getRequestedCategory() {
+        return new URLSearchParams(window.location.search).get('category');
+    }
+
+    function findCategoryMenuItem(category) {
+        return Array.from(document.querySelectorAll('.menu-item'))
+            .find(item => item.textContent.trim().toLowerCase() === category.toLowerCase());
     }
 
     async function ensureCurrentUser() {
@@ -1442,7 +1466,7 @@
                         </div>` : ''}
                     ${isIssue ? `
                         <div class="notification-actions">
-                            <button onclick="showMessagesPanel(document.querySelectorAll('.menu-item')[6])">Continue Chat</button>
+                            <button onclick="showMessagesPanel(document.getElementById('messagesMenuItem'))">Continue Chat</button>
                             <button class="reject-btn" onclick="openReportPage(${notification.rentalRequestId})">Report User</button>
                             ${userIsOwner && ['PICKUP_DISPUTE', 'PICKUP_FAILED'].includes(status) ? `<button onclick="openPickupModal(${notification.rentalRequestId}, this)">Reschedule Pickup</button>` : ''}
                             <button onclick="cancelRental(${notification.rentalRequestId}, this)">Cancel Rental</button>
@@ -1606,7 +1630,7 @@
 
     async function openMessageWithUser(userId) {
         if (!userId) return;
-        await showMessagesPanel(document.querySelectorAll('.menu-item')[6]);
+        await showMessagesPanel(document.getElementById('messagesMenuItem'));
         const notification = latestNotifications.find(n => Number(n.borrowerUserId) === Number(userId) || Number(n.ownerUserId) === Number(userId));
         const name = notification && Number(notification.borrowerUserId) === Number(userId)
             ? (notification.borrowerName || 'Borrower')
@@ -1661,7 +1685,7 @@
         currentUser = null;
         localStorage.removeItem('toolmatesUser');
         applyAuthState(null);
-        filterCategory('Home', document.querySelectorAll('.menu-item')[0]);
+        filterCategory('Home', document.getElementById('homeMenuItem'));
     }
 
     async function getResponseError(response, fallbackMessage) {
@@ -1849,7 +1873,7 @@
             sessionStorage.removeItem('toolmatesOpenConversationUserId');
             sessionStorage.removeItem('toolmatesOpenConversationName');
             setTimeout(async () => {
-                await showMessagesPanel(document.querySelectorAll('.menu-item')[6]);
+                await showMessagesPanel(document.getElementById('messagesMenuItem'));
                 await loadConversationMessages(Number(conversationUserId), conversationName);
             }, 250);
         }
