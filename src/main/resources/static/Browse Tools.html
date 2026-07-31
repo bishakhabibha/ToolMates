@@ -113,7 +113,7 @@
     .search-teal-btn i { font-size: 19px; color: #ffffff; }
 
     .browse-container {
-      max-width: 1200px;
+      max-width: none;
       width: 100%;
       margin: 0 auto;
       padding: 28px 24px;
@@ -208,14 +208,15 @@
     .product-image-wrap {
       position: relative;
       width: 100%;
+      aspect-ratio: 25 / 18;
       overflow: hidden;
       border-radius: 12px;
     }
 
     .item-image-thumb {
       width: 100%;
-      height: auto;
-      aspect-ratio: 1 / 0.72;
+      height: 100%;
+      display: block;
       border-radius: 12px;
       object-fit: cover;
       flex-shrink: 0;

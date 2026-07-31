@@ -2,6 +2,7 @@ package com.javaproj.ToolMates.auth.repository;
 
 import com.javaproj.ToolMates.auth.model.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +84,7 @@ public class NotificationDao {
                     n.message_text AS messageText,
                     n.notification_type AS notificationType,
                     n.is_read AS isRead,
+                    n.is_read AS `read`,
                     n.created_at AS createdAt,
                     r.status AS rentalStatus,
                     r.start_date AS pickupDate,
@@ -117,7 +120,42 @@ public class NotificationDao {
                 WHERE n.user_id = ?
                 ORDER BY n.created_at DESC
                 """;
-        return jdbc.queryForList(sql, userId);
+        try {
+            return jdbc.queryForList(sql, userId);
+        } catch (DataAccessException ex) {
+            return findBasicDetailsByUserId(userId);
+        }
+    }
+
+    private List<Map<String, Object>> findBasicDetailsByUserId(Long userId) {
+        String sql = """
+                SELECT
+                    notification_id AS notificationId,
+                    user_id AS userId,
+                    rental_request_id AS rentalRequestId,
+                    message_text AS messageText,
+                    notification_type AS notificationType,
+                    is_read AS isRead,
+                    is_read AS `read`,
+                    created_at AS createdAt
+                FROM notifications
+                WHERE user_id = ?
+                ORDER BY created_at DESC
+                """;
+        return jdbc.query(sql, (rs, rowNum) -> {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("notificationId", rs.getLong("notificationId"));
+            row.put("userId", rs.getLong("userId"));
+            long rentalRequestId = rs.getLong("rentalRequestId");
+            row.put("rentalRequestId", rs.wasNull() ? null : rentalRequestId);
+            row.put("messageText", rs.getString("messageText"));
+            row.put("notificationType", rs.getString("notificationType"));
+            row.put("isRead", rs.getBoolean("isRead"));
+            row.put("read", rs.getBoolean("read"));
+            Timestamp createdAt = rs.getTimestamp("createdAt");
+            row.put("createdAt", createdAt == null ? null : createdAt.toLocalDateTime());
+            return row;
+        }, userId);
     }
 
     public int countUnread(Long userId) {
