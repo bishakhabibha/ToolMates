@@ -1139,6 +1139,7 @@
     let activeConversationUserId = null;
     let activeConversationName = '';
     let activePickupButton = null;
+    let activeContentView = 'home';
 
     function jumpToSlide(index) {
         const slides = document.querySelectorAll('.slide');
@@ -1211,9 +1212,11 @@
     }
 
     function filterCategory(category, element) {
+        activeContentView = 'tools';
         document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
         if (element) element.classList.add('active');
         if (category === 'Home') {
+            activeContentView = 'home';
             history.replaceState(null, '', 'dashboard.html');
         } else if (!['All', 'Reviews', 'My Account'].includes(category)) {
             history.replaceState(null, '', `dashboard.html?category=${encodeURIComponent(category)}`);
@@ -1311,6 +1314,7 @@
             });
             if (response.ok) {
                 cachedToolsList = await response.json();
+                if (activeContentView !== 'home') return;
                 const requestedCategory = getRequestedCategory();
                 if (requestedCategory) {
                     const categoryItem = findCategoryMenuItem(requestedCategory);
@@ -1369,6 +1373,7 @@
     }
 
     async function showNotificationPanel(element) {
+        activeContentView = 'notifications';
         document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
         if (element) element.classList.add('active');
         document.getElementById('promoBannerSection').style.display = 'none';
@@ -1383,14 +1388,49 @@
                 credentials: 'include',
                 headers: { 'Accept': 'application/json' }
             });
+            if (response.status === 401 || response.status === 403) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Please log in to view notifications.</p>';
+                return;
+            }
             if (!response.ok) throw new Error('Notification load failed');
             latestNotifications = await response.json();
             renderNotifications(latestNotifications);
-            await fetch('/api/notifications/me/read', { method: 'POST', credentials: 'include' });
-            refreshUnreadDot();
+            fetch('/api/notifications/me/read', { method: 'POST', credentials: 'include' })
+                .then(() => refreshUnreadDot())
+                .catch(error => console.error('Could not mark notifications read:', error));
         } catch (error) {
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Please log in to view notifications.</p>';
+            console.error('Could not show notifications:', error);
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #7f8c8d; padding: 40px 0;">Could not load notifications. Please try again.</p>';
         }
+    }
+
+    function getNotificationMeta(type) {
+        const metadata = {
+            rental_request: { title: 'Rental request', icon: 'ti-bell-plus', tone: 'type-action' },
+            rental_rejected: { title: 'Rental rejected', icon: 'ti-circle-x', tone: 'type-warning' },
+            pickup_details_available: { title: 'Pickup details ready', icon: 'ti-calendar-check', tone: 'type-action' },
+            pickup_confirmation_owner: { title: 'Confirm pickup', icon: 'ti-clipboard-check', tone: 'type-action' },
+            pickup_confirmation_borrower: { title: 'Confirm pickup', icon: 'ti-clipboard-check', tone: 'type-action' },
+            pickup_confirmation_waiting: { title: 'Pickup confirmation pending', icon: 'ti-hourglass', tone: 'type-warning' },
+            pickup_dispute: { title: 'Pickup issue', icon: 'ti-alert-circle', tone: 'type-warning' },
+            pickup_failed: { title: 'Pickup failed', icon: 'ti-alert-triangle', tone: 'type-warning' },
+            pickup_reminder_15: { title: 'Pickup reminder', icon: 'ti-clock', tone: 'type-action' },
+            pickup_reminder_5: { title: 'Pickup reminder', icon: 'ti-clock', tone: 'type-action' },
+            payment_confirmation_owner: { title: 'Confirm payment', icon: 'ti-cash', tone: 'type-action' },
+            payment_confirmation_borrower: { title: 'Confirm payment', icon: 'ti-cash', tone: 'type-action' },
+            payment_confirmation_waiting: { title: 'Payment confirmation pending', icon: 'ti-hourglass', tone: 'type-warning' },
+            payment_confirmation_reminder: { title: 'Payment reminder', icon: 'ti-receipt', tone: 'type-warning' },
+            payment_dispute: { title: 'Payment issue', icon: 'ti-alert-circle', tone: 'type-warning' },
+            payment_pending: { title: 'Payment pending', icon: 'ti-hourglass', tone: 'type-warning' },
+            rental_expiry_warning: { title: 'Rental ending soon', icon: 'ti-clock-exclamation', tone: 'type-warning' },
+            return_due_owner: { title: 'Return due', icon: 'ti-rotate-clockwise', tone: 'type-action' },
+            return_due_borrower: { title: 'Return due', icon: 'ti-rotate-clockwise', tone: 'type-action' },
+            return_confirmation: { title: 'Confirm return', icon: 'ti-circle-check', tone: 'type-action' },
+            return_confirmation_waiting: { title: 'Return confirmation pending', icon: 'ti-hourglass', tone: 'type-warning' },
+            report_required: { title: 'Report required', icon: 'ti-flag', tone: 'type-warning' },
+            message: { title: 'New message', icon: 'ti-message-circle', tone: 'type-action' }
+        };
+        return metadata[type] || { title: 'Notification', icon: 'ti-bell', tone: 'type-action' };
     }
 
     function renderNotifications(notifications) {
@@ -1708,6 +1748,7 @@
     }
 
     async function showMessagesPanel(element) {
+        activeContentView = 'messages';
         await ensureCurrentUser();
         document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
         if (element) element.classList.add('active');
@@ -1852,6 +1893,7 @@
 
     async function handleSearchSubmit(event) {
         if (event.key === 'Enter') {
+            activeContentView = 'tools';
             const query = event.target.value.trim();
             try {
                 const response = await fetch(`/api/tools/search?query=${encodeURIComponent(query)}`, {
